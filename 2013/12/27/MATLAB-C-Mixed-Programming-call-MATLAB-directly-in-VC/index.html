@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. Refer to the previous blog for details. call MATLAB directly in VC++.   This blog w">
+  <meta name="description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. Refer to the previous blog for details.  call MATLAB directly in VC++.    This blog will">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MATLAB&#x2F;C++ Mixed Programming: call MATLAB directly in VC++">
 <meta property="og:url" content="https://blog-tommyhu.github.io/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/index.html">
 <meta property="og:site_name" content="Yongtao Hu&#39;s blog">
-<meta property="og:description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. Refer to the previous blog for details. call MATLAB directly in VC++.   This blog w">
+<meta property="og:description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. Refer to the previous blog for details.  call MATLAB directly in VC++.    This blog will">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2013-12-27T05:04:22.000Z">
 <meta property="article:modified_time" content="2020-04-29T05:05:54.821Z">
@@ -241,37 +241,38 @@
 
       
         <p>There are two ways in VC++ to call MATLAB:</p>
-<ol type="1">
-<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-cmatlab.html" target="_blank" rel="noopener">previous blog</a> for details.</p></li>
-<li><p>call MATLAB directly in VC++.</p></li>
+<ol>
+<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-cmatlab.html" target="_blank" rel="noopener">previous blog</a> for details.</p>
+</li>
+<li><p>call MATLAB directly in VC++.</p>
+</li>
 </ol>
-<hr />
+<hr>
 <p>This blog will focus on the second approach (also the easier one).</p>
-<h5 id="pre-work">Pre-work:</h5>
-<ul>
+<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
 <li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
 <li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
-<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>): <figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></li>
+<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+</li>
 </ul>
-<h5 id="vc-setup">VC setup:</h5>
-<ol type="1">
+<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
 <li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
 <li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
 <li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
 <li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
 <li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
 <li><p>Call in VC++: refer to <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
-In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:
+<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
 <ul>
 <li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
 <li><code>string</code></li>
 <li>matrix</li>
 <li>gray-scale image</li>
 <li>RGB image</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-<h5 id="other-remarks">Other Remarks:</h5>
-<ul>
+<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
 <li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
 </ul>
 
@@ -361,7 +362,7 @@ In this cpp file, there are also ways to handle data passing of different types 
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#pre-work"><span class="nav-number">1.</span> <span class="nav-text">Pre-work:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#vc-setup"><span class="nav-number">2.</span> <span class="nav-text">VC setup:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#other-remarks"><span class="nav-number">3.</span> <span class="nav-text">Other Remarks:</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Pre-work"><span class="nav-number">1.</span> <span class="nav-text">Pre-work:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#VC-setup"><span class="nav-number">2.</span> <span class="nav-text">VC setup:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Other-Remarks"><span class="nav-number">3.</span> <span class="nav-text">Other Remarks:</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

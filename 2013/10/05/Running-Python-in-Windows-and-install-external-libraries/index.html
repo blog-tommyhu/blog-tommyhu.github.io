@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Setup Python environment in Windows: (using Anaconda)  Download Window&#39;s version Anaconda. Install (e.g. default to folder C:\Anaconda). Setup python system variable: new a system variable with na">
+  <meta name="description" content="Setup Python environment in Windows: (using Anaconda) Download Window’s version Anaconda. Install (e.g. default to folder C:\Anaconda). Setup python system variable: new a system variable with name PY">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Running Python in Windows and install external libraries">
 <meta property="og:url" content="https://blog-tommyhu.github.io/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/index.html">
 <meta property="og:site_name" content="Yongtao Hu&#39;s blog">
-<meta property="og:description" content="Setup Python environment in Windows: (using Anaconda)  Download Window&#39;s version Anaconda. Install (e.g. default to folder C:\Anaconda). Setup python system variable: new a system variable with na">
+<meta property="og:description" content="Setup Python environment in Windows: (using Anaconda) Download Window’s version Anaconda. Install (e.g. default to folder C:\Anaconda). Setup python system variable: new a system variable with name PY">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2013-10-05T05:07:14.000Z">
 <meta property="article:modified_time" content="2020-04-29T05:08:09.964Z">
@@ -238,40 +238,33 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="setup-python-environment-in-windows-using-anaconda">Setup Python environment in Windows: (using <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>)</h5>
-<ol type="1">
-<li>Download Window's version <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>.</li>
+        <h5 id="Setup-Python-environment-in-Windows-using-Anaconda"><a href="#Setup-Python-environment-in-Windows-using-Anaconda" class="headerlink" title="Setup Python environment in Windows: (using Anaconda)"></a>Setup Python environment in Windows: (using <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>)</h5><ol>
+<li>Download Window’s version <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>.</li>
 <li>Install (e.g. default to folder <code>C:\Anaconda</code>).</li>
 <li>Setup python system variable: new a system variable with name <code>PYTHONPATH</code> and value <code>C:\Anaconda\Lib\site-packages</code>.</li>
 </ol>
-<h5 id="install-external-libraries-3-different-ways">Install external libraries (3 different ways):</h5>
-<ol type="1">
-<li><strong>Install from Anaconda server:</strong></li>
-</ol>
-<ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda's start menu.</li>
+<h5 id="Install-external-libraries-3-different-ways"><a href="#Install-external-libraries-3-different-ways" class="headerlink" title="Install external libraries (3 different ways):"></a>Install external libraries (3 different ways):</h5><ol>
+<li><strong>Install from Anaconda server:</strong><ul>
+<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
 <li>To install <strong>py</strong> library, type <code>conda install py</code> (You can first type <code>conda search xxx</code> to search <strong>xxx</strong> library exist in Anaconda server or not, full list is available by type <code>conda list</code>).</li>
 </ul>
-<ol start="2" type="1">
-<li><strong>Install from external libraries directly:</strong> (Take <a href="https://code.google.com/p/protobuf/" target="_blank" rel="noopener"><strong>protobuf</strong></a> as an example in <code>C:\Libs\protobuf-2.4.1</code>)</li>
-</ol>
-<ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda's start menu.</li>
-<li>cd to protobuf's folder: <code>C:\Libs\protobuf-2.4.1\python</code>.</li>
+</li>
+<li><strong>Install from external libraries directly:</strong> (Take <a href="https://code.google.com/p/protobuf/" target="_blank" rel="noopener"><strong>protobuf</strong></a> as an example in <code>C:\Libs\protobuf-2.4.1</code>)<ul>
+<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
+<li>cd to protobuf’s folder: <code>C:\Libs\protobuf-2.4.1\python</code>.</li>
 <li>Build: <code>python setup.py build</code></li>
 <li>Install: <code>python setup.py install</code></li>
 <li>Done. Then you can e.g. <code>from google.protobuf import descriptor</code> and use e.g. <code>descriptor.FileDescriptor()</code> in <strong>.py</strong> source code.</li>
 </ul>
-<ol start="3" type="1">
-<li><strong>Install by copy files directly:</strong> (Take <strong>OpenCV</strong> as am example in <code>C:\Libs\OpenCV-2.3.1</code>)</li>
-</ol>
-<ul>
+</li>
+<li><strong>Install by copy files directly:</strong> (Take <strong>OpenCV</strong> as am example in <code>C:\Libs\OpenCV-2.3.1</code>)<ul>
 <li>Copy <strong>cy.py</strong> and <strong>cv2.pyd</strong> from folder <code>C:\Libs\OpenCV-2.3.1\build\python\2.7</code> to <code>C:\Anaconda\Lib\site-packages</code>.</li>
 <li>Done. Then you can <code>import cv/cv2</code> and use e.g. <code>cv2.imwrite()</code> in <strong>.py</strong> source code.</li>
 </ul>
-<h5 id="run-python">Run Python</h5>
-<ol type="1">
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda's start menu.</li>
+</li>
+</ol>
+<h5 id="Run-Python"><a href="#Run-Python" class="headerlink" title="Run Python"></a>Run Python</h5><ol>
+<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
 <li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
 <li>Run: <code>&gt; python xxx.py</code>.</li>
 </ol>
@@ -360,7 +353,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#setup-python-environment-in-windows-using-anaconda"><span class="nav-number">1.</span> <span class="nav-text">Setup Python environment in Windows: (using Anaconda)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#install-external-libraries-3-different-ways"><span class="nav-number">2.</span> <span class="nav-text">Install external libraries (3 different ways):</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#run-python"><span class="nav-number">3.</span> <span class="nav-text">Run Python</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Setup-Python-environment-in-Windows-using-Anaconda"><span class="nav-number">1.</span> <span class="nav-text">Setup Python environment in Windows: (using Anaconda)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Install-external-libraries-3-different-ways"><span class="nav-number">2.</span> <span class="nav-text">Install external libraries (3 different ways):</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Run-Python"><span class="nav-number">3.</span> <span class="nav-text">Run Python</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

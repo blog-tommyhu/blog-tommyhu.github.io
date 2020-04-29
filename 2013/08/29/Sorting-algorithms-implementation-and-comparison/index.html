@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Implementation: Implementation of 10 sorting algorithms can be found here, including 1. SelectionSort 2. InsertSort 3. ShellSort 4. BubbleSort 5. HeapSort 6. QuickSort 7. MergeSort 8. CountingSort 9.">
+  <meta name="description" content="Implementation:Implementation of 10 sorting algorithms can be found here, including  SelectionSort InsertSort ShellSort BubbleSort HeapSort QuickSort MergeSort CountingSort RadixSort BucketSort  Anima">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Sorting algorithms: implementation and comparison">
 <meta property="og:url" content="https://blog-tommyhu.github.io/2013/08/29/Sorting-algorithms-implementation-and-comparison/index.html">
 <meta property="og:site_name" content="Yongtao Hu&#39;s blog">
-<meta property="og:description" content="Implementation: Implementation of 10 sorting algorithms can be found here, including 1. SelectionSort 2. InsertSort 3. ShellSort 4. BubbleSort 5. HeapSort 6. QuickSort 7. MergeSort 8. CountingSort 9.">
+<meta property="og:description" content="Implementation:Implementation of 10 sorting algorithms can be found here, including  SelectionSort InsertSort ShellSort BubbleSort HeapSort QuickSort MergeSort CountingSort RadixSort BucketSort  Anima">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2013-08-29T05:09:21.000Z">
-<meta property="article:modified_time" content="2020-04-29T05:10:39.661Z">
+<meta property="article:modified_time" content="2020-04-29T05:34:01.264Z">
 <meta property="article:author" content="Yongtao Hu">
 <meta property="article:tag" content="coding">
 <meta property="article:tag" content="algorithm">
@@ -217,7 +217,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 13:10:39" itemprop="dateModified" datetime="2020-04-29T13:10:39+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 13:34:01" itemprop="dateModified" datetime="2020-04-29T13:34:01+08:00">2020-04-29</time>
               </span>
 
           
@@ -238,22 +238,24 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="implementation">Implementation:</h5>
-<p>Implementation of 10 sorting algorithms can be found <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/cplusplus/Sorting.cpp" target="_blank" rel="noopener">here</a>, including 1. SelectionSort 2. InsertSort 3. ShellSort 4. BubbleSort 5. HeapSort 6. QuickSort 7. MergeSort 8. CountingSort 9. RadixSort 10. BucketSort</p>
+        <h5 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation:"></a>Implementation:</h5><p>Implementation of 10 sorting algorithms can be found <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/cplusplus/Sorting.cpp" target="_blank" rel="noopener">here</a>, including</p>
+<ol>
+<li>SelectionSort</li>
+<li>InsertSort</li>
+<li>ShellSort</li>
+<li>BubbleSort</li>
+<li>HeapSort</li>
+<li>QuickSort</li>
+<li>MergeSort</li>
+<li>CountingSort</li>
+<li>RadixSort</li>
+<li>BucketSort</li>
+</ol>
 <p>Animation for above soring algorithms can be found <a href="http://www.cs.usfca.edu/~galles/visualization/Algorithms.html" target="_blank" rel="noopener">here</a>.</p>
-<h5 id="comparison">Comparison:</h5>
-<table style="width:100%;">
-<colgroup>
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-<col style="width: 14%" />
-</colgroup>
+<h5 id="Comparison"><a href="#Comparison" class="headerlink" title="Comparison:"></a>Comparison:</h5><div class="table-container">
+<table>
 <thead>
-<tr class="header">
+<tr>
 <th>Algorithm</th>
 <th>Average Time</th>
 <th>Worst Time</th>
@@ -264,99 +266,100 @@
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>SelectionSort</td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(C\)</span></td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$\checkmark$</td>
+<td>$C$</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td>InsertSort</td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(C\)</span></td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$O(n)$</td>
+<td>$\checkmark$</td>
+<td>$C$</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>ShellSort</td>
 <td><em>N/A</em></td>
 <td><em>N/A</em></td>
 <td><em>N/A</em></td>
 <td>x</td>
-<td><span class="math inline">\(C\)</span></td>
+<td>$C$</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td>BubbleSort</td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(C\)</span></td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$\checkmark$</td>
+<td>$C$</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>HeapSort</td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
 <td>x</td>
-<td><span class="math inline">\(C\)</span></td>
+<td>$C$</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td>QuickSort</td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
-<td><span class="math inline">\(O(n^2)\)</span></td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
+<td>$O(nlogn)$</td>
+<td>$O(n^2)$</td>
+<td>$O(nlogn)$</td>
 <td>x</td>
-<td><span class="math inline">\(C\)</span></td>
+<td>$C$</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr>
 <td>MergeSort</td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
-<td><span class="math inline">\(O(nlogn)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(n\)</span></td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>$\checkmark$</td>
+<td>$n$</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr>
 <td>CountingSort</td>
-<td><span class="math inline">\(O(n+k)\)</span></td>
-<td><span class="math inline">\(O(n+k)\)</span></td>
-<td><span class="math inline">\(O(n+k)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(n+k+C\)</span></td>
+<td>$O(n+k)$</td>
+<td>$O(n+k)$</td>
+<td>$O(n+k)$</td>
+<td>$\checkmark$</td>
+<td>$n+k+C$</td>
 <td>non-negative and within some range</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>RadixSort</td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(n+k+C\)</span></td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$\checkmark$</td>
+<td>$n+k+C$</td>
 <td>non-negative</td>
 </tr>
-<tr class="even">
+<tr>
 <td>BucketSort</td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(O(n)\)</span></td>
-<td><span class="math inline">\(\checkmark\)</span></td>
-<td><span class="math inline">\(2n+C\)</span></td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$\checkmark$</td>
+<td>$2n+C$</td>
 <td>elements distribute in buckets evenly and independent</td>
 </tr>
 </tbody>
 </table>
-<p>Note: <span class="math inline">\(C\)</span> is a small constant; <span class="math inline">\(k\)</span> is the max element; <span class="math inline">\(n\)</span> is the number of total elements. <em>N/A</em> means it depends on selection of increment value.</p>
+</div>
+<p>Note: $C$ is a small constant; $k$ is the max element; $n$ is the number of total elements. <em>N/A</em> means it depends on selection of increment value.</p>
 
     </div>
 
@@ -439,7 +442,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#implementation"><span class="nav-number">1.</span> <span class="nav-text">Implementation:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#comparison"><span class="nav-number">2.</span> <span class="nav-text">Comparison:</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Implementation"><span class="nav-number">1.</span> <span class="nav-text">Implementation:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Comparison"><span class="nav-number">2.</span> <span class="nav-text">Comparison:</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -574,6 +577,61 @@
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
