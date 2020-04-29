@@ -180,6 +180,171 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2020/04/29/Blogging-via-Hexo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon.png">
+      <meta itemprop="name" content="Yongtao Hu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yongtao Hu's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/29/Blogging-via-Hexo/" class="post-title-link" itemprop="url">Blogging via Hexo</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-04-29 16:54:16 / Modified: 20:53:16" itemprop="dateCreated datePublished" datetime="2020-04-29T16:54:16+08:00">2020-04-29</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2020/04/29/Blogging-via-Hexo/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/29/Blogging-via-Hexo/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>I recently moved my blog here using <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> instead of previous <a href="http://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a>, though the old version is still <a href="http://blog-ythu.github.io/" target="_blank" rel="noopener">available</a>. Hexo is a fast, simple &amp; powerful blog framework. Compared with Jekyll, Hexo is more flexible in terms of setup, post writing via Markdown, tags, themes, content searching, 3rd-part plugin support, etc.</p>
+<p>This post summarizes the setup steps of Hexo in Windows 10, which I hope will somehow help those who want to blog using Hexo as well.</p>
+<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
+<li>Install <a href="http://nodejs.org/" target="_blank" rel="noopener"><strong>Node.js</strong></a>. Verify installation via running <code>node -v</code> in cmd.</li>
+<li>Install <a href="http://git-scm.com/" target="_blank" rel="noopener"><strong>Git</strong></a>. Verify installation via running <code>git version</code> in cmd.</li>
+<li>Install <strong>Hexo</strong>. Run the following commands in cmd   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Init-blog"><a href="#Init-blog" class="headerlink" title="Init blog"></a>Init blog</h1><ol>
+<li>Open cmd in the target base folder.</li>
+<li>Run the following commands (assume blog root folder as <code>blog</code>):   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init blog</span><br><span class="line"><span class="built_in">cd</span> blog</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h1><h2 id="Setup-deploy-repo1"><a href="#Setup-deploy-repo1" class="headerlink" title="Setup deploy repo1"></a>Setup deploy repo<sup><a href="#fn_1" id="reffn_1">1</a></sup></h2><ol>
+<li>Create a Git repo, e.g. <code>blog</code> under <code>me</code> GitHub account.</li>
+<li>Add SSH Key to <code>me</code> GitHub account (assuming assocaited with email account <code>me@gmail.com</code>).<ol>
+<li>Open <strong>Git Bash</strong>.</li>
+<li>Run commands   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C me@gmail.com</span><br></pre></td></tr></table></figure></li>
+<li>Open created <code>id_rsa.pub</code> and copy all its content to <code>me</code> GitHub account.</li>
+</ol>
+</li>
+<li>Setup user info by running following commands in <strong>Git Bash</strong>   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">"user_name"</span></span><br><span class="line">git config --global user.email <span class="string">"email_address"</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Use-NexT-theme"><a href="#Use-NexT-theme" class="headerlink" title="Use NexT theme"></a>Use NexT theme</h2><ol>
+<li>Download <a href="https://github.com/theme-next/hexo-theme-next/releases" target="_blank" rel="noopener">NexT releases</a> and put it to <code>blog/themes/next</code>.</li>
+<li>Enable it by editing <code>blog/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">      <span class="attr">theme:</span> <span class="string">next</span></span><br><span class="line">      <span class="string">```</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">## Support global search[^2]</span></span><br><span class="line"><span class="number">1</span><span class="string">.</span> <span class="string">Install</span> <span class="string">plugin</span> <span class="string">`hexo-generator-searchdb`.</span> <span class="string">Run</span> <span class="string">following</span> <span class="string">commands</span> <span class="string">in</span> <span class="string">cmd.</span></span><br><span class="line">      <span class="string">```bash</span></span><br><span class="line">      <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-generator-searchdb</span> <span class="string">--save</span></span><br></pre></td></tr></table></figure></li>
+<li>Add following config to <code>blog/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># search</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line"><span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line"><span class="attr">field:</span> <span class="string">post</span></span><br><span class="line"><span class="attr">format:</span> <span class="string">html</span></span><br><span class="line"><span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure></li>
+<li>Enable in theme config, i.e. <code>blog/themes/next/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Local search</span></span><br><span class="line"><span class="attr">local_search:</span></span><br><span class="line">      <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Support-images-via-standard-Markdown5"><a href="#Support-images-via-standard-Markdown5" class="headerlink" title="Support images via standard Markdown5"></a>Support images via standard Markdown<sup><a href="#fn_5" id="reffn_5">5</a></sup></h2><ol>
+<li>Enable in config <code>blog/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">post_asset_folder:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
+<li>Run commend in cmd.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -s hexo-asset-link</span><br></pre></td></tr></table></figure></li>
+<li>Done! Add image in post using   <figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![<span class="string">Alt Text</span>](<span class="link">Post-Asset-Folder/image-name.png</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Support-LaTex-math-equations3"><a href="#Support-LaTex-math-equations3" class="headerlink" title="Support LaTex math equations3"></a>Support LaTex math equations<sup><a href="#fn_3" id="reffn_3">3</a></sup></h2><ol>
+<li>Install <strong>Kramed</strong> to replace <strong>Marked</strong>.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm uninstall hexo-renderer-marked --save</span><br><span class="line">npm install hexo-renderer-kramed --save</span><br></pre></td></tr></table></figure></li>
+<li>Config <code>blog/node_modules/hexo-renderer-kramed/lib/renderer.js</code>. Replace   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Change inline math rule</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatText</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Fit kramed's rule: $$ + \1 + $$</span></span><br><span class="line">      <span class="keyword">return</span> text.replace(<span class="regexp">/`\$(.*?)\$`/g</span>, <span class="string">'$$$$$1$$$$'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+   by   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Change inline math rule</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatText</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>Install <code>hexo-renderer-mathjax</code> to replace <code>hexo-math</code>.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm uninstall hexo-math --save</span><br><span class="line">npm install hexo-renderer-mathjax --save</span><br></pre></td></tr></table></figure></li>
+<li>Config Mathjax CDN in <code>blog/node_modules/hexo-renderer-mathjax/mathjax.html</code>. Config <code>&lt;script&gt;</code> as   <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li>Config <code>blog/node_modules/kramed/lib/rules/inline.js</code>.   <ol>
+<li>Replace    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">escape</span>: <span class="regexp">/^\\([\\`*&#123;&#125;\[\]()#$+\-.!_&gt;])/</span>,</span><br></pre></td></tr></table></figure>
+   by   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">escape</span>: <span class="regexp">/^\\([`*\[\]()# +\-.!_&gt;])/</span>,</span><br></pre></td></tr></table></figure></li>
+<li>Replace    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">em: <span class="regexp">/^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/</span>,</span><br></pre></td></tr></table></figure>
+   by   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">em: <span class="regexp">/^\*((?:\*\*|[\s\S])+?)\*(?!\*)/</span>,</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li>Enable Mathjax in <code>blog/themes/next/_config.yml</code>   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">mathjax:</span></span><br><span class="line">      <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
+<li>Enable in given post (only enable when needed for speed).   <figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: ...</span><br><span class="line">date: ...</span><br><span class="line">mathjax: true</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Support-Disqus-comments4"><a href="#Support-Disqus-comments4" class="headerlink" title="Support Disqus comments4"></a>Support Disqus comments<sup><a href="#fn_4" id="reffn_4">4</a></sup></h2><ol>
+<li>Setup on <a href="https://disqus.com/" target="_blank" rel="noopener">Disqus</a>.<ol>
+<li>Create an account and log into Disqus. </li>
+<li>Click the <code>GET STARTED</code> button.</li>
+<li>Click <code>I want to install Disqus on my site</code>.</li>
+<li>Enter <code>Website Name</code>, which will serve as your Disqus shortname, and select a <code>Category</code>.</li>
+<li>Click <code>Create Site</code> button.</li>
+<li>In <code>2. Install Disqus</code>, click <code>I don&#39;t see my platform listed, install manually with Universal Code</code>, and then click <code>Configure</code>.</li>
+<li>Click <code>Complete Setup</code>.</li>
+</ol>
+</li>
+<li>Config in <code>blog/themes/next/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">disqus:</span></span><br><span class="line">      <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">shortname:</span> <span class="string">your-short-disqus-name</span></span><br><span class="line">      <span class="attr">count:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Write-preview-amp-deploy"><a href="#Write-preview-amp-deploy" class="headerlink" title="Write, preview &amp; deploy"></a>Write, preview &amp; deploy</h1><ol>
+<li>Create a post, e.g. <code>first post</code>. This will add <code>blog/source/_posts/first-post.md</code>, which can be edited using any text/Markdown editor you want.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new <span class="string">"first post"</span></span><br></pre></td></tr></table></figure></li>
+<li>Build and preview posts (preview at <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>)   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate &amp;&amp; hexo server</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Note: While in preview, post edits will be updated in realtime (may require refreshing the preview page).</p>
+</blockquote>
+</li>
+<li>Deploy/publish. By default, it will be available at <a href="https://me.github.io" target="_blank" rel="noopener">https://me.github.io</a>.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g -d</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote id="fn_1">
+<sup>1</sup>. <a href="https://www.cnblogs.com/xsilence/p/6001938.html" target="_blank" rel="noopener">针对github权限导致hexo部署失败的解决方案</a><a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
+</blockquote>
+<blockquote id="fn_2">
+<sup>2</sup>. <a href="https://yashuning.github.io/2018/06/29/hexo-Next-%E4%B8%BB%E9%A2%98%E6%B7%BB%E5%8A%A0%E6%90%9C%E7%B4%A2%E5%8A%9F%E8%83%BD/" target="_blank" rel="noopener">hexo - Next 主题添加搜索功能</a><a href="#reffn_2" title="Jump back to footnote [2] in the text."> &#8617;</a>
+</blockquote>
+<blockquote id="fn_3">
+<sup>3</sup>. <a href="https://www.jianshu.com/p/e8d433a2c5b7" target="_blank" rel="noopener">如何在 hexo 中支持 Mathjax?</a><a href="#reffn_3" title="Jump back to footnote [3] in the text."> &#8617;</a>
+</blockquote>
+<blockquote id="fn_4">
+<sup>4</sup>. <a href="https://theme-next.org/docs/third-party-services/comments" target="_blank" rel="noopener">Comment Systems</a><a href="#reffn_4" title="Jump back to footnote [4] in the text."> &#8617;</a>
+</blockquote>
+<blockquote id="fn_5">
+<sup>5</sup>. <a href="https://chrismroberts.com/2020/01/06/using-markdown-in-hexo-to-add-images/" target="_blank" rel="noopener">Adding Images to Hexo Posts with Markdown</a><a href="#reffn_5" title="Jump back to footnote [5] in the text."> &#8617;</a>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2015/06/23/Track-memory-leaks-in-VS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1403,93 +1568,6 @@ The difference is that: the first method <strong>only copy the listed files</str
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2013/01/21/Character-encodings-of-text-files/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/icon.png">
-      <meta itemprop="name" content="Yongtao Hu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yongtao Hu's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2013/01/21/Character-encodings-of-text-files/" class="post-title-link" itemprop="url">Character encodings of text files</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2013-01-21 14:47:52" itemprop="dateCreated datePublished" datetime="2013-01-21T14:47:52+08:00">2013-01-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:19:53" itemprop="dateModified" datetime="2020-04-29T16:19:53+08:00">2020-04-29</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus: </span>
-    
-    <a title="disqus" href="/2013/01/21/Character-encodings-of-text-files/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/01/21/Character-encodings-of-text-files/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
-<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
-<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
-<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1561,14 +1639,14 @@ The difference is that: the first method <strong>only copy the listed files</str
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

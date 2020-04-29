@@ -180,6 +180,93 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2013/01/21/Character-encodings-of-text-files/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon.png">
+      <meta itemprop="name" content="Yongtao Hu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yongtao Hu's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2013/01/21/Character-encodings-of-text-files/" class="post-title-link" itemprop="url">Character encodings of text files</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2013-01-21 14:47:52" itemprop="dateCreated datePublished" datetime="2013-01-21T14:47:52+08:00">2013-01-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-04-29 16:19:53" itemprop="dateModified" datetime="2020-04-29T16:19:53+08:00">2020-04-29</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2013/01/21/Character-encodings-of-text-files/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/01/21/Character-encodings-of-text-files/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
+<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
+<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2013/01/02/Build-Boost-for-x32-x64-VC-compilers-on-Windows/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1762,197 +1849,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/icon.png">
-      <meta itemprop="name" content="Yongtao Hu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yongtao Hu's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/" class="post-title-link" itemprop="url">MATLAB/C++ Mixed Programming: distribute MATLAB code into independent C++ shared library</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2012-04-29 15:47:39" itemprop="dateCreated datePublished" datetime="2012-04-29T15:47:39+08:00">2012-04-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:31:43" itemprop="dateModified" datetime="2020-04-29T16:31:43+08:00">2020-04-29</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus: </span>
-    
-    <a title="disqus" href="/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>There are two ways in VC++ to call MATLAB:</p>
-<ol>
-<li>distribute MATLAB code into MATLAB independent C++ shared library.</li>
-<li>call MATLAB directly in VC++. Refer to the <a href="https://blog-tommyhu.github.io/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/">this blog</a> for details.</li>
-</ol>
-<p>This blog will focus on the first approach.</p>
-<hr>
-<p>Distributing MATLAB code into C++ libraries will enable us to call MATLAB in C++. This is further can be done to be MATLAB independent, which means we can call these libraries on any PC without MATLAB pre-installed. Also, good news is that, according to <a href="http://www.mathworks.com/support/solutions/en/data/1-GQC9MB/index.html" target="_blank" rel="noopener">MATLAB Support</a>, all deployed components and applications can be distributed free of charge. So, in this way, we can integrate MATLAB codes into our own product without concerning the license problem.</p>
-<hr>
-<p>In the following, I will show you how you can do this step by step.</p>
-<!-- add TOC here -->
-<div id="genTocHere"></div>
-
-<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><p>Take the following MATLAB function <code>myadd2.m</code> as an example, from which we want to generate MATLAB independent C++ shared library.</p>
-<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="Deploy-in-MATLAB"><a href="#Deploy-in-MATLAB" class="headerlink" title="Deploy in MATLAB:"></a>Deploy in MATLAB:</h2><ol>
-<li>Setup mex in MATLAB if needed, see <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-mex.html" target="_blank" rel="noopener">MATLAB/C++ Mixed Programming: setup mex in MATLAB</a>.</li>
-<li>>&gt; <code>mcc -C -W cpplib:libmyadd2 -T link:lib myadd2.m</code> (<code>-C</code> option is needed to generate <code>.ctf</code> file).</li>
-<li><p>Done. We can find the following files generated in the file folder.</p>
-<ul>
-<li><strong>libmyadd2.h</strong></li>
-<li><strong>libmyadd2.ctf</strong></li>
-<li><strong>libmyadd2.dll</strong></li>
-<li><strong>libmyadd2.lib</strong></li>
-<li>libmyadd2_mcc_component_data.c</li>
-<li>libmyadd2.cpp</li>
-<li>libmyadd2.exports</li>
-<li>libmyadd2.exp</li>
-<li><p>libmyadd2.prj</p>
-<p>Among these, only the first 4 will be needed to be called in VC.</p>
-</li>
-</ul>
-</li>
-</ol>
-<p>NOTE: alternately, we can use MATLAB <strong>deploytool</strong> to do this:</p>
-<ol>
-<li>>&gt; <code>deploytool</code></li>
-<li>Pre-setup: In the <strong>Deployment Project</strong> window, edit project <code>Name</code> (also the name for the generated .h/.lib/.dll files, <code>libmyadd2</code> here), <code>Location</code> and most importantly choose the deployment <code>Type</code> to be <code>C++ shared library</code> (4 types in total to choose from including <code>Windows Standalone Application</code>, <code>Console Application</code>, <code>C Shared Library and C++ Shared Library</code>; the other 3 are not fully tested).</li>
-<li>Add files: In the <strong>C++ Shared Library</strong> window, under <code>Build</code> menu, click <code>[Add files]</code> to add <code>myadd2.m</code> as our exported functions.</li>
-<li>Setup: Click <code>Actions</code> Button in the <code>C++ Shared Library</code> window <code>&gt; Settings… &gt; General &gt;</code> uncheck the <code>&#39;Embed CTF archive into the Application&#39;</code>. Note that if we leave this option checked by default, it will not generate <code>.ctf</code> file. Their differences are:<ul>
-<li>Without <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in system Temp folder, i.e. <code>C:\Users\tommyhu\AppData\Local\Temp\tommyhu\mcrCache7.17\myadd20</code>.</li>
-<li>With <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in VC++ solution folder, i.e. <code>C:\Users\tommyhu\Documents\visual studio 2010\Projects\test\libmyadd2_mcr</code>.</li>
-</ul>
-</li>
-<li>Build: Click <strong>Build</strong> Button in the <strong>C++ Shared Library window</strong> to do real building.</li>
-<li>Done. Under <code>..\folderWeSet\libmyadd2\distrib</code>, we will find all files we need including:<ul>
-<li><strong>libmyadd2.h</strong></li>
-<li><strong>libmyadd2.ctf</strong></li>
-<li><strong>libmyadd2.dll</strong></li>
-<li><strong>libmyadd2.lib</strong></li>
-</ul>
-</li>
-</ol>
-<h2 id="Setup-client-PC"><a href="#Setup-client-PC" class="headerlink" title="Setup client PC:"></a>Setup client PC:</h2><p>Note: skip this step if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version.</p>
-<ul>
-<li>Copy <strong>MCRInstaller.exe</strong> to client PC and install. Note that <strong>MCRInstaller.exe</strong> should be consistent with the MATLAB version. Usually you can find it under path like<code>…\MATLAB\R2012a\toolbox\compiler\deploy\win64</code>.</li>
-</ul>
-<p>Note: although we have generated MATLAB independent C++ shared libraries, we still need to slightly setup client PC in order to make it work. Actually we still need to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) of it, but at least not full of it, make it portable enough. In reality, we can package it together with our product (and install automatically).</p>
-<h2 id="Call-in-VC"><a href="#Call-in-VC" class="headerlink" title="Call in VC++:"></a>Call in VC++:</h2><ol>
-<li>Libraries preparation: copy the above 4 files into VC project.</li>
-<li>VC setup:<ul>
-<li>Add MATLAB Compiler Runtime include folder to project <code>Include files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\include</code>.</li>
-<li>Add MATLAB Compiler Runtime library folder to project <code>Library files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\lib\win64\microsoft</code>.</li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\runtime\win64;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\bin\win64</code>.</li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code>. (Note also to add <code>libmx.lib</code> and <code>libmat.lib</code> if you plan to use <code>mxArray</code> in your code.)</li>
-<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code>.</li>
-</ul>
-</li>
-<li>Calling: please refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB.cpp" target="_blank" rel="noopener"><code>VC_call_MATLAB.cpp</code></a>.</li>
-</ol>
-<p>Note that, if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version, you don’t need step 2 to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) because these have been included when you install MATLAB. Under this condition, instead, you can setup VC as follows:</p>
-<ul>
-<li>VC setup:<ul>
-<li>Add MATLAB include folder to project <strong>Include files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\include</code></li>
-<li>Add MATLAB library folder to project <strong>Library files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <strong>Linker&gt;Input&gt;Additional Dependencies</strong>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code></li>
-<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code></li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h2><ol>
-<li>When .m file that we want to distribute also calls several other .m files, we don’t need to particularly to indicate. The steps are the same: only the final .m file is need to be distributed.</li>
-<li>Different distributed shared libraries perform independently, i.e., they cannot share variables to work together. For example, it is impossible for one library to use the data created by another library, which will be released when its library ends.</li>
-<li><p><strong>Thread-safety</strong>: According to <a href="http://www.mathworks.com/help/matlab/matlab_external/using-matlab-engine.html" target="_blank" rel="noopener">MATLAB documentation</a>, MATLAB libraries are not thread-safe. If you create multithreaded applications, make sure only one thread accesses the engine application. For example, if you want to use the above <code>libmyadd2.lib</code>, use <code>ThreadLock.h/.cpp</code> as follows:</p>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ThreadLock.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> ThreadLock Lock;</span><br><span class="line">Lock.Lock();</span><br><span class="line">myadd2(<span class="number">2</span>, y, z, a, b);</span><br><span class="line">Lock.Unlock();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Type passing</strong>: Passing C++ native types to <code>mwArray</code> in order to call MATLAB</p>
-<ul>
-<li><p>When passing a grayscale <code>Mat</code> image, can use <code>mxINT8_CLASS</code> as follows.</p>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// assume we want to passing Mat img(rows, cols, CV_8UC1)</span></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">imgP</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(mat, mat);</span><br><span class="line">imgP.SetData(mat.ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>When passing a color <code>Mat</code> image (assume in format <code>CV_RGB</code>), currently no way is found to pass it directly. Possible way is to pass the r, g, b channels independently and then combine them to be a color image in MATLAB as follows.</p>
-<ul>
-<li><p>In VC++:</p>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// suppose we want to pass Mat img</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Mat&gt; channels; <span class="comment">// R, G, B channels</span></span><br><span class="line">split(img, channels);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">image_R</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_G</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_B</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(channels[<span class="number">0</span>], channels[<span class="number">0</span>]);</span><br><span class="line">transpose(channels[<span class="number">1</span>], channels[<span class="number">1</span>]);</span><br><span class="line">transpose(channels[<span class="number">2</span>], channels[<span class="number">2</span>]);</span><br><span class="line">image_R.SetData(channels[<span class="number">0</span>].ptr(), rows*cols);</span><br><span class="line">image_G.SetData(channels[<span class="number">1</span>].ptr(), rows*cols);</span><br><span class="line">image_B.SetData(channels[<span class="number">2</span>].ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>In MATLAB:</p>
- <figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">image(:,:,<span class="number">1</span>) = image_R;</span><br><span class="line">image(:,:,<span class="number">2</span>) = image_G;</span><br><span class="line">image(:,:,<span class="number">3</span>) = image_B;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>The way to define the input parameter based on a <code>string</code> or <code>char []</code> is as follows:</p>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ini input parameter: im_path based on string aString or char aString[]</span></span><br><span class="line"><span class="function">mwArray <span class="title">im_path</span><span class="params">(aString.c_str())</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>For passing other types, we had better to use double (<code>mxDOUBLE_CLASS</code>) instead of int (<code>mxINT8_CLASS</code>) even though it actually is a int.</p>
-</li>
-<li><p>For passing complex values:</p>
- <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// passing to MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rdata[<span class="number">4</span>] = &#123;<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>&#125;;</span><br><span class="line"><span class="keyword">double</span> idata[<span class="number">4</span>] = &#123;<span class="number">10.0</span>, <span class="number">20.0</span>, <span class="number">30.0</span>, <span class="number">40.0</span>&#125;;</span><br><span class="line"><span class="function">mwArray <span class="title">a</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, mxDOUBLE_CLASS, mxCOMPLEX)</span></span>;</span><br><span class="line">a.Real().SetData(rdata, <span class="number">4</span>);</span><br><span class="line">a.Imag().SetData(idata, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// get back from MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rbuffer[<span class="number">4</span>];</span><br><span class="line"><span class="keyword">double</span> ibuffer[<span class="number">4</span>];</span><br><span class="line">a.Real().GetData(rbuffer,<span class="number">4</span>);</span><br><span class="line">a.Imag().GetData(ibuffer,<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2024,14 +1920,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
