@@ -299,7 +299,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 12:53:57" itemprop="dateModified" datetime="2020-04-29T12:53:57+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:22:14" itemprop="dateModified" datetime="2020-04-29T16:22:14+08:00">2020-04-29</time>
               </span>
 
           
@@ -332,7 +332,7 @@
 <p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
 <p>Correct way to handle is:</p>
 <ol>
-<li>Download and extract <code>gbk2uni.exe</code> from <a href="https://bitbucket.org/herohuyongtao/files/downloads/gbk2uni.zip" target="_blank" rel="noopener">https://bitbucket.org/herohuyongtao/files/downloads/gbk2uni.zip</a> to the Latex source folder.</li>
+<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
 <li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
 <li>Run <code>pdflatex</code> again. Done!</li>
 </ol>
@@ -635,7 +635,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 13:05:54" itemprop="dateModified" datetime="2020-04-29T13:05:54+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:24:22" itemprop="dateModified" datetime="2020-04-29T16:24:22+08:00">2020-04-29</time>
               </span>
 
           
@@ -665,7 +665,7 @@ The difference is that: the first method <strong>only copy the listed files</str
       
           <p>There are two ways in VC++ to call MATLAB:</p>
 <ol>
-<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-cmatlab.html" target="_blank" rel="noopener">previous blog</a> for details.</p>
+<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
 </li>
 <li><p>call MATLAB directly in VC++.</p>
 </li>
@@ -684,7 +684,7 @@ The difference is that: the first method <strong>only copy the listed files</str
 <li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
 <li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
 <li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
-<li><p>Call in VC++: refer to <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
+<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
 <p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
 <ul>
 <li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
@@ -856,7 +856,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 13:34:01" itemprop="dateModified" datetime="2020-04-29T13:34:01+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:29:21" itemprop="dateModified" datetime="2020-04-29T16:29:21+08:00">2020-04-29</time>
               </span>
 
           
@@ -884,7 +884,7 @@ The difference is that: the first method <strong>only copy the listed files</str
     <div class="post-body" itemprop="articleBody">
 
       
-          <h5 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation:"></a>Implementation:</h5><p>Implementation of 10 sorting algorithms can be found <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/cplusplus/Sorting.cpp" target="_blank" rel="noopener">here</a>, including</p>
+          <h5 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation:"></a>Implementation:</h5><p>Implementation of 10 sorting algorithms can be found <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/Sorting.cpp" target="_blank" rel="noopener">here</a>, including</p>
 <ol>
 <li>SelectionSort</li>
 <li>InsertSort</li>
@@ -1438,7 +1438,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 14:49:24" itemprop="dateModified" datetime="2020-04-29T14:49:24+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:19:53" itemprop="dateModified" datetime="2020-04-29T16:19:53+08:00">2020-04-29</time>
               </span>
 
           
@@ -1467,7 +1467,7 @@ The difference is that: the first method <strong>only copy the listed files</str
 
       
           <p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
-<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another (has been integrated in <a href="https://bitbucket.org/herohuyongtao/useful-functions" target="_blank" rel="noopener">useful functions</a>).</p>
+<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
 <h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>

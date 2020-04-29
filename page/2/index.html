@@ -450,7 +450,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 15:06:42" itemprop="dateModified" datetime="2020-04-29T15:06:42+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:21:25" itemprop="dateModified" datetime="2020-04-29T16:21:25+08:00">2020-04-29</time>
               </span>
 
           
@@ -508,7 +508,7 @@
 </ol>
 <h2 id="error-LNK1000-Internal-error-during-IncrBuildImage"><a href="#error-LNK1000-Internal-error-during-IncrBuildImage" class="headerlink" title="error LNK1000: Internal error during IncrBuildImage"></a>error LNK1000: Internal error during IncrBuildImage</h2><p>This is common in VS2008, VS2010 fix this. Two ways to fix it:</p>
 <ol>
-<li>Install patch <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
+<li>Install patch <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
 <li>Two steps:<ol>
 <li><code>Project –&gt; Properties –&gt; Linker –&gt; General –&gt; Enable Incremental Linking –&gt; &#39;No&#39;</code>.</li>
 <li><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Program Database (/Zi)&#39;</code>.</li>
@@ -916,7 +916,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 15:32:24" itemprop="dateModified" datetime="2020-04-29T15:32:24+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:32:34" itemprop="dateModified" datetime="2020-04-29T16:32:34+08:00">2020-04-29</time>
               </span>
 
           
@@ -944,7 +944,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>In <a href="http://blog-ythu.github.io/2012/06/18/using-Libxml2/" target="_blank" rel="noopener">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
+          <p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
 <p>In the followings, I will show how to use MSXML to read/write xml files.</p>
 <h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
 <li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
@@ -1008,7 +1008,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 15:34:14" itemprop="dateModified" datetime="2020-04-29T15:34:14+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:30:49" itemprop="dateModified" datetime="2020-04-29T16:30:49+08:00">2020-04-29</time>
               </span>
 
           
@@ -1048,10 +1048,10 @@
 <li>Add path <code>&lt;GnuWin root&gt;/lib</code> to VC++ Library Directories.</li>
 <li>Add <code>libiconv.lib</code> and <code>libxml2.lib</code> to Project Linker Input Additional Dependencies.</li>
 <li>Copy <code>libxml2.dll</code> under path <code>&lt;Libxml2 root&gt;/bin</code> to project folder.</li>
-<li>Copy <a href="https://bitbucket.org/herohuyongtao/using-libxml2-library-in-vs/src/tip/src/Opencv2.3.1/iconv.dll" target="_blank" rel="noopener"><code>iconv.dll</code></a> and <a href="https://bitbucket.org/herohuyongtao/using-libxml2-library-in-vs/src/tip/src/Opencv2.3.1/zlib1.dll" target="_blank" rel="noopener"><code>zlib1.dll</code></a> to project folder.</li>
+<li>Copy <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs/-/blob/master/src/Opencv2.3.1/iconv.dll" target="_blank" rel="noopener"><code>iconv.dll</code></a> and <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs/-/blob/master/src/Opencv2.3.1/zlib1.dll" target="_blank" rel="noopener"><code>zlib1.dll</code></a> to project folder.</li>
 </ul>
 </li>
-<li>Do like <a href="https://bitbucket.org/herohuyongtao/using-libxml2-library-in-vs" target="_blank" rel="noopener">project</a> to read/write data from/to XML files.</li>
+<li>Do like <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs" target="_blank" rel="noopener">project</a> to read/write data from/to XML files.</li>
 </ol>
 
       
@@ -1797,7 +1797,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 15:48:51" itemprop="dateModified" datetime="2020-04-29T15:48:51+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:31:43" itemprop="dateModified" datetime="2020-04-29T16:31:43+08:00">2020-04-29</time>
               </span>
 
           
@@ -1828,7 +1828,7 @@
           <p>There are two ways in VC++ to call MATLAB:</p>
 <ol>
 <li>distribute MATLAB code into MATLAB independent C++ shared library.</li>
-<li>call MATLAB directly in VC++. Refer to the <a href="http://blog-ythu.github.io/2013/12/27/mixed-programming-call-MATLAB-directly/" target="_blank" rel="noopener">this blog</a> for details.</li>
+<li>call MATLAB directly in VC++. Refer to the <a href="https://blog-tommyhu.github.io/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/">this blog</a> for details.</li>
 </ol>
 <p>This blog will focus on the first approach.</p>
 <hr>
@@ -1893,7 +1893,7 @@
 <li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code>.</li>
 </ul>
 </li>
-<li>Calling: please refer to <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/cplusplus/VC_call_MATLAB.cpp" target="_blank" rel="noopener"><code>VC_call_MATLAB.cpp</code></a>.</li>
+<li>Calling: please refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB.cpp" target="_blank" rel="noopener"><code>VC_call_MATLAB.cpp</code></a>.</li>
 </ol>
 <p>Note that, if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version, you don’t need step 2 to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) because these have been included when you install MATLAB. Under this condition, instead, you can setup VC as follows:</p>
 <ul>
@@ -1909,7 +1909,7 @@
 <h2 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h2><ol>
 <li>When .m file that we want to distribute also calls several other .m files, we don’t need to particularly to indicate. The steps are the same: only the final .m file is need to be distributed.</li>
 <li>Different distributed shared libraries perform independently, i.e., they cannot share variables to work together. For example, it is impossible for one library to use the data created by another library, which will be released when its library ends.</li>
-<li><p><strong>Thread-safety</strong>: According to <a href="http://www.mathworks.com/help/matlab/matlab_external/using-matlab-engine.html" target="_blank" rel="noopener">MATLAB documentation</a>, MATLAB libraries are not thread-safe. If you create multithreaded applications, make sure only one thread accesses the engine application. For example, if you want to use the above <code>libmyadd2.lib</code>, use <a href="https://bitbucket.org/herohuyongtao/useful-functions" target="_blank" rel="noopener">ThreadLock.h/.cpp</a> as follows:</p>
+<li><p><strong>Thread-safety</strong>: According to <a href="http://www.mathworks.com/help/matlab/matlab_external/using-matlab-engine.html" target="_blank" rel="noopener">MATLAB documentation</a>, MATLAB libraries are not thread-safe. If you create multithreaded applications, make sure only one thread accesses the engine application. For example, if you want to use the above <code>libmyadd2.lib</code>, use <code>ThreadLock.h/.cpp</code> as follows:</p>
  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ThreadLock.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> ThreadLock Lock;</span><br><span class="line">Lock.Lock();</span><br><span class="line">myadd2(<span class="number">2</span>, y, z, a, b);</span><br><span class="line">Lock.Unlock();</span><br></pre></td></tr></table></figure>
 </li>
 <li><p><strong>Type passing</strong>: Passing C++ native types to <code>mwArray</code> in order to call MATLAB</p>

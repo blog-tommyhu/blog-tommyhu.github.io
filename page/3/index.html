@@ -813,7 +813,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:12:53" itemprop="dateModified" datetime="2020-04-29T16:12:53+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:28:22" itemprop="dateModified" datetime="2020-04-29T16:28:22+08:00">2020-04-29</time>
               </span>
 
           
@@ -846,8 +846,8 @@
 <li><strong>数据</strong>: 写在 <code>Doc</code> 中</li>
 <li><strong>变量</strong>: 在 <code>View.h</code> 中申明, 在 <code>View.cpp</code> 的构造函数中初始化, 在 <code>View.cpp</code> 的析构函数中释放</li>
 </ul>
-<h2 id="添加消息函数"><a href="#添加消息函数" class="headerlink" title="添加消息函数"></a>添加消息函数</h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="https://bytebucket.org/herohuyongtao/blog-files/raw/tip/images/clip_image001.png" target="_blank" rel="noopener"><strong>Messages</strong>图标</a> &gt; 找相应的</p>
-<h2 id="注册函数-ON-COMMAND"><a href="#注册函数-ON-COMMAND" class="headerlink" title="注册函数 ON_COMMAND"></a>注册函数 <code>ON_COMMAND</code></h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="https://bytebucket.org/herohuyongtao/blog-files/raw/tip/images/clip_image002.png" target="_blank" rel="noopener"><strong>Events</strong>图标</a> &gt; 找相应的<br>(注: 比如menu设置N选1型(menu 中选择其中之一会打钩$\checkmark$), 类似操作, 在每个项目的第二个点击添加, 然后代码类似如下:</p>
+<h2 id="添加消息函数"><a href="#添加消息函数" class="headerlink" title="添加消息函数"></a>添加消息函数</h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image001.png"><strong>Messages</strong>图标</a> &gt; 找相应的</p>
+<h2 id="注册函数-ON-COMMAND"><a href="#注册函数-ON-COMMAND" class="headerlink" title="注册函数 ON_COMMAND"></a>注册函数 <code>ON_COMMAND</code></h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image002.png"><strong>Events</strong>图标</a> &gt; 找相应的<br>(注: 比如menu设置N选1型(menu 中选择其中之一会打钩$\checkmark$), 类似操作, 在每个项目的第二个点击添加, 然后代码类似如下:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnUpdateButtonLighton</span><span class="params">(CCmdUI *pCmdUI)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your command update UI handler code here</span></span><br><span class="line">    pCmdUI-&gt;SetCheck(m_nLightState == LIGHT_ON);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="添加状态栏提示信息"><a href="#添加状态栏提示信息" class="headerlink" title="添加状态栏提示信息"></a>添加状态栏提示信息</h2><ul>
 <li><p>在<code>MainFrm.cpp</code>中添加文字占位符, 粗体为新添加</p>
@@ -925,7 +925,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:11:55" itemprop="dateModified" datetime="2020-04-29T16:11:55+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:28:46" itemprop="dateModified" datetime="2020-04-29T16:28:46+08:00">2020-04-29</time>
               </span>
 
           
@@ -953,7 +953,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://bitbucket.org/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
+          <h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://gitlab.com/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
 <h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p><code>RenderScene()</code> 函数里面只放绘制的东西, 计算的所有代码独立出去, 保证速度!</p>
 <h2 id="加速显示"><a href="#加速显示" class="headerlink" title="加速显示"></a>加速显示</h2><p>用显示列表, 把要绘制的语句写进显示列表, 然后只需要在 <code>RenderScene()</code> 中调用显示列表就行了, 如下:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// create one display list</span></span><br><span class="line">GLuint index = glGenLists(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// compile the display list, store a triangle in it</span></span><br><span class="line">glNewList(index, GL_COMPILE);</span><br><span class="line">glBegin(GL_TRIANGLES);</span><br><span class="line">glVertex3fv(v0);</span><br><span class="line">glVertex3fv(v1);</span><br><span class="line">glVertex3fv(v2);</span><br><span class="line">glEnd();</span><br><span class="line">glEndList();</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the display list</span></span><br><span class="line">glCallList(index);</span><br><span class="line"></span><br><span class="line"><span class="comment">// delete it if it is not used any more</span></span><br><span class="line">glDeleteLists(index, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>

@@ -28,7 +28,7 @@
 <meta property="og:description" content="We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. main.tex as an example: 12345678910\documentclass&amp;#123;article&amp;#125; \usepackage[english]&amp;#123">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2014-12-08T04:50:04.000Z">
-<meta property="article:modified_time" content="2020-04-29T04:53:57.509Z">
+<meta property="article:modified_time" content="2020-04-29T08:22:14.952Z">
 <meta property="article:author" content="Yongtao Hu">
 <meta property="article:tag" content="coding">
 <meta property="article:tag" content="latex">
@@ -217,7 +217,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 12:53:57" itemprop="dateModified" datetime="2020-04-29T12:53:57+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 16:22:14" itemprop="dateModified" datetime="2020-04-29T16:22:14+08:00">2020-04-29</time>
               </span>
 
           
@@ -257,7 +257,7 @@
 <p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
 <p>Correct way to handle is:</p>
 <ol>
-<li>Download and extract <code>gbk2uni.exe</code> from <a href="https://bitbucket.org/herohuyongtao/files/downloads/gbk2uni.zip" target="_blank" rel="noopener">https://bitbucket.org/herohuyongtao/files/downloads/gbk2uni.zip</a> to the Latex source folder.</li>
+<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
 <li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
 <li>Run <code>pdflatex</code> again. Done!</li>
 </ol>
