@@ -28,7 +28,7 @@
 <meta property="og:description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. Refer to the previous blog for details.  call MATLAB directly in VC++.    This blog will">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2013-12-27T05:04:22.000Z">
-<meta property="article:modified_time" content="2020-04-29T08:24:22.247Z">
+<meta property="article:modified_time" content="2020-04-29T13:18:20.227Z">
 <meta property="article:author" content="Yongtao Hu">
 <meta property="article:tag" content="coding">
 <meta property="article:tag" content="mixed_programming">
@@ -219,7 +219,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:24:22" itemprop="dateModified" datetime="2020-04-29T16:24:22+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:18:20" itemprop="dateModified" datetime="2020-04-29T21:18:20+08:00">2020-04-29</time>
               </span>
 
           
@@ -263,6 +263,7 @@
 </ol>
 <hr>
 <p>This blog will focus on the second approach (also the easier one).</p>
+<a id="more"></a>
 <h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
 <li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
 <li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>

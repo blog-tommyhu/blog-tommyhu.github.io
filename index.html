@@ -205,7 +205,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-04-29 16:54:16 / Modified: 20:53:16" itemprop="dateCreated datePublished" datetime="2020-04-29T16:54:16+08:00">2020-04-29</time>
+              <time title="Created: 2020-04-29 16:54:16 / Modified: 21:14:04" itemprop="dateCreated datePublished" datetime="2020-04-29T16:54:16+08:00">2020-04-29</time>
             </span>
 
           
@@ -235,98 +235,14 @@
       
           <p>I recently moved my blog here using <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> instead of previous <a href="http://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a>, though the old version is still <a href="http://blog-ythu.github.io/" target="_blank" rel="noopener">available</a>. Hexo is a fast, simple &amp; powerful blog framework. Compared with Jekyll, Hexo is more flexible in terms of setup, post writing via Markdown, tags, themes, content searching, 3rd-part plugin support, etc.</p>
 <p>This post summarizes the setup steps of Hexo in Windows 10, which I hope will somehow help those who want to blog using Hexo as well.</p>
-<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
-<li>Install <a href="http://nodejs.org/" target="_blank" rel="noopener"><strong>Node.js</strong></a>. Verify installation via running <code>node -v</code> in cmd.</li>
-<li>Install <a href="http://git-scm.com/" target="_blank" rel="noopener"><strong>Git</strong></a>. Verify installation via running <code>git version</code> in cmd.</li>
-<li>Install <strong>Hexo</strong>. Run the following commands in cmd   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="Init-blog"><a href="#Init-blog" class="headerlink" title="Init blog"></a>Init blog</h1><ol>
-<li>Open cmd in the target base folder.</li>
-<li>Run the following commands (assume blog root folder as <code>blog</code>):   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo init blog</span><br><span class="line"><span class="built_in">cd</span> blog</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h1><h2 id="Setup-deploy-repo1"><a href="#Setup-deploy-repo1" class="headerlink" title="Setup deploy repo1"></a>Setup deploy repo<sup><a href="#fn_1" id="reffn_1">1</a></sup></h2><ol>
-<li>Create a Git repo, e.g. <code>blog</code> under <code>me</code> GitHub account.</li>
-<li>Add SSH Key to <code>me</code> GitHub account (assuming assocaited with email account <code>me@gmail.com</code>).<ol>
-<li>Open <strong>Git Bash</strong>.</li>
-<li>Run commands   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C me@gmail.com</span><br></pre></td></tr></table></figure></li>
-<li>Open created <code>id_rsa.pub</code> and copy all its content to <code>me</code> GitHub account.</li>
-</ol>
-</li>
-<li>Setup user info by running following commands in <strong>Git Bash</strong>   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">"user_name"</span></span><br><span class="line">git config --global user.email <span class="string">"email_address"</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Use-NexT-theme"><a href="#Use-NexT-theme" class="headerlink" title="Use NexT theme"></a>Use NexT theme</h2><ol>
-<li>Download <a href="https://github.com/theme-next/hexo-theme-next/releases" target="_blank" rel="noopener">NexT releases</a> and put it to <code>blog/themes/next</code>.</li>
-<li>Enable it by editing <code>blog/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">      <span class="attr">theme:</span> <span class="string">next</span></span><br><span class="line">      <span class="string">```</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">## Support global search[^2]</span></span><br><span class="line"><span class="number">1</span><span class="string">.</span> <span class="string">Install</span> <span class="string">plugin</span> <span class="string">`hexo-generator-searchdb`.</span> <span class="string">Run</span> <span class="string">following</span> <span class="string">commands</span> <span class="string">in</span> <span class="string">cmd.</span></span><br><span class="line">      <span class="string">```bash</span></span><br><span class="line">      <span class="string">npm</span> <span class="string">install</span> <span class="string">hexo-generator-searchdb</span> <span class="string">--save</span></span><br></pre></td></tr></table></figure></li>
-<li>Add following config to <code>blog/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># search</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line"><span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line"><span class="attr">field:</span> <span class="string">post</span></span><br><span class="line"><span class="attr">format:</span> <span class="string">html</span></span><br><span class="line"><span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure></li>
-<li>Enable in theme config, i.e. <code>blog/themes/next/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Local search</span></span><br><span class="line"><span class="attr">local_search:</span></span><br><span class="line">      <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Support-images-via-standard-Markdown5"><a href="#Support-images-via-standard-Markdown5" class="headerlink" title="Support images via standard Markdown5"></a>Support images via standard Markdown<sup><a href="#fn_5" id="reffn_5">5</a></sup></h2><ol>
-<li>Enable in config <code>blog/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">post_asset_folder:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
-<li>Run commend in cmd.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -s hexo-asset-link</span><br></pre></td></tr></table></figure></li>
-<li>Done! Add image in post using   <figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![<span class="string">Alt Text</span>](<span class="link">Post-Asset-Folder/image-name.png</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Support-LaTex-math-equations3"><a href="#Support-LaTex-math-equations3" class="headerlink" title="Support LaTex math equations3"></a>Support LaTex math equations<sup><a href="#fn_3" id="reffn_3">3</a></sup></h2><ol>
-<li>Install <strong>Kramed</strong> to replace <strong>Marked</strong>.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm uninstall hexo-renderer-marked --save</span><br><span class="line">npm install hexo-renderer-kramed --save</span><br></pre></td></tr></table></figure></li>
-<li>Config <code>blog/node_modules/hexo-renderer-kramed/lib/renderer.js</code>. Replace   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Change inline math rule</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatText</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Fit kramed's rule: $$ + \1 + $$</span></span><br><span class="line">      <span class="keyword">return</span> text.replace(<span class="regexp">/`\$(.*?)\$`/g</span>, <span class="string">'$$$$$1$$$$'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-   by   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Change inline math rule</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">formatText</span>(<span class="params">text</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> text;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>Install <code>hexo-renderer-mathjax</code> to replace <code>hexo-math</code>.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm uninstall hexo-math --save</span><br><span class="line">npm install hexo-renderer-mathjax --save</span><br></pre></td></tr></table></figure></li>
-<li>Config Mathjax CDN in <code>blog/node_modules/hexo-renderer-mathjax/mathjax.html</code>. Config <code>&lt;script&gt;</code> as   <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>Config <code>blog/node_modules/kramed/lib/rules/inline.js</code>.   <ol>
-<li>Replace    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">escape</span>: <span class="regexp">/^\\([\\`*&#123;&#125;\[\]()#$+\-.!_&gt;])/</span>,</span><br></pre></td></tr></table></figure>
-   by   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">escape</span>: <span class="regexp">/^\\([`*\[\]()# +\-.!_&gt;])/</span>,</span><br></pre></td></tr></table></figure></li>
-<li>Replace    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">em: <span class="regexp">/^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/</span>,</span><br></pre></td></tr></table></figure>
-   by   <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">em: <span class="regexp">/^\*((?:\*\*|[\s\S])+?)\*(?!\*)/</span>,</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li>Enable Mathjax in <code>blog/themes/next/_config.yml</code>   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">mathjax:</span></span><br><span class="line">      <span class="attr">enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
-<li>Enable in given post (only enable when needed for speed).   <figure class="highlight md"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: ...</span><br><span class="line">date: ...</span><br><span class="line">mathjax: true</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Support-Disqus-comments4"><a href="#Support-Disqus-comments4" class="headerlink" title="Support Disqus comments4"></a>Support Disqus comments<sup><a href="#fn_4" id="reffn_4">4</a></sup></h2><ol>
-<li>Setup on <a href="https://disqus.com/" target="_blank" rel="noopener">Disqus</a>.<ol>
-<li>Create an account and log into Disqus. </li>
-<li>Click the <code>GET STARTED</code> button.</li>
-<li>Click <code>I want to install Disqus on my site</code>.</li>
-<li>Enter <code>Website Name</code>, which will serve as your Disqus shortname, and select a <code>Category</code>.</li>
-<li>Click <code>Create Site</code> button.</li>
-<li>In <code>2. Install Disqus</code>, click <code>I don&#39;t see my platform listed, install manually with Universal Code</code>, and then click <code>Configure</code>.</li>
-<li>Click <code>Complete Setup</code>.</li>
-</ol>
-</li>
-<li>Config in <code>blog/themes/next/_config.yml</code>.   <figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">disqus:</span></span><br><span class="line">      <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">shortname:</span> <span class="string">your-short-disqus-name</span></span><br><span class="line">      <span class="attr">count:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="Write-preview-amp-deploy"><a href="#Write-preview-amp-deploy" class="headerlink" title="Write, preview &amp; deploy"></a>Write, preview &amp; deploy</h1><ol>
-<li>Create a post, e.g. <code>first post</code>. This will add <code>blog/source/_posts/first-post.md</code>, which can be edited using any text/Markdown editor you want.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new <span class="string">"first post"</span></span><br></pre></td></tr></table></figure></li>
-<li>Build and preview posts (preview at <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>)   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate &amp;&amp; hexo server</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Note: While in preview, post edits will be updated in realtime (may require refreshing the preview page).</p>
-</blockquote>
-</li>
-<li>Deploy/publish. By default, it will be available at <a href="https://me.github.io" target="_blank" rel="noopener">https://me.github.io</a>.   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g -d</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<blockquote id="fn_1">
-<sup>1</sup>. <a href="https://www.cnblogs.com/xsilence/p/6001938.html" target="_blank" rel="noopener">针对github权限导致hexo部署失败的解决方案</a><a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_2">
-<sup>2</sup>. <a href="https://yashuning.github.io/2018/06/29/hexo-Next-%E4%B8%BB%E9%A2%98%E6%B7%BB%E5%8A%A0%E6%90%9C%E7%B4%A2%E5%8A%9F%E8%83%BD/" target="_blank" rel="noopener">hexo - Next 主题添加搜索功能</a><a href="#reffn_2" title="Jump back to footnote [2] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_3">
-<sup>3</sup>. <a href="https://www.jianshu.com/p/e8d433a2c5b7" target="_blank" rel="noopener">如何在 hexo 中支持 Mathjax?</a><a href="#reffn_3" title="Jump back to footnote [3] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_4">
-<sup>4</sup>. <a href="https://theme-next.org/docs/third-party-services/comments" target="_blank" rel="noopener">Comment Systems</a><a href="#reffn_4" title="Jump back to footnote [4] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_5">
-<sup>5</sup>. <a href="https://chrismroberts.com/2020/01/06/using-markdown-in-hexo-to-add-images/" target="_blank" rel="noopener">Adding Images to Hexo Posts with Markdown</a><a href="#reffn_5" title="Jump back to footnote [5] in the text."> &#8617;</a>
-</blockquote>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/29/Blogging-via-Hexo/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -376,7 +292,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-28 21:54:37" itemprop="dateModified" datetime="2020-04-28T21:54:37+08:00">2020-04-28</time>
+                <time title="Modified: 2020-04-29 21:16:02" itemprop="dateModified" datetime="2020-04-29T21:16:02+08:00">2020-04-29</time>
               </span>
 
           
@@ -405,16 +321,14 @@
 
       
           <p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
-<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
-<p>Note that:</p>
-<ol>
-<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
-<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
-</ol>
-<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2015/06/23/Track-memory-leaks-in-VS/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -464,7 +378,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:22:14" itemprop="dateModified" datetime="2020-04-29T16:22:14+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:16:31" itemprop="dateModified" datetime="2020-04-29T21:16:31+08:00">2020-04-29</time>
               </span>
 
           
@@ -493,31 +407,14 @@
 
       
           <p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
-<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
-<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
-<p>Correct way to handle is:</p>
-<ol>
-<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
-<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
-<li>Run <code>pdflatex</code> again. Done!</li>
-</ol>
-<hr>
-<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
-<ol>
-<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
-<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
-<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
-<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
-</ol>
-<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
-<hr>
-<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
-<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
-<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2014/12/08/Handle-Chinese-bookmarks-in-Latex/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -567,7 +464,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 12:56:31" itemprop="dateModified" datetime="2020-04-29T12:56:31+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:16:47" itemprop="dateModified" datetime="2020-04-29T21:16:47+08:00">2020-04-29</time>
               </span>
 
           
@@ -596,26 +493,14 @@
 
       
           <h2 id="CMakeLists-txt-for-Lib-project"><a href="#CMakeLists-txt-for-Lib-project" class="headerlink" title="CMakeLists.txt for Lib project:"></a>CMakeLists.txt for Lib project:</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># add path of headers to include_directories</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC for static lib, and SHARED for dynamic</span></span><br><span class="line"><span class="keyword">FILE</span>(GLOB SOURCES</span><br><span class="line">	src/*.h</span><br><span class="line">    src/*.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># link libs, list all of them</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(mylib</span><br><span class="line">    -lib-name-.lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<h2 id="CMakeLists-txt-for-EXE-project"><a href="#CMakeLists-txt-for-EXE-project" class="headerlink" title="CMakeLists.txt for EXE project:"></a>CMakeLists.txt for EXE project:</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Set the minimum required version of cmake.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the entire solution name.</span></span><br><span class="line"><span class="keyword">project</span>(testProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add path of headers to include_directories.</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"><span class="keyword">include_directories</span>(lib/mylib)</span><br><span class="line"><span class="keyword">include_directories</span>(external/-external-lib-/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add an executable to the project using the specified source files.</span></span><br><span class="line"><span class="keyword">file</span>(GLOB SOURCES</span><br><span class="line">    src/*.*</span><br><span class="line">	lib/-external-lib-/source/*.h</span><br><span class="line">    lib/-external-lib-/source/*.cpp</span><br><span class="line">    <span class="keyword">test</span>/main.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add mylib lib project</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(lib/mylib)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> mylib)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add opencv lib</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV <span class="number">2</span> REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;OPENCV_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;OPENCV_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;OPENCV_DEFINITIONS&#125;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span><span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><ol>
-<li>For <strong><code>add_executable()</code></strong>: actually there is no need to add headers here, but is essential to load them also in project view.</li>
-<li>To use name that contains spaces, use <code>\</code> before spaces to escape them.</li>
-<li>To group source files in VS (e.g. put given source files into new folder under VS), use<ul>
-<li><code>source_group(&lt;name&gt; FILES &lt;src&gt;...)</code> (use <code>${SOURCES}</code> for  files list defined earlier), or</li>
-<li><code>source_group(&lt;name&gt; REGULAR_EXPRESSION &lt;regex&gt;)</code> (e.g. use <code>.*..*</code> for normal <code>*.*</code>)</li>
-</ul>
-</li>
-<li>Link different libraries for Debug and Release mode: <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">target_link_libraries</span>(testProj</span><br><span class="line">      debug -path-to-debug-lib-/lib_debug.lib</span><br><span class="line">optimized -path-to-release-lib-/lib.lib</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></li>
-<li>CMake for setting highest warning level can be: <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># set highest warnings level, and treat them as errors</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="comment"># c++</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_CXX_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># c</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_C_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUCC <span class="keyword">OR</span> CMAKE_COMPILER_IS_GNUCXX)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
-<li>Enable OpenMP: <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># enable openmp</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenMP)</span><br><span class="line"><span class="keyword">if</span> (OPENMP_FOUND)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; $&#123;OpenMP_C_FLAGS&#125;"</span>)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; $&#123;OpenMP_CXX_FLAGS&#125;"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
-<li>for copying all needed data files to binary dir (when <code>cmake</code>), there are two ways:<ul>
-<li>List all the files, e.g.,  <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data/*.*</span><br><span class="line">	lib/-external-lib-/models/*.dat</span><br><span class="line">	lib/-matlab-/*.m</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure></li>
-<li>List only the folders that contain the data, e.g.,  <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data</span><br><span class="line">	lib/-external-lib-/models</span><br><span class="line">	lib/-matlab-</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure>
-The difference is that: the first method <strong>only copy the listed files</strong> to the binary dir <strong>without directory structure</strong>, while the second will <strong>copy all the files in these folders</strong>, as well as <strong>with directory structure</strong> (only the least parent will retain), i.e. there will be three folders named <code>test-data</code>, <code>models</code> and <code>-matlab-</code> in the binary dir after copying.</li>
-</ul>
-</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2014/09/25/CMake-sumup/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -665,7 +550,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 13:03:08" itemprop="dateModified" datetime="2020-04-29T13:03:08+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:17:00" itemprop="dateModified" datetime="2020-04-29T21:17:00+08:00">2020-04-29</time>
               </span>
 
           
@@ -697,60 +582,14 @@ The difference is that: the first method <strong>only copy the listed files</str
 <li><a href="http://denniskubes.com/2012/08/20/is-c-pass-by-value-or-reference/" target="_blank" rel="noopener">everything is pass-by-value</a></li>
 <li><a href="http://stackoverflow.com/a/21950708/2589776" target="_blank" rel="noopener">cannot declare functions inside <code>struct</code></a></li>
 </ul>
-<h5 id="C-1"><a href="#C-1" class="headerlink" title="C++"></a>C++</h5><ul>
-<li>string literal<ul>
-<li><a href="http://stackoverflow.com/a/164229/2589776" target="_blank" rel="noopener"><code>char *str=&quot;string&quot;;</code> vs. <code>char str[]=&quot;string&quot;;</code></a></li>
-<li><a href="http://stackoverflow.com/a/24760066/2589776" target="_blank" rel="noopener">life-time of string literal</a> [<a href="http://stackoverflow.com/q/9970295/2589776" target="_blank" rel="noopener">2</a>]</li>
-<li><a href="http://stackoverflow.com/a/24804277/2589776" target="_blank" rel="noopener">adjacent string literals are concatenated in translation phase 6</a></li>
-</ul>
-</li>
-<li><a href="http://stackoverflow.com/a/23544364/2589776" target="_blank" rel="noopener">array decayed to pointer: when &amp; when not</a></li>
-<li><a href="http://stackoverflow.com/q/57483/2589776" target="_blank" rel="noopener">pointer vs. reference</a></li>
-<li><a href="http://stackoverflow.com/a/24807698/2589776" target="_blank" rel="noopener">compare pointers</a></li>
-<li><a href="http://stackoverflow.com/a/54596/2589776" target="_blank" rel="noopener"><code>class</code> vs. <code>struct</code></a></li>
-<li><a href="http://stackoverflow.com/q/332030/2589776" target="_blank" rel="noopener"><code>static_cast</code> vs. <code>dynamic_cast</code> vs. <code>const_cast</code> vs. <code>reinterpret_cast</code></a></li>
-<li><a href="http://stackoverflow.com/a/22383496/2589776" target="_blank" rel="noopener"><code>cout double</code> value with full precision</a></li>
-<li><a href="http://stackoverflow.com/a/21375753/2589776" target="_blank" rel="noopener">Why <code>cout</code> works weird for <code>unsigned char</code></a>?</li>
-<li><a href="http://stackoverflow.com/a/162615/2589776" target="_blank" rel="noopener"><code>const</code> reading</a> | <a href="http://stackoverflow.com/a/22419598/2589776" target="_blank" rel="noopener">cvqualifiers</a> | <a href="http://www.parashift.com/c++-faq-lite/const-correctness.html" target="_blank" rel="noopener"><code>const</code> correctness</a> | <a href="http://duramecho.com/ComputerInformation/WhyHowCppConst.html" target="_blank" rel="noopener">The C++ <code>const</code> Declaration: Why &amp; How</a> | <a href="http://stackoverflow.com/a/751783/2589776" target="_blank" rel="noopener"><code>const</code> member function</a></li>
-<li><a href="http://stackoverflow.com/q/22410531/2589776" target="_blank" rel="noopener">get the type of an array element</a></li>
-<li><a href="http://stackoverflow.com/a/47990/2589776" target="_blank" rel="noopener">set, clear, toggle, and check a single bit</a></li>
-<li><a href="http://stackoverflow.com/q/5605125/2589776" target="_blank" rel="noopener"><code>iostream::eof</code> inside a loop condition is wrong!!!</a></li>
-<li><a href="http://stackoverflow.com/a/23042974/2589776" target="_blank" rel="noopener"><code>set</code> with custom comparator</a></li>
-<li><a href="http://stackoverflow.com/q/4176328/2589776" target="_blank" rel="noopener">Undefined Behavior and Sequence Points</a></li>
-<li><a href="http://stackoverflow.com/q/10195343/2589776" target="_blank" rel="noopener">copy files (for all types/without knowing types)</a></li>
-</ul>
-<h5 id="OpenCV"><a href="#OpenCV" class="headerlink" title="OpenCV"></a>OpenCV</h5><ul>
-<li><a href="http://www.anlak.com/2012/10/using-opencv-2-4-x-with-visual-studio-2010-tutorial.html" target="_blank" rel="noopener">setup in VS</a></li>
-<li><a href="http://stackoverflow.com/a/20730585/2589776" target="_blank" rel="noopener">missing dll issues</a></li>
-<li><a href="http://stackoverflow.com/a/23486280/2589776" target="_blank" rel="noopener">automatic memory management (e.g. <code>Mat</code>)</a></li>
-<li><a href="http://stackoverflow.com/a/21336627/2589776" target="_blank" rel="noopener"><code>waitKey()</code></a></li>
-<li><a href="http://stackoverflow.com/a/21421342/2589776" target="_blank" rel="noopener"><code>imwrite()</code> supported types</a></li>
-<li>comma-separated initializer for <code>Mat</code>: <code>Mat mat = (Mat_&lt;float&gt;(2,3) &lt;&lt; 1, 2, 3, 4, 5, 6);</code></li>
-<li><a href="http://stackoverflow.com/a/22329736/2589776" target="_blank" rel="noopener">apply function to each image pixel</a></li>
-<li><a href="http://stackoverflow.com/q/23510571/2589776" target="_blank" rel="noopener">set all <code>Mat</code> values at given channel to given value</a></li>
-<li><a href="http://stackoverflow.com/a/23573442/2589776" target="_blank" rel="noopener">set <code>Mat</code> values given condition</a></li>
-<li><a href="http://stackoverflow.com/a/26685567/2589776" target="_blank" rel="noopener">convertion from <code>Mat</code> to <code>vector</code></a></li>
-<li><a href="http://stackoverflow.com/a/30828747/2589776" target="_blank" rel="noopener">create rotated rectangular or polygonal ROI/mask</a></li>
-<li><a href="http://stackoverflow.com/a/11412325/2589776" target="_blank" rel="noopener"><code>kmeans()</code> on color images (per pixel [RGB] as a sample)</a></li>
-<li><a href="http://stackoverflow.com/a/22374195/2589776" target="_blank" rel="noopener">HOG feature</a> | <a href="http://stackoverflow.com/a/20805153/2589776" target="_blank" rel="noopener"><code>CascadeClassifier::detectMultiScale()</code> parameters</a></li>
-</ul>
-<h5 id="Dos"><a href="#Dos" class="headerlink" title="Dos"></a>Dos</h5><ul>
-<li><a href="http://stackoverflow.com/a/12049845/2589776" target="_blank" rel="noopener">Rename and move files in batch</a></li>
-</ul>
-<h5 id="Mixed-Programming"><a href="#Mixed-Programming" class="headerlink" title="Mixed Programming"></a>Mixed Programming</h5><ul>
-<li><a href="http://stackoverflow.com/a/23063703/2589776" target="_blank" rel="noopener">Matlab/C++ - mixed programming</a></li>
-<li><a href="http://stackoverflow.com/q/27697451/2589776" target="_blank" rel="noopener">Matlab/OpenCV - <code>Mat</code> transfering through XML</a></li>
-</ul>
-<h5 id="Regex"><a href="#Regex" class="headerlink" title="Regex"></a>Regex</h5><ul>
-<li><a href="http://stackoverflow.com/q/22937618/2589776" target="_blank" rel="noopener">reference list</a></li>
-<li><a href="http://stackoverflow.com/a/23563821/2589776" target="_blank" rel="noopener">find/replace in VS</a></li>
-</ul>
-<h5 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h5><ul>
-<li><a href="http://stackoverflow.com/a/20844851/2589776" target="_blank" rel="noopener">Convert recursion to iteration</a></li>
-</ul>
-<hr>
-<p><strong>Note</strong>: If one thread is both applied to C and C++, I will put it in C++.</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2014/04/13/Good-refs-on-Stack-Overflow/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -800,7 +639,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:24:22" itemprop="dateModified" datetime="2020-04-29T16:24:22+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:18:20" itemprop="dateModified" datetime="2020-04-29T21:18:20+08:00">2020-04-29</time>
               </span>
 
           
@@ -837,33 +676,14 @@ The difference is that: the first method <strong>only copy the listed files</str
 </ol>
 <hr>
 <p>This blog will focus on the second approach (also the easier one).</p>
-<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
-<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
-<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
-<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
-<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
-<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
-<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
-<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
-<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
-<ul>
-<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
-<li><code>string</code></li>
-<li>matrix</li>
-<li>gray-scale image</li>
-<li>RGB image</li>
-</ul>
-</li>
-</ol>
-<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
-<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
-</ul>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -913,7 +733,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 13:08:09" itemprop="dateModified" datetime="2020-04-29T13:08:09+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:18:32" itemprop="dateModified" datetime="2020-04-29T21:18:32+08:00">2020-04-29</time>
               </span>
 
           
@@ -946,32 +766,14 @@ The difference is that: the first method <strong>only copy the listed files</str
 <li>Install (e.g. default to folder <code>C:\Anaconda</code>).</li>
 <li>Setup python system variable: new a system variable with name <code>PYTHONPATH</code> and value <code>C:\Anaconda\Lib\site-packages</code>.</li>
 </ol>
-<h5 id="Install-external-libraries-3-different-ways"><a href="#Install-external-libraries-3-different-ways" class="headerlink" title="Install external libraries (3 different ways):"></a>Install external libraries (3 different ways):</h5><ol>
-<li><strong>Install from Anaconda server:</strong><ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>To install <strong>py</strong> library, type <code>conda install py</code> (You can first type <code>conda search xxx</code> to search <strong>xxx</strong> library exist in Anaconda server or not, full list is available by type <code>conda list</code>).</li>
-</ul>
-</li>
-<li><strong>Install from external libraries directly:</strong> (Take <a href="https://code.google.com/p/protobuf/" target="_blank" rel="noopener"><strong>protobuf</strong></a> as an example in <code>C:\Libs\protobuf-2.4.1</code>)<ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>cd to protobuf’s folder: <code>C:\Libs\protobuf-2.4.1\python</code>.</li>
-<li>Build: <code>python setup.py build</code></li>
-<li>Install: <code>python setup.py install</code></li>
-<li>Done. Then you can e.g. <code>from google.protobuf import descriptor</code> and use e.g. <code>descriptor.FileDescriptor()</code> in <strong>.py</strong> source code.</li>
-</ul>
-</li>
-<li><strong>Install by copy files directly:</strong> (Take <strong>OpenCV</strong> as am example in <code>C:\Libs\OpenCV-2.3.1</code>)<ul>
-<li>Copy <strong>cy.py</strong> and <strong>cv2.pyd</strong> from folder <code>C:\Libs\OpenCV-2.3.1\build\python\2.7</code> to <code>C:\Anaconda\Lib\site-packages</code>.</li>
-<li>Done. Then you can <code>import cv/cv2</code> and use e.g. <code>cv2.imwrite()</code> in <strong>.py</strong> source code.</li>
-</ul>
-</li>
-</ol>
-<h5 id="Run-Python"><a href="#Run-Python" class="headerlink" title="Run Python"></a>Run Python</h5><ol>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
-<li>Run: <code>&gt; python xxx.py</code>.</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1021,7 +823,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 16:29:21" itemprop="dateModified" datetime="2020-04-29T16:29:21+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:18:44" itemprop="dateModified" datetime="2020-04-29T21:18:44+08:00">2020-04-29</time>
               </span>
 
           
@@ -1062,116 +864,14 @@ The difference is that: the first method <strong>only copy the listed files</str
 <li>RadixSort</li>
 <li>BucketSort</li>
 </ol>
-<p>Animation for above soring algorithms can be found <a href="http://www.cs.usfca.edu/~galles/visualization/Algorithms.html" target="_blank" rel="noopener">here</a>.</p>
-<h5 id="Comparison"><a href="#Comparison" class="headerlink" title="Comparison:"></a>Comparison:</h5><div class="table-container">
-<table>
-<thead>
-<tr>
-<th>Algorithm</th>
-<th>Average Time</th>
-<th>Worst Time</th>
-<th>Best Time</th>
-<th>Stable?</th>
-<th>Auxiliary Space</th>
-<th>Constraints</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>SelectionSort</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$\checkmark$</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>InsertSort</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$O(n)$</td>
-<td>$\checkmark$</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>ShellSort</td>
-<td><em>N/A</em></td>
-<td><em>N/A</em></td>
-<td><em>N/A</em></td>
-<td>x</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>BubbleSort</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$\checkmark$</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>HeapSort</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>x</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>QuickSort</td>
-<td>$O(nlogn)$</td>
-<td>$O(n^2)$</td>
-<td>$O(nlogn)$</td>
-<td>x</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>MergeSort</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>$\checkmark$</td>
-<td>$n$</td>
-<td></td>
-</tr>
-<tr>
-<td>CountingSort</td>
-<td>$O(n+k)$</td>
-<td>$O(n+k)$</td>
-<td>$O(n+k)$</td>
-<td>$\checkmark$</td>
-<td>$n+k+C$</td>
-<td>non-negative and within some range</td>
-</tr>
-<tr>
-<td>RadixSort</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$\checkmark$</td>
-<td>$n+k+C$</td>
-<td>non-negative</td>
-</tr>
-<tr>
-<td>BucketSort</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$\checkmark$</td>
-<td>$2n+C$</td>
-<td>elements distribute in buckets evenly and independent</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Note: $C$ is a small constant; $k$ is the max element; $n$ is the number of total elements. <em>N/A</em> means it depends on selection of increment value.</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2013/08/29/Sorting-algorithms-implementation-and-comparison/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1221,7 +921,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 14:41:46" itemprop="dateModified" datetime="2020-04-29T14:41:46+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:18:56" itemprop="dateModified" datetime="2020-04-29T21:18:56+08:00">2020-04-29</time>
               </span>
 
           
@@ -1254,79 +954,14 @@ The difference is that: the first method <strong>only copy the listed files</str
 <li><a href="http://notepad-plus-plus.org/download" target="_blank" rel="noopener"><strong>Notepad++</strong></a>: advanced text editor</li>
 <li><a href="https://code.visualstudio.com/" target="_blank" rel="noopener"><strong>Visual Studio Code</strong></a>: advanced editor for structured code</li>
 </ul>
-<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><ul>
-<li><a href="http://www.mythicsoft.com/agentransack/download" target="_blank" rel="noopener"><strong>Agent Ransack</strong></a>: fast content search in files</li>
-<li><a href="http://www.bulkrenameutility.co.uk/Download.php" target="_blank" rel="noopener"><strong>Bulk Rename Utility</strong></a>: batch file and folder renaming</li>
-<li><a href="http://ejie.me/" target="_blank" rel="noopener"><strong>Clover</strong></a>: add multi-tab functionality for Windows Explorer</li>
-<li><a href="http://www.voidtools.com/downloads/" target="_blank" rel="noopener"><strong>Everything</strong></a>: fast file search</li>
-<li><a href="http://www.lopesoft.com/en/filemenutools/download" target="_blank" rel="noopener"><strong>FileMenu Tools</strong></a>: file/folder right click menus manager</li>
-<li><a href="http://www.listary.com/download" target="_blank" rel="noopener"><strong>Listary</strong></a>: file managing/browsing…</li>
-<li><a href="https://www.piriform.com/recuva/download" target="_blank" rel="noopener"><strong>Recuva</strong></a>: restore deleted files</li>
-</ul>
-<h2 id="System"><a href="#System" class="headerlink" title="System"></a>System</h2><ul>
-<li><a href="https://toolslib.net/downloads/viewdownload/1-adwcleaner/" target="_blank" rel="noopener"><strong>AdwCleaner</strong></a>: remove toolbars and hijackers</li>
-<li><a href="http://www.disktool.cn/feature.html" target="_blank" rel="noopener"><strong>Disk Tool</strong></a>: disk partition management</li>
-<li><a href="http://www.displayfusion.com/Download/" target="_blank" rel="noopener"><strong>DisplayFusion</strong></a>: multi-monitor taskbars, title-bar buttons…</li>
-<li><strong>EaseUS Partition Master</strong>: disk partition management, good for converting dynamic disks to basic mode</li>
-<li><a href="http://www.microsoft.com/en-hk/download/details.aspx?id=35460" target="_blank" rel="noopener"><strong>Mouse without Borders</strong></a>: control multiple PCs using single mouse</li>
-<li><a href="http://www.rapidee.com/en/download" target="_blank" rel="noopener"><strong>Rapid Environment Editor</strong></a>: environment variables management</li>
-<li><a href="https://rufus.akeo.ie/" target="_blank" rel="noopener"><strong>Rufus</strong></a>: create bootable USB (in case <em>Windows 7 USB DVD Download Tool</em> fails)</li>
-<li><a href="https://www.realtimesoft.com/ultramon/download.asp" target="_blank" rel="noopener"><strong>UltraMon</strong></a>: multi-toolbars for multi-monitors</li>
-</ul>
-<h2 id="Viewer-Player-Editor"><a href="#Viewer-Player-Editor" class="headerlink" title="Viewer / Player / Editor"></a>Viewer / Player / Editor</h2><ul>
-<li><strong>Adobe Audition</strong>: real-time multi-channel audio recording &amp; audio editing</li>
-<li><a href="http://audacity.sourceforge.net/download/" target="_blank" rel="noopener"><strong>Audacity</strong></a>: audio editing, e.g. cutting, resampling, changing speed…</li>
-<li><strong>CorelDRAW</strong>: vector diagram drawing</li>
-<li><a href="https://en.bandisoft.com/bandizip/" target="_blank" rel="noopener"><strong>Bandizip</strong></a>: compress/extract files</li>
-<li><a href="http://www.tracker-software.com/product/pdf-xchange-editor" target="_blank" rel="noopener"><strong>PDF-XChange Editor</strong></a>: pdf viewer and editor</li>
-<li><a href="http://potplayer.daum.net/" target="_blank" rel="noopener"><strong>PotPlayer</strong></a>: video player</li>
-<li><a href="http://www.xnview.com/en/xnview/" target="_blank" rel="noopener"><strong>XnView</strong></a>: image viewer</li>
-</ul>
-<h2 id="Coding"><a href="#Coding" class="headerlink" title="Coding"></a>Coding</h2><ul>
-<li><a href="https://github.com/lucasg/Dependencies" target="_blank" rel="noopener"><strong>Dependencies</strong></a>: track dependent dlls, good for exporting cross-platform apps</li>
-<li><strong>Matlab Plugins</strong>:<ul>
-<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig" target="_blank" rel="noopener">export_fig</a>: exports figures nicely to a number of vector &amp; bitmap formats</li>
-<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/8028-mmread" target="_blank" rel="noopener">mmread</a>: read virtually any media file in Windows, Linux, or Mac</li>
-</ul>
-</li>
-<li><a href="https://www.syntevo.com/smartgit/" target="_blank" rel="noopener"><strong>SmartGit</strong></a>: Git &amp; Mercurial client</li>
-<li><a href="http://tortoisesvn.net/downloads.html" target="_blank" rel="noopener"><strong>TortoiseSVN</strong></a>: SVN repo browser, check out…</li>
-<li><strong>Visual Studio Extensions</strong>:<ul>
-<li><strong>C# outline</strong>: add braces {} outlining for C#</li>
-<li><strong>Code alignment</strong>: format code vertically</li>
-<li><strong>Code Compare</strong>: code comparison and automatic merging</li>
-<li><strong>Image Watch</strong>: watch window for viewing in-memory OpenCV images</li>
-<li><strong>Indent Guides</strong>: display indent and page width guides</li>
-<li><strong>Productivity Power Tools</strong>: code structure visualizer (better disabled as conflict with Indent Guides), scrollbar markers, double-click to maximize windows, ctrl + click to peek definition, show matched margin, color printing</li>
-<li><strong>ReSharper</strong>: to-do explorer, color picker in C#/WPF, unit testing</li>
-<li><strong>Visual Assist X</strong>: navigate, refactor, generate code, coding assistance</li>
-<li><strong>VSCommands</strong>: main menu enhancements, code block end tagger, build assistance, output window enhancement</li>
-</ul>
-</li>
-</ul>
-<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><ul>
-<li><a href="http://bing.msn.cn/dict/desktop/" target="_blank" rel="noopener"><strong>BingDict</strong></a>: Chinese/English Dictionary</li>
-<li><strong>Camtasia Studio</strong>: screen recording</li>
-<li><strong>Chrome Plugins</strong>:<ul>
-<li><a href="https://chrome.google.com/webstore/detail/adblock/gighmmpiobklfepjocnamgkkbiglidom" target="_blank" rel="noopener">AdBlock</a>: Ads blocking</li>
-<li><a href="https://chrome.google.com/webstore/detail/checker-plus-for-gmail/oeopbcgkkoapgobdbedcemjljbihmemj" target="_blank" rel="noopener">Checker Plus for Gmail</a>: email checking</li>
-<li><a href="https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj" target="_blank" rel="noopener">Linkclump</a>: roi links copying/openning (can be self-defined)</li>
-<li><a href="https://chrome.google.com/webstore/detail/remove-cookies-for-site/lmfdblomdpkcniknaenceeogpgepocmm" target="_blank" rel="noopener">Remove cookies for site</a>: remove cookies for given site</li>
-<li><a href="https://chrome.google.com/webstore/detail/webmail-ad-blocker/cbhfdchmklhpcngcgjmpdbjakdggkkjp" target="_blank" rel="noopener">Webmail Ad Blocker</a>: Ads blocking for webmails</li>
-</ul>
-</li>
-<li><strong>DVD Decrypter</strong>: extract data from DVD</li>
-<li><strong>Duck Capture</strong>: screenshot, good to capture whole webpage (multi-page)</li>
-<li><a href="https://filezilla-project.org/" target="_blank" rel="noopener"><strong>FileZilla</strong></a>: ftp connect client</li>
-<li><a href="http://www.pcfreetime.com/download.html" target="_blank" rel="noopener"><strong>FormatFactory</strong></a>: picture/audio/video file format converting</li>
-<li><a href="http://www.fraps.com/download.php" target="_blank" rel="noopener"><strong>Fraps</strong></a>: screen capture…, really useful to capture screen under full-screen mode</li>
-<li><strong>Image Composite Editor</strong>: advanced panoramic image stitcher</li>
-<li><a href="https://www.bunkus.org/videotools/mkvtoolnix/downloads.html" target="_blank" rel="noopener"><strong>mkvtoolnix</strong></a>: video processing, e.g. extracting given channel audio from movie…</li>
-<li><a href="http://www.teamviewer.com/en/download/windows.aspx" target="_blank" rel="noopener"><strong>TeamViewer</strong></a>: cross-domain remote desktop connector</li>
-<li><a href="http://wkhtmltopdf.org/downloads.html" target="_blank" rel="noopener"><strong>WKhtmlTOpdf</strong></a>: convent HTML to PDF with style retained, using<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wkhtmltopdf.exe www.website.url.com out.pdf</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2013/05/24/Good-PC-tools/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1376,7 +1011,7 @@ The difference is that: the first method <strong>only copy the listed files</str
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 14:45:20" itemprop="dateModified" datetime="2020-04-29T14:45:20+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-29 21:19:08" itemprop="dateModified" datetime="2020-04-29T21:19:08+08:00">2020-04-29</time>
               </span>
 
           
@@ -1405,155 +1040,14 @@ The difference is that: the first method <strong>only copy the listed files</str
 
       
           <p>Similar to <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>, <a href="https://bitbucket.org/" target="_blank" rel="noopener">Bitbucket</a> makes it very easy to host your code. We all know that GitHub works great for open-source. However, you have to pay if you want to create private repositories. On the other hand, Bitbucket enables you to create unlimited free private repositories. This is an important reason why more and more people are using Bitbucket nowadays. In this post, I will show how to use Bitbucket to easily host your code (over <a href="http://tortoisehg.bitbucket.org/" target="_blank" rel="noopener">TortoiseHg</a> specifically).</p>
-<h2 id="Setup-Bitbucket-over-Internet"><a href="#Setup-Bitbucket-over-Internet" class="headerlink" title="Setup Bitbucket over Internet"></a>Setup Bitbucket over Internet</h2><ol>
-<li>Login <code>Bitbucket &gt; Repositories &gt; Create repository</code>.</li>
-<li>In the Create a new repository page:<ul>
-<li><strong>Name</strong>: Fill in the repository name (<code>testRepo</code> as an example).</li>
-<li><strong>Description</strong>: I will always leave this empty because I prefer to use a <code>README.text</code> file instead, which supports <a href="http://pypi.python.org/pypi/Markdown" target="_blank" rel="noopener">Python-Markdown</a> and is much more powerful.</li>
-<li>…</li>
-</ul>
-</li>
-</ol>
-<h2 id="Setup-TortoiseHg"><a href="#Setup-TortoiseHg" class="headerlink" title="Setup TortoiseHg"></a>Setup TortoiseHg</h2><p>Simple way is to use <strong>SSH keys</strong> and follow setup sets by this post: <a href="https://codebeamer.com/cb/wiki/32044#section-Windows" target="_blank" rel="noopener">Set up SSH for Mercurial</a>. One key step is to add the following content to <code>mercurial.ini</code> (TortoiseHg’s global setting file):</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[ui]</span></span><br><span class="line"><span class="attr">username</span> = -name-you-want-to-show- &lt;-email-@xxmail.com&gt;</span><br><span class="line"><span class="attr">ssh</span> = <span class="string">"C:\Program Files\TortoiseHg\TortoisePlink.exe"</span> -ssh -<span class="number">2</span> -batch -C</span><br></pre></td></tr></table></figure>
-<p>Another key step is to generate your private SSH key file using <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank" rel="noopener">PuTTYGen</a> and copy the key to your online Bitbucket profile.</p>
-<p>Note:</p>
-<ol>
-<li>Make sure <code>Pageant.exe</code> is running in background in order to make it work (<code>Add key &gt; load &gt;</code> input passphrase).</li>
-<li><p>It’s possible to make <code>Pageant.exe</code> automatically load keys on system startup, see <a href="http://blog.shvetsov.com/2010/03/making-pageant-automatically-load-keys.html" target="_blank" rel="noopener">this post</a>. Key step is add a shortcut of <code>Pageant.exe</code> to PC’s <code>Startup</code> folder and change its <code>Target</code> to be something like:</p>
- <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">"C:\Program Files\TortoiseHg\Pageant.exe" "-path-of-your-ssh-key-file-.ppk"</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Commit-your-code-using-TortoiseHg"><a href="#Commit-your-code-using-TortoiseHg" class="headerlink" title="Commit your code using TortoiseHg"></a>Commit your code using TortoiseHg</h2><ol>
-<li><code>File &gt; New Repository &gt;</code> Change <code>Destination path</code> to where your code is <code>&gt; Create</code>.</li>
-<li>Click <code>Commit</code> button in toolbar. It will list all the modified (including edit/add/delete…) files in the left window. Note, click <code>Refresh current repository</code> button in toolbar when needed if you cannot see the new updated files. Check the files that we want to check in. And you can right click &gt; <code>Ignore</code> to ignores files to check in.</li>
-<li>Fill in some commit update information in the right window and then click <code>Commit</code>.</li>
-<li>Click <code>Push outgoing changes to selected URL</code> button in toolbar.</li>
-<li>In <code>Remote Repository &gt;</code> Select <code>https</code> &gt;<code>Add the URL of the repo</code>testRepo<code>&gt; Click</code>save` button in just this left to remember this URL so that you have no need to type again when doing further commit this repo to this URL.</li>
-</ol>
-<p>Note: all you need to do is to loop in step 2~5 for further commits.</p>
-<h2 id="Sync-between-multiple-users-PCs"><a href="#Sync-between-multiple-users-PCs" class="headerlink" title="Sync between multiple users/PCs"></a>Sync between multiple users/PCs</h2><ol>
-<li><strong>Get latest</strong>: Before editing, always get current latest version by <code>Repository &gt; Synchronize &gt; Pull</code>.</li>
-<li><strong>Update local to latest</strong>:  Right click current local version &gt; <code>Update</code> &gt; Write the latest revision in <code>Update to &gt; Update</code>.</li>
-<li><strong>Edit source</strong>.</li>
-<li><strong>Push</strong>: <code>Commit &gt; Push outgoing changes to selected URL</code>.<br>Done if no conflict found with server version (e.g. no one pushed new revisions during our editing). If do find conflict, it will shows <code>abort: push creates new remote head xxxxxxx!</code> in TortoiseHg.</li>
-<li><strong>Resolve conflicts</strong>:<ul>
-<li>Get latest: <code>Repository &gt; Synchronize &gt; Pull</code>.</li>
-<li>Merge: Right click latest revision by others that is just pulled <code>&gt; Merge with Local… &gt; Next &gt;</code> Click <code>resolved</code> in current Merge window to resolve conflicts &gt; Click the file (do this one by one) that we need to resolve in <code>Unresolved conflicts</code> sub-window and click <code>Tool Resolve</code> (assume <code>KDiff3</code> has been installed, this will call KDiff3 to compare both versions side by side) &gt; In the <code>Output</code> window, right click <code>?&lt;Merge Conflick&gt; &gt; Select Line(s) from</code> the version that you want (or both versions) <code>&gt; Save</code> and <code>Close</code> KDiff3 &gt; <code>Close</code> the Resolve Conflicts window &gt; Change Commit message if you need in the <code>Merge</code> window <code>&gt; Commit Now &gt; Finish</code>.</li>
-</ul>
-</li>
-<li><strong>Push</strong>: Push outgoing changes to selected URL.</li>
-</ol>
-<h2 id="Other-remarks"><a href="#Other-remarks" class="headerlink" title="Other remarks"></a>Other remarks</h2><h3 id="Repo-grouping"><a href="#Repo-grouping" class="headerlink" title="Repo grouping"></a>Repo grouping</h3><p>Use <em>teams</em> to group repos (only way currently). Issues can also be import/export in <code>Settings-&gt;Import &amp; export-&gt;…</code></p>
-<h3 id="Get-some-specific-version"><a href="#Get-some-specific-version" class="headerlink" title="Get some specific version"></a>Get some specific version</h3><ul>
-<li><p>If there is no corresponding repo in your PC:</p>
-<ol>
-<li>Clone the repo to PC (done in TortoiseHg).</li>
-<li>Open it by TortoiseHg. Then all its revisions will show in the right view.</li>
-<li><p>Select the revision you want to get &gt; Right click &gt; <code>Export &gt; Archive</code> &gt; Choose the <code>Destination path &gt; Archive</code>.</p>
-<blockquote>
-<p>Clone vs. Archive:</p>
-<ul>
-<li>Clone will copy everything including <code>.hg</code> folder (can be opened by TortoiseHg).</li>
-<li>Archive will copy everything except .hg folder (can NOT be opened by TortoiseHg).</li>
-</ul>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p>Otherwise:</p>
-<ul>
-<li>Select current revision &gt; Right click &gt; <code>Update…</code> &gt; Put the revision you want to get in the <code>Update to</code> box &gt; <code>Update</code>.</li>
-</ul>
-</li>
-</ul>
-<h3 id="Link-to-most-recent-version-of-given-file1"><a href="#Link-to-most-recent-version-of-given-file1" class="headerlink" title="Link to most-recent version of given file1"></a>Link to most-recent version of given file<sup><a href="#fn_1" id="reffn_1">1</a></sup></h3><ol>
-<li>Get the file link of any version, e.g. <a href="https://bitbucket.org/herohuyongtao/files/src/f7b75d07772182019e80200a18e5f1130f75fc70/files/VC_call_MATLAB.cpp?at=default" target="_blank" rel="noopener">https://bitbucket.org/herohuyongtao/files/src/f7b75d07772182019e80200a18e5f1130f75fc70/files/VC_call_MATLAB.cpp?at=default</a></li>
-<li><p>Change string corresponding to version (<code>f7b75d07772182019e80200a18e5f1130f75fc70</code> in above example) to <code>tip</code> or <code>default</code> (or any other branch name) and delete the tail until to the file type, i.e. to be   <a href="https://bitbucket.org/herohuyongtao/files/src/tip/files/VC_call_MATLAB.cpp" target="_blank" rel="noopener">https://bitbucket.org/herohuyongtao/files/src/tip/files/VC_call_MATLAB.cpp</a> or <a href="https://bitbucket.org/herohuyongtao/files/src/default/files/VC_call_MATLAB.cpp" target="_blank" rel="noopener">https://bitbucket.org/herohuyongtao/files/src/default/files/VC_call_MATLAB.cpp</a>.</p>
-<blockquote>
-<p>The difference between <code>tip</code> and <code>default</code> is that using <code>tip</code> for the very latest commit, regardless of branch. Instead, <code>default</code> or any other branch would link to the latest version under that branch.</p>
-</blockquote>
-</li>
-</ol>
-<h3 id="Delete-local-commits"><a href="#Delete-local-commits" class="headerlink" title="Delete local commits"></a>Delete local commits</h3><ul>
-<li>If only need to delete last commit, <code>Repository &gt; Rollback/Undo...</code>. This will keep changes in local.</li>
-<li><p>If want to delete all local commits<sup><a href="#fn_2" id="reffn_2">2</a></sup><sup>,</sup><sup><a href="#fn_6" id="reffn_6">6</a></sup> (this will also revert all changes):</p>
-<ol>
-<li><p>Enable <code>mq</code> extension by adding the following to <code>mercurial.ini</code> or enable it via <code>File &gt; Settings &gt; Extensions &gt; mq</code>:</p>
- <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[extensions]</span></span><br><span class="line"><span class="attr">mq</span>=</span><br></pre></td></tr></table></figure></li>
-<li>Run <code>hg strip &#39;roots(outgoing())&#39;</code> in console.<blockquote>
-<p>Note: it seems that this doesn’t work for <code>graft</code> commits, in this case, just use <code>hg strip #changeset#</code>.</p>
-</blockquote>
-</li>
-</ol>
-</li>
-</ul>
-<h3 id="Copy-changes-from-other-commits"><a href="#Copy-changes-from-other-commits" class="headerlink" title="Copy changes from other commits"></a>Copy changes from other commits</h3><p>This can be viewed as one kind of merging except that all files are updated to other commits. This is very useful when you want to update old <code>default</code> branch to one new <code>branch</code>.</p>
-<p>This can be done in the following steps<sup><a href="#fn_5" id="reffn_5">5</a></sup>:</p>
-<ol>
-<li>Set the current commit to which you want to be overwritten by other commits by right click \(\rightarrow\) <code>Update...</code> \(\rightarrow\) set the commit number.</li>
-<li>Select the commit that you want to copy changes from \(\rightarrow\) right click \(\rightarrow\) <code>Graft to Local...</code>.</li>
-</ol>
-<h3 id="Ignore-given-files-folders"><a href="#Ignore-given-files-folders" class="headerlink" title="Ignore given files/folders"></a>Ignore given files/folders</h3><ul>
-<li>Ignore all its content under folder, simply add <code>-path-to-folder-/folderName/</code> to file <code>.hgignore</code>.</li>
-<li><p>Ignore all its content under folder except given files or given sub-folders, add similar conent to file <code>.hgignore</code> (note that, unlike folders, files should end with <code>$</code>):</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">syntax: regexp</span><br><span class="line">-path-to-folder-/folderName/(?!exceptFile1.ext1$|exceptFile2.ext2$|exceptSubFolder1|exceptSubFolder2|)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="Sub-repos"><a href="#Sub-repos" class="headerlink" title="Sub-repos"></a>Sub-repos</h3><p>Subrepositories allow you to have a standalone repository included within a parent repository<sup><a href="#fn_3" id="reffn_3">3</a></sup> (<a href="https://bitbucket.org/xixs/public" target="_blank" rel="noopener">hg example</a> / <a href="https://github.com/willyd/caffe-windows-dependencies" target="_blank" rel="noopener">git example</a>).</p>
-<ol>
-<li>In the main repo, create file <code>.hgsub</code>.</li>
-<li><p>Add sub-repo mapping info in file <code>.hgsub</code> with format: <code>local_subrepo_path = external_repo_path</code> (where <code>local_subrepo_path</code> is relative to the root of your main repo). Suppose we want to add repo hosted at <code>https://me@bitbucket.org/me/subrepo</code> to folder <code>-path-to-main-repo-path-/libs/subrepo</code>, the content of file <code>.hgsub</code> will be like:</p>
- <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">libs/subrepo = https://me@bitbucket.org/me/subrepo</span><br></pre></td></tr></table></figure></li>
-<li>Add and commit file <code>.hgsub</code> to the main repo. File structure identified by <code>local_subrepo_path</code> will be created. E.g. in above example, folder <code>libs/subrepo</code> will be created automatically.</li>
-</ol>
-<blockquote>
-<p>Note: You must revert anything done to the sub-repo when pushing changes to the main repo, though you can modify it to fit your needs during development.</p>
-</blockquote>
-<p>Note that, when cloning the main repo, by default, all sub-repos (and their contents) are also cloned. If you only want to download some of the sub-repos (especially useful if the sub-repos are huge in terms of number and size), follow the following steps:</p>
-<ol>
-<li>Download the main repo from its download page.</li>
-<li>In TortoiseHg \(\rightarrow\) <code>File</code> \(\rightarrow\) <code>New Repository...</code> \(\rightarrow\) browse to the download main folder \(\rightarrow\) <code>Create</code>.</li>
-<li>Check on all files to commit (may need to press commit button twice).</li>
-<li><p>Download sub-repos.</p>
-<ul>
-<li>One-by-one:<ul>
-<li>In <code>Repository Registry</code> window \(\rightarrow\) click the main repo to expand all its sub-repos \(\rightarrow\) double click the sub-repo needed to download \(\rightarrow\) click <code>Pull</code> button.</li>
-</ul>
-</li>
-<li><p>Batch style:</p>
-<ol>
-<li>Download file <a href="https://www.dropbox.com/s/zsx5av6mjeux47b/onsub.py" target="_blank" rel="noopener"><code>onsub.py</code></a> and put anywhere on your PC.</li>
-<li><p>In TortoiseHg \(\rightarrow\) right click the main repo \(\rightarrow\) on the main repo’s repository setting window \(\rightarrow\) click <code>Edit File</code> \(\rightarrow\) add the following content to the opened file (i.e. <code>hgrc</code> file) and <code>Save</code>.</p>
- <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[extensions]</span></span><br><span class="line"><span class="attr">onsub</span> = -path-to-<span class="literal">on</span>sub.py-/<span class="literal">on</span>sub.py</span><br></pre></td></tr></table></figure></li>
-<li>Edit both files <code>.hgsub</code> and <code>.hgsubstate</code> to keep only the lines for the sub-repos that you want to download.</li>
-<li>Run <code>hg onsub &quot;hg pull -u&quot;</code> in console<sup><a href="#fn_4" id="reffn_4">4</a></sup>.</li>
-<li><em>(optional)</em> If you want to download given commit of one sub-repo, after the above steps, go to the sub-repo that you want to edit and update to the commit you want.</li>
-</ol>
-</li>
-</ul>
-</li>
-</ol>
-<hr>
-<blockquote id="fn_1">
-<sup>1</sup>. Link to most-recent version of static file: <a href="https://bitbucket.org/site/master/issue/3769/link-to-most-recent-version-of-static-file" target="_blank" rel="noopener">https://bitbucket.org/site/master/issue/3769/link-to-most-recent-version-of-static-file</a>.<a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_2">
-<sup>2</sup>. Delete all local changesets and revert to tree: <a href="http://stackoverflow.com/a/2143711/2589776" target="_blank" rel="noopener">http://stackoverflow.com/a/2143711/2589776</a>.<a href="#reffn_2" title="Jump back to footnote [2] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_3">
-<sup>3</sup>. Getting Started With Mercurial Subrepositories: <a href="https://tomtech999.wordpress.com/2011/12/17/getting-started-with-mercurial-subrepositories/" target="_blank" rel="noopener">https://tomtech999.wordpress.com/2011/12/17/getting-started-with-mercurial-subrepositories/</a>.<a href="#reffn_3" title="Jump back to footnote [3] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_4">
-<sup>4</sup>. OnsubExtension: <a href="https://www.mercurial-scm.org/wiki/OnsubExtension" target="_blank" rel="noopener">https://www.mercurial-scm.org/wiki/OnsubExtension</a>.<a href="#reffn_4" title="Jump back to footnote [4] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_5">
-<sup>5</sup>. Copy changes from other branches onto the current branch: <a href="https://selenic.com/hg/help/graft" target="_blank" rel="noopener">https://selenic.com/hg/help/graft</a>.<a href="#reffn_5" title="Jump back to footnote [5] in the text."> &#8617;</a>
-</blockquote>
-<blockquote id="fn_6">
-<sup>6</sup>. Is there any way to delete local commits in Mercurial?: <a href="http://stackoverflow.com/questions/2338986/is-there-any-way-to-delete-local-commits-in-mercurial" target="_blank" rel="noopener">http://stackoverflow.com/questions/2338986/is-there-any-way-to-delete-local-commits-in-mercurial</a><a href="#reffn_6" title="Jump back to footnote [6] in the text."> &#8617;</a>
-</blockquote>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2013/01/22/Host-code-via-Bitbucket/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
