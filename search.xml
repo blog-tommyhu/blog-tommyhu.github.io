@@ -134,6 +134,43 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>DOS sumup</title>
+    <url>/2012/04/06/DOS-sumup/</url>
+    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
+<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
+<li><p>Get all file names</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Get all file full paths</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>dos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Character encodings of text files</title>
+    <url>/2013/01/21/Character-encodings-of-text-files/</url>
+    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
+<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
+<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>encoding</tag>
+        <tag>text</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Conversion between image and world coordinates</title>
     <url>/2012/04/06/Conversion-between-image-and-world-coordinates/</url>
     <content><![CDATA[<p>Conversion between Image Coordinates and World Coordinates are fundamental to all image formation problems. Always confused to me. Sumup here for further references.</p>
@@ -315,112 +352,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>DOS sumup</title>
-    <url>/2012/04/06/DOS-sumup/</url>
-    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
-<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
-<li><p>Get all file names</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Get all file full paths</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>dos</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Character encodings of text files</title>
-    <url>/2013/01/21/Character-encodings-of-text-files/</url>
-    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
-<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
-<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
-<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>encoding</tag>
-        <tag>text</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Debugging: errors and fixes</title>
-    <url>/2012/09/06/Debugging-errors-and-fixes/</url>
-    <content><![CDATA[<h2 id="Can-not-find-dxtrans-h-in-DirectX-programming"><a href="#Can-not-find-dxtrans-h-in-DirectX-programming" class="headerlink" title="Can not find dxtrans.h in DirectX programming"></a>Can not find dxtrans.h in DirectX programming</h2><p>cc: <a href="http://blog.csdn.net/clever101/article/details/5617982" target="_blank" rel="noopener">http://blog.csdn.net/clever101/article/details/5617982</a></p>
-<ol>
-<li>Remove <code>#include &quot;dxtrans.h&quot;</code> where causing errors (e.g. <code>qedit.h</code>).</li>
-<li><p>Add the following macro definition to the beginning of code <code>#include &lt;qedit.h&gt;</code></p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtCompositor_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtAlphaSetter_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtJpeg_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtKey_INTERFACE_DEFINED__</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="error-C2143-syntax-error-missing-‘-’-before-‘constant’"><a href="#error-C2143-syntax-error-missing-‘-’-before-‘constant’" class="headerlink" title="error C2143: syntax error : missing ‘)’ before ‘constant’"></a>error C2143: syntax error : missing ‘)’ before ‘constant’</h2><p>E.g. after defining a constant: <code>#define A 1</code>, but in program, we mistaken using <code>int A;</code> and so on.</p>
-<p>Solve: use <code>A</code> directly, not <code>int A</code>.</p>
-<h2 id="error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’"><a href="#error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’" class="headerlink" title="error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’"></a>error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’</h2><p>In <code>winnt.h</code>, add the following line</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> POINTER_64 __ptr64</span></span><br></pre></td></tr></table></figure>
-<p>before</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> *PVOID;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> * POINTER_64 PVOID64;</span><br></pre></td></tr></table></figure>
-<h2 id="error-C2471-cannot-update-program-database-—-vc90-pdb"><a href="#error-C2471-cannot-update-program-database-—-vc90-pdb" class="headerlink" title="error C2471: cannot update program database —-vc90.pdb"></a>error C2471: cannot update program database —-vc90.pdb</h2><p><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Disabled&#39;</code>.</p>
-<h2 id="error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’"><a href="#error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’" class="headerlink" title="error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’"></a>error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’</h2><p>Two ways to fix it:</p>
-<ol>
-<li><code>Project –&gt; Properties –&gt; General –&gt; Character Set –&gt; &quot;Use Multi-Byte Character Set&quot;</code>.</li>
-<li>Indicate that the string literal, in this case <code>&quot;Hello world!&quot;</code> is of a specific encoding. This can be done through either prefixing it with <code>L</code>, such as <code>L&quot;Hello world!&quot;</code>, or surrounding it with the generic <code>_T(&quot;Hello world!&quot;)</code> macro. The latter will expand to the L prefix if you are compiling for unicode, and nothing (indicating multi-byte) otherwise.</li>
-</ol>
-<h2 id="error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility"><a href="#error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility" class="headerlink" title="error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)"></a>error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)</h2><p>Based on: <a href="https://svn.boost.org/trac/boost/ticket/4874" target="_blank" rel="noopener">https://svn.boost.org/trac/boost/ticket/4874</a><br>This is a bug of boost library (before version 1_52_0) when using VC2010 in Debug mode (note: the problem also exists in boost-1_52_0 for VC2012 in Debug mode, but still cannot be solved with this method). It can be solved by modifying <code>BOOST_PATH/boost/multi_array/view.hpp</code> to something like</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">multi_array_view&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> multi_array_view&amp; other) &#123;</span><br><span class="line">    <span class="keyword">if</span> (&amp;other != <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="comment">// make sure the dimensions agree</span></span><br><span class="line">        BOOST_ASSERT(other.num_dimensions() == <span class="keyword">this</span>-&gt;num_dimensions());</span><br><span class="line">        BOOST_ASSERT(<span class="built_in">std</span>::equal(other.shape(),</span><br><span class="line">            other.shape()+<span class="keyword">this</span>-&gt;num_dimensions(),</span><br><span class="line">            <span class="keyword">this</span>-&gt;shape()));</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> _MSC_VER &gt;= 1600</span></span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterThis = begin();</span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterOther = other.begin();</span><br><span class="line">        <span class="keyword">for</span> (; iterThis != end(); ++iterThis, ++iterOther)</span><br><span class="line">            *iterThis = *iterOther;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">        <span class="comment">// iterator-based copy</span></span><br><span class="line">        <span class="built_in">std</span>::copy(other.begin(),other.end(),begin());</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Error-Code-S1023-when-installing-DirectX-SDK-June-2010"><a href="#Error-Code-S1023-when-installing-DirectX-SDK-June-2010" class="headerlink" title="Error Code: S1023 when installing DirectX SDK (June 2010)"></a>Error Code: S1023 when installing DirectX SDK (June 2010)</h2><p>cc: <a href="http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx" target="_blank" rel="noopener">http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx</a></p>
-<ol>
-<li><p>Remove the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong> from the system (both x86 and x64 if applicable). This can be easily done via a command-line with administrator rights:</p>
- <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">MsiExec.exe /passive /X&#123;F0C3E5D1-<span class="number">1</span>ADE-<span class="number">321</span>E-<span class="number">8167</span>-<span class="number">68</span>EF0DE699A5&#125;</span><br><span class="line">MsiExec.exe /passive /X&#123;<span class="number">1</span>D8E6291-B0D5-<span class="number">35</span>EC-<span class="number">8441</span>-<span class="number">6616</span>F567A0F7&#125;</span><br></pre></td></tr></table></figure></li>
-<li>Install the DirectX SDK (June 2010).</li>
-<li>Reinstall the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong>. On an x64 system, you should install both the x86 and x64 versions of the C++ REDIST. Be sure to install the most <a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;id=26999" target="_blank" rel="noopener">current version available</a>.</li>
-</ol>
-<h2 id="error-LNK1000-Internal-error-during-IncrBuildImage"><a href="#error-LNK1000-Internal-error-during-IncrBuildImage" class="headerlink" title="error LNK1000: Internal error during IncrBuildImage"></a>error LNK1000: Internal error during IncrBuildImage</h2><p>This is common in VS2008, VS2010 fix this. Two ways to fix it:</p>
-<ol>
-<li>Install patch <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
-<li>Two steps:<ol>
-<li><code>Project –&gt; Properties –&gt; Linker –&gt; General –&gt; Enable Incremental Linking –&gt; &#39;No&#39;</code>.</li>
-<li><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Program Database (/Zi)&#39;</code>.</li>
-</ol>
-</li>
-</ol>
-<h2 id="error-LNK1104-cannot-open-file-‘cxcore-lib’"><a href="#error-LNK1104-cannot-open-file-‘cxcore-lib’" class="headerlink" title="error LNK1104: cannot open file ‘cxcore.lib’"></a>error LNK1104: cannot open file ‘cxcore.lib’</h2><p><code>Project –&gt; Properties –&gt; Configuration properties –&gt; Linker – &gt; Input –&gt; Additional Dependence –&gt;</code> Check whether all libs here are consistent with current PC (e.g. after installing OpenCV2.0, should be cxcore200.lib).</p>
-<h2 id="error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW"><a href="#error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW" class="headerlink" title="error LNK2001: unresolved external symbol __imp___CrtDbgReportW"></a>error LNK2001: unresolved external symbol <code>__imp___CrtDbgReportW</code></h2><p>This will happen when compiling code under <strong>vc10 + Debug</strong>.</p>
-<p>Solve: <code>Project –&gt; Properties –&gt; C/C++ –&gt; Code Generation –&gt; Runtime Library –&gt; Multi-threaded Debug DLL (/MDd)&#39;</code>.</p>
-<h2 id="error-LNK2001-unresolved-external-symbol"><a href="#error-LNK2001-unresolved-external-symbol" class="headerlink" title="error LNK2001: unresolved external symbol"></a>error LNK2001: unresolved external symbol</h2><p>Reason: not use <code>class::</code> before the types/names we defined ourselves.</p>
-<p>Solve: try to add these all <code>class::</code> needed.</p>
-<h2 id="This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged"><a href="#This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged" class="headerlink" title="This source file has changed. It no longer matches the version of the file used to build the application being debugged"></a>This source file has changed. It no longer matches the version of the file used to build the application being debugged</h2><ol>
-<li>Check if code contains illegal characters, e.g. copied from QQ.</li>
-<li>Build your project before you debug.</li>
-</ol>
-<h2 id="Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists"><a href="#Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists" class="headerlink" title="Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists"></a>Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists</h2><p>This will happen when you want to create a solution platform for a single project in a big solution, which one of other projects in the solution has already has this solution platform.<br>Solve <a href="http://www.dpvreony.co.uk/blog/post/v/62" target="_blank" rel="noopener">[1]</a>:</p>
-<ol>
-<li>Close Visual Studio</li>
-<li>Find the project’s (the one that you want to create platform) <code>.vcproject</code>  file and open it with e.g. notepad… other than VS.</li>
-<li>Inside the <code>&lt;ItemGroup Label=&quot;ProjectConfigurations&quot;&gt;</code> node you will find a series of Configuration nodes. Copy (and paste underneath) one which has a name attribute beginning with <code>Debug|</code> and replace the text at the end with your desired platform (i.e. Change <code>Debug|Win32</code> to <code>Debug|x64</code>).</li>
-<li>Repeat the above step for a <code>Release</code> configuration.</li>
-</ol>
-<hr>
-<h2 id="Others"><a href="#Others" class="headerlink" title="Others:"></a>Others:</h2><h3 id="Error-code-S1023-when-trying-to-install-DirectX"><a href="#Error-code-S1023-when-trying-to-install-DirectX" class="headerlink" title="Error code: S1023 when trying to install DirectX"></a>Error code: S1023 when trying to install DirectX</h3><p>Solve <a href="http://answers.microsoft.com/en-us/windows/forum/windows_7-windows_programs/error-code-s1023-when-trying-to-install-directx/0aadf7ec-e004-42eb-8a1a-2865ff5b3a37" target="_blank" rel="noopener">[1]</a>:</p>
-<ol>
-<li>Uninstall <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
-<li>Install DirectX again. Should be OK.</li>
-<li>Install back <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>debugging</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Good PC tools</title>
     <url>/2013/05/24/Good-PC-tools/</url>
     <content><![CDATA[<h2 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h2><ul>
@@ -508,6 +439,41 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>Handle Chinese bookmarks in Latex</title>
+    <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
+    <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
+<a id="more"></a>
+<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
+<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
+<p>Correct way to handle is:</p>
+<ol>
+<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
+<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
+<li>Run <code>pdflatex</code> again. Done!</li>
+</ol>
+<hr>
+<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
+<ol>
+<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
+<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
+<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
+<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
+<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
+<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
+</ol>
+<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
+<hr>
+<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
+<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
+<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>latex</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Good refs on Stack Overflow</title>
     <url>/2014/04/13/Good-refs-on-Stack-Overflow/</url>
     <content><![CDATA[<h5 id="C"><a href="#C" class="headerlink" title="C"></a>C</h5><ul>
@@ -574,38 +540,119 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Handle Chinese bookmarks in Latex</title>
-    <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
-    <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
-<a id="more"></a>
-<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
-<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
-<p>Correct way to handle is:</p>
+    <title>Debugging: errors and fixes</title>
+    <url>/2012/09/06/Debugging-errors-and-fixes/</url>
+    <content><![CDATA[<h2 id="Can-not-find-dxtrans-h-in-DirectX-programming"><a href="#Can-not-find-dxtrans-h-in-DirectX-programming" class="headerlink" title="Can not find dxtrans.h in DirectX programming"></a>Can not find dxtrans.h in DirectX programming</h2><p>cc: <a href="http://blog.csdn.net/clever101/article/details/5617982" target="_blank" rel="noopener">http://blog.csdn.net/clever101/article/details/5617982</a></p>
 <ol>
-<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
-<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
-<li>Run <code>pdflatex</code> again. Done!</li>
+<li>Remove <code>#include &quot;dxtrans.h&quot;</code> where causing errors (e.g. <code>qedit.h</code>).</li>
+<li><p>Add the following macro definition to the beginning of code <code>#include &lt;qedit.h&gt;</code></p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtCompositor_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtAlphaSetter_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtJpeg_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtKey_INTERFACE_DEFINED__</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="error-C2143-syntax-error-missing-‘-’-before-‘constant’"><a href="#error-C2143-syntax-error-missing-‘-’-before-‘constant’" class="headerlink" title="error C2143: syntax error : missing ‘)’ before ‘constant’"></a>error C2143: syntax error : missing ‘)’ before ‘constant’</h2><p>E.g. after defining a constant: <code>#define A 1</code>, but in program, we mistaken using <code>int A;</code> and so on.</p>
+<p>Solve: use <code>A</code> directly, not <code>int A</code>.</p>
+<h2 id="error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’"><a href="#error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’" class="headerlink" title="error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’"></a>error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’</h2><p>In <code>winnt.h</code>, add the following line</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> POINTER_64 __ptr64</span></span><br></pre></td></tr></table></figure>
+<p>before</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> *PVOID;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> * POINTER_64 PVOID64;</span><br></pre></td></tr></table></figure>
+<h2 id="error-C2471-cannot-update-program-database-—-vc90-pdb"><a href="#error-C2471-cannot-update-program-database-—-vc90-pdb" class="headerlink" title="error C2471: cannot update program database —-vc90.pdb"></a>error C2471: cannot update program database —-vc90.pdb</h2><p><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Disabled&#39;</code>.</p>
+<h2 id="error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’"><a href="#error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’" class="headerlink" title="error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’"></a>error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’</h2><p>Two ways to fix it:</p>
+<ol>
+<li><code>Project –&gt; Properties –&gt; General –&gt; Character Set –&gt; &quot;Use Multi-Byte Character Set&quot;</code>.</li>
+<li>Indicate that the string literal, in this case <code>&quot;Hello world!&quot;</code> is of a specific encoding. This can be done through either prefixing it with <code>L</code>, such as <code>L&quot;Hello world!&quot;</code>, or surrounding it with the generic <code>_T(&quot;Hello world!&quot;)</code> macro. The latter will expand to the L prefix if you are compiling for unicode, and nothing (indicating multi-byte) otherwise.</li>
+</ol>
+<h2 id="error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility"><a href="#error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility" class="headerlink" title="error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)"></a>error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)</h2><p>Based on: <a href="https://svn.boost.org/trac/boost/ticket/4874" target="_blank" rel="noopener">https://svn.boost.org/trac/boost/ticket/4874</a><br>This is a bug of boost library (before version 1_52_0) when using VC2010 in Debug mode (note: the problem also exists in boost-1_52_0 for VC2012 in Debug mode, but still cannot be solved with this method). It can be solved by modifying <code>BOOST_PATH/boost/multi_array/view.hpp</code> to something like</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">multi_array_view&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> multi_array_view&amp; other) &#123;</span><br><span class="line">    <span class="keyword">if</span> (&amp;other != <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="comment">// make sure the dimensions agree</span></span><br><span class="line">        BOOST_ASSERT(other.num_dimensions() == <span class="keyword">this</span>-&gt;num_dimensions());</span><br><span class="line">        BOOST_ASSERT(<span class="built_in">std</span>::equal(other.shape(),</span><br><span class="line">            other.shape()+<span class="keyword">this</span>-&gt;num_dimensions(),</span><br><span class="line">            <span class="keyword">this</span>-&gt;shape()));</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> _MSC_VER &gt;= 1600</span></span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterThis = begin();</span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterOther = other.begin();</span><br><span class="line">        <span class="keyword">for</span> (; iterThis != end(); ++iterThis, ++iterOther)</span><br><span class="line">            *iterThis = *iterOther;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">        <span class="comment">// iterator-based copy</span></span><br><span class="line">        <span class="built_in">std</span>::copy(other.begin(),other.end(),begin());</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Error-Code-S1023-when-installing-DirectX-SDK-June-2010"><a href="#Error-Code-S1023-when-installing-DirectX-SDK-June-2010" class="headerlink" title="Error Code: S1023 when installing DirectX SDK (June 2010)"></a>Error Code: S1023 when installing DirectX SDK (June 2010)</h2><p>cc: <a href="http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx" target="_blank" rel="noopener">http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx</a></p>
+<ol>
+<li><p>Remove the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong> from the system (both x86 and x64 if applicable). This can be easily done via a command-line with administrator rights:</p>
+ <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">MsiExec.exe /passive /X&#123;F0C3E5D1-<span class="number">1</span>ADE-<span class="number">321</span>E-<span class="number">8167</span>-<span class="number">68</span>EF0DE699A5&#125;</span><br><span class="line">MsiExec.exe /passive /X&#123;<span class="number">1</span>D8E6291-B0D5-<span class="number">35</span>EC-<span class="number">8441</span>-<span class="number">6616</span>F567A0F7&#125;</span><br></pre></td></tr></table></figure></li>
+<li>Install the DirectX SDK (June 2010).</li>
+<li>Reinstall the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong>. On an x64 system, you should install both the x86 and x64 versions of the C++ REDIST. Be sure to install the most <a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;id=26999" target="_blank" rel="noopener">current version available</a>.</li>
+</ol>
+<h2 id="error-LNK1000-Internal-error-during-IncrBuildImage"><a href="#error-LNK1000-Internal-error-during-IncrBuildImage" class="headerlink" title="error LNK1000: Internal error during IncrBuildImage"></a>error LNK1000: Internal error during IncrBuildImage</h2><p>This is common in VS2008, VS2010 fix this. Two ways to fix it:</p>
+<ol>
+<li>Install patch <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
+<li>Two steps:<ol>
+<li><code>Project –&gt; Properties –&gt; Linker –&gt; General –&gt; Enable Incremental Linking –&gt; &#39;No&#39;</code>.</li>
+<li><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Program Database (/Zi)&#39;</code>.</li>
+</ol>
+</li>
+</ol>
+<h2 id="error-LNK1104-cannot-open-file-‘cxcore-lib’"><a href="#error-LNK1104-cannot-open-file-‘cxcore-lib’" class="headerlink" title="error LNK1104: cannot open file ‘cxcore.lib’"></a>error LNK1104: cannot open file ‘cxcore.lib’</h2><p><code>Project –&gt; Properties –&gt; Configuration properties –&gt; Linker – &gt; Input –&gt; Additional Dependence –&gt;</code> Check whether all libs here are consistent with current PC (e.g. after installing OpenCV2.0, should be cxcore200.lib).</p>
+<h2 id="error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW"><a href="#error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW" class="headerlink" title="error LNK2001: unresolved external symbol __imp___CrtDbgReportW"></a>error LNK2001: unresolved external symbol <code>__imp___CrtDbgReportW</code></h2><p>This will happen when compiling code under <strong>vc10 + Debug</strong>.</p>
+<p>Solve: <code>Project –&gt; Properties –&gt; C/C++ –&gt; Code Generation –&gt; Runtime Library –&gt; Multi-threaded Debug DLL (/MDd)&#39;</code>.</p>
+<h2 id="error-LNK2001-unresolved-external-symbol"><a href="#error-LNK2001-unresolved-external-symbol" class="headerlink" title="error LNK2001: unresolved external symbol"></a>error LNK2001: unresolved external symbol</h2><p>Reason: not use <code>class::</code> before the types/names we defined ourselves.</p>
+<p>Solve: try to add these all <code>class::</code> needed.</p>
+<h2 id="This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged"><a href="#This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged" class="headerlink" title="This source file has changed. It no longer matches the version of the file used to build the application being debugged"></a>This source file has changed. It no longer matches the version of the file used to build the application being debugged</h2><ol>
+<li>Check if code contains illegal characters, e.g. copied from QQ.</li>
+<li>Build your project before you debug.</li>
+</ol>
+<h2 id="Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists"><a href="#Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists" class="headerlink" title="Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists"></a>Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists</h2><p>This will happen when you want to create a solution platform for a single project in a big solution, which one of other projects in the solution has already has this solution platform.<br>Solve <a href="http://www.dpvreony.co.uk/blog/post/v/62" target="_blank" rel="noopener">[1]</a>:</p>
+<ol>
+<li>Close Visual Studio</li>
+<li>Find the project’s (the one that you want to create platform) <code>.vcproject</code>  file and open it with e.g. notepad… other than VS.</li>
+<li>Inside the <code>&lt;ItemGroup Label=&quot;ProjectConfigurations&quot;&gt;</code> node you will find a series of Configuration nodes. Copy (and paste underneath) one which has a name attribute beginning with <code>Debug|</code> and replace the text at the end with your desired platform (i.e. Change <code>Debug|Win32</code> to <code>Debug|x64</code>).</li>
+<li>Repeat the above step for a <code>Release</code> configuration.</li>
 </ol>
 <hr>
-<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
+<h2 id="Others"><a href="#Others" class="headerlink" title="Others:"></a>Others:</h2><h3 id="Error-code-S1023-when-trying-to-install-DirectX"><a href="#Error-code-S1023-when-trying-to-install-DirectX" class="headerlink" title="Error code: S1023 when trying to install DirectX"></a>Error code: S1023 when trying to install DirectX</h3><p>Solve <a href="http://answers.microsoft.com/en-us/windows/forum/windows_7-windows_programs/error-code-s1023-when-trying-to-install-directx/0aadf7ec-e004-42eb-8a1a-2865ff5b3a37" target="_blank" rel="noopener">[1]</a>:</p>
 <ol>
-<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
-<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
-<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
-<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
-</ol>
-<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
-<hr>
-<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
-<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
-<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
+<li>Uninstall <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
+<li>Install DirectX again. Should be OK.</li>
+<li>Install back <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
 </ol>
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>latex</tag>
+        <tag>debugging</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
+    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
+    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
+<ol>
+<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
+</li>
+<li><p>call MATLAB directly in VC++.</p>
+</li>
+</ol>
+<hr>
+<p>This blog will focus on the second approach (also the easier one).</p>
+<a id="more"></a>
+<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
+<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
+<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
+<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
+<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
+<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
+<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
+<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
+<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
+<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
+<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
+<ul>
+<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
+<li><code>string</code></li>
+<li>matrix</li>
+<li>gray-scale image</li>
+<li>RGB image</li>
+</ul>
+</li>
+</ol>
+<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
+<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>mixed_programming</tag>
+        <tag>matlab</tag>
+        <tag>c++</tag>
       </tags>
   </entry>
   <entry>
@@ -768,53 +815,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
-    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
-    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
-<ol>
-<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
-</li>
-<li><p>call MATLAB directly in VC++.</p>
-</li>
-</ol>
-<hr>
-<p>This blog will focus on the second approach (also the easier one).</p>
-<a id="more"></a>
-<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
-<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
-<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
-<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
-<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
-<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
-<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
-<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
-<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
-<ul>
-<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
-<li><code>string</code></li>
-<li>matrix</li>
-<li>gray-scale image</li>
-<li>RGB image</li>
-</ul>
-</li>
-</ol>
-<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
-<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>mixed_programming</tag>
-        <tag>matlab</tag>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>IO sumup</title>
     <url>/2012/01/01/IO-sumup/</url>
     <content><![CDATA[<h2 id="using-C-FILE-stdio-h"><a href="#using-C-FILE-stdio-h" class="headerlink" title="using C - FILE (stdio.h)"></a>using C - FILE (stdio.h)</h2><ul>
@@ -852,46 +852,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>i/o</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MATLAB sumup</title>
-    <url>/2012/08/30/MATLAB-sumup/</url>
-    <content><![CDATA[<h2 id="Get-rect-from-mouse"><a href="#Get-rect-from-mouse" class="headerlink" title="Get rect from mouse"></a>Get rect from mouse</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imshow(<span class="string">'test.jpg'</span>);</span><br><span class="line">rect = getrect;</span><br></pre></td></tr></table></figure>
-<h2 id="对话框-dialog-box"><a href="#对话框-dialog-box" class="headerlink" title="对话框 dialog box"></a>对话框 dialog box</h2><p>cc: <a href="http://hi.baidu.com/7777777_shu/item/ccb713f20ce99e18d7ff8cda" target="_blank" rel="noopener">matlab GUI之对话框</a></p>
-<h2 id="多个string连接"><a href="#多个string连接" class="headerlink" title="多个string连接"></a>多个string连接</h2><ol>
-<li><p><code>sprintf</code></p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br></pre></td></tr></table></figure></li>
-<li><p>strcat</p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名"><a href="#获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名" class="headerlink" title="获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)"></a>获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[pathstr,realname,ext] = fileparts(<span class="string">'C:\\images\\test.bmp'</span>);</span><br></pre></td></tr></table></figure>
-<p>=&gt;</p>
-<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">pathstr = <span class="string">'C:\images\'</span></span><br><span class="line"><span class="string">realname = '</span>test'</span><br><span class="line">ext = <span class="string">'.bmp'</span></span><br></pre></td></tr></table></figure>
-<h2 id="UI获取文件名和文件夹"><a href="#UI获取文件名和文件夹" class="headerlink" title="UI获取文件名和文件夹"></a>UI获取文件名和文件夹</h2><ul>
-<li><p>文件</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[filename, pathname] = uigetfile(&#123;<span class="string">'*.*'</span>;<span class="string">'*.avi'</span>;<span class="string">'*.mpg'</span>;<span class="string">'*.wmv'</span>;<span class="string">'*.asf'</span>;<span class="string">'*.asx'</span>;<span class="string">'*.mj2'</span>&#125;, <span class="string">'Select a VIDEO file...'</span>);</span><br><span class="line">video_file_name = fullfile(pathname, filename); <span class="comment">% use fullfile for OS independent</span></span><br></pre></td></tr></table></figure></li>
-<li><p>文件夹</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">output_images_folder = uigetdir(pwd, <span class="string">'Select the FOLDER where to save images...'</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="遍历文件夹内所有-指定类型-文件"><a href="#遍历文件夹内所有-指定类型-文件" class="headerlink" title="遍历文件夹内所有(指定类型)文件"></a>遍历文件夹内所有(指定类型)文件</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">data_pwd = uigetdir;</span><br><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br><span class="line">filearray = dir(file_temp);</span><br><span class="line">s=<span class="built_in">max</span>(<span class="built_in">size</span>(filearray));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:s</span><br><span class="line">    imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="获取image的长-宽和channel数"><a href="#获取image的长-宽和channel数" class="headerlink" title="获取image的长, 宽和channel数"></a>获取image的长, 宽和channel数</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">img = imread(<span class="string">'C:\Users\tommyhu\Desktop\test\frame_0000.bmp'</span>);</span><br><span class="line">[h, w, c] = <span class="built_in">size</span>(img);</span><br></pre></td></tr></table></figure>
-<h2 id="遍历video的每一帧"><a href="#遍历video的每一帧" class="headerlink" title="遍历video的每一帧"></a>遍历video的每一帧</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">mov = VideoReader(video_file_name);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:mov.numberofframes</span><br><span class="line">    b=read(mov,<span class="built_in">i</span>);</span><br><span class="line">	... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="获取用户输入"><a href="#获取用户输入" class="headerlink" title="获取用户输入"></a>获取用户输入</h2><ul>
-<li><p>命令行方式</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">strResponse = input(<span class="string">'Do you want more? Y/N [Y]: '</span>, <span class="string">'s'</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>UI方式</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">prompt = &#123; <span class="string">'from:'</span>,<span class="string">'to:'</span>,<span class="string">'step'</span>&#125;;</span><br><span class="line">dlg_title = <span class="string">'choose images'</span>;</span><br><span class="line">num_lines = [<span class="number">4</span> <span class="number">1</span> <span class="number">3</span>]; <span class="comment">% can be a scaler number that applies to all</span></span><br><span class="line">defAns = &#123;<span class="string">'0'</span>, <span class="string">''</span>, <span class="string">'1'</span>&#125;;</span><br><span class="line">options = <span class="string">'on'</span>; <span class="comment">% enable to resize window</span></span><br><span class="line">answer = inputdlg(prompt,dlg_title,num_lines,defAns);</span><br><span class="line"></span><br><span class="line">from=str2num(cell2mat(answer(<span class="number">1</span>)));</span><br><span class="line">to=str2num(cell2mat(answer(<span class="number">2</span>)));</span><br><span class="line">stepsize=str2num(cell2mat(answer(<span class="number">3</span>)));</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="输出到txt"><a href="#输出到txt" class="headerlink" title="输出到txt"></a>输出到txt</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">fileID = fopen(<span class="string">'faces.txt'</span>, <span class="string">'w'</span>);</span><br><span class="line">fprintf(fileID,<span class="string">'[%4.2f,%d,%d,%d]\n'</span>, x, y, z, t);</span><br><span class="line">fclose(fileID);</span><br></pre></td></tr></table></figure>
-<h2 id="Functions-with-required-and-optional-inputs"><a href="#Functions-with-required-and-optional-inputs" class="headerlink" title="Functions with required and optional inputs"></a>Functions with required and optional inputs</h2><p>Refer to <a href="http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html" target="_blank" rel="noopener">http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html</a>.</p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>matlab</tag>
       </tags>
   </entry>
   <entry>
@@ -1019,6 +979,46 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>MATLAB sumup</title>
+    <url>/2012/08/30/MATLAB-sumup/</url>
+    <content><![CDATA[<h2 id="Get-rect-from-mouse"><a href="#Get-rect-from-mouse" class="headerlink" title="Get rect from mouse"></a>Get rect from mouse</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imshow(<span class="string">'test.jpg'</span>);</span><br><span class="line">rect = getrect;</span><br></pre></td></tr></table></figure>
+<h2 id="对话框-dialog-box"><a href="#对话框-dialog-box" class="headerlink" title="对话框 dialog box"></a>对话框 dialog box</h2><p>cc: <a href="http://hi.baidu.com/7777777_shu/item/ccb713f20ce99e18d7ff8cda" target="_blank" rel="noopener">matlab GUI之对话框</a></p>
+<h2 id="多个string连接"><a href="#多个string连接" class="headerlink" title="多个string连接"></a>多个string连接</h2><ol>
+<li><p><code>sprintf</code></p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br></pre></td></tr></table></figure></li>
+<li><p>strcat</p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名"><a href="#获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名" class="headerlink" title="获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)"></a>获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[pathstr,realname,ext] = fileparts(<span class="string">'C:\\images\\test.bmp'</span>);</span><br></pre></td></tr></table></figure>
+<p>=&gt;</p>
+<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">pathstr = <span class="string">'C:\images\'</span></span><br><span class="line"><span class="string">realname = '</span>test'</span><br><span class="line">ext = <span class="string">'.bmp'</span></span><br></pre></td></tr></table></figure>
+<h2 id="UI获取文件名和文件夹"><a href="#UI获取文件名和文件夹" class="headerlink" title="UI获取文件名和文件夹"></a>UI获取文件名和文件夹</h2><ul>
+<li><p>文件</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[filename, pathname] = uigetfile(&#123;<span class="string">'*.*'</span>;<span class="string">'*.avi'</span>;<span class="string">'*.mpg'</span>;<span class="string">'*.wmv'</span>;<span class="string">'*.asf'</span>;<span class="string">'*.asx'</span>;<span class="string">'*.mj2'</span>&#125;, <span class="string">'Select a VIDEO file...'</span>);</span><br><span class="line">video_file_name = fullfile(pathname, filename); <span class="comment">% use fullfile for OS independent</span></span><br></pre></td></tr></table></figure></li>
+<li><p>文件夹</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">output_images_folder = uigetdir(pwd, <span class="string">'Select the FOLDER where to save images...'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="遍历文件夹内所有-指定类型-文件"><a href="#遍历文件夹内所有-指定类型-文件" class="headerlink" title="遍历文件夹内所有(指定类型)文件"></a>遍历文件夹内所有(指定类型)文件</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">data_pwd = uigetdir;</span><br><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br><span class="line">filearray = dir(file_temp);</span><br><span class="line">s=<span class="built_in">max</span>(<span class="built_in">size</span>(filearray));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:s</span><br><span class="line">    imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="获取image的长-宽和channel数"><a href="#获取image的长-宽和channel数" class="headerlink" title="获取image的长, 宽和channel数"></a>获取image的长, 宽和channel数</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">img = imread(<span class="string">'C:\Users\tommyhu\Desktop\test\frame_0000.bmp'</span>);</span><br><span class="line">[h, w, c] = <span class="built_in">size</span>(img);</span><br></pre></td></tr></table></figure>
+<h2 id="遍历video的每一帧"><a href="#遍历video的每一帧" class="headerlink" title="遍历video的每一帧"></a>遍历video的每一帧</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">mov = VideoReader(video_file_name);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:mov.numberofframes</span><br><span class="line">    b=read(mov,<span class="built_in">i</span>);</span><br><span class="line">	... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="获取用户输入"><a href="#获取用户输入" class="headerlink" title="获取用户输入"></a>获取用户输入</h2><ul>
+<li><p>命令行方式</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">strResponse = input(<span class="string">'Do you want more? Y/N [Y]: '</span>, <span class="string">'s'</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>UI方式</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">prompt = &#123; <span class="string">'from:'</span>,<span class="string">'to:'</span>,<span class="string">'step'</span>&#125;;</span><br><span class="line">dlg_title = <span class="string">'choose images'</span>;</span><br><span class="line">num_lines = [<span class="number">4</span> <span class="number">1</span> <span class="number">3</span>]; <span class="comment">% can be a scaler number that applies to all</span></span><br><span class="line">defAns = &#123;<span class="string">'0'</span>, <span class="string">''</span>, <span class="string">'1'</span>&#125;;</span><br><span class="line">options = <span class="string">'on'</span>; <span class="comment">% enable to resize window</span></span><br><span class="line">answer = inputdlg(prompt,dlg_title,num_lines,defAns);</span><br><span class="line"></span><br><span class="line">from=str2num(cell2mat(answer(<span class="number">1</span>)));</span><br><span class="line">to=str2num(cell2mat(answer(<span class="number">2</span>)));</span><br><span class="line">stepsize=str2num(cell2mat(answer(<span class="number">3</span>)));</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="输出到txt"><a href="#输出到txt" class="headerlink" title="输出到txt"></a>输出到txt</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">fileID = fopen(<span class="string">'faces.txt'</span>, <span class="string">'w'</span>);</span><br><span class="line">fprintf(fileID,<span class="string">'[%4.2f,%d,%d,%d]\n'</span>, x, y, z, t);</span><br><span class="line">fclose(fileID);</span><br></pre></td></tr></table></figure>
+<h2 id="Functions-with-required-and-optional-inputs"><a href="#Functions-with-required-and-optional-inputs" class="headerlink" title="Functions with required and optional inputs"></a>Functions with required and optional inputs</h2><p>Refer to <a href="http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html" target="_blank" rel="noopener">http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html</a>.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>matlab</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MFC sumup</title>
     <url>/2011/10/09/MFC-sumup/</url>
     <content><![CDATA[<h2 id="代码组织"><a href="#代码组织" class="headerlink" title="代码组织"></a>代码组织</h2><ul>
@@ -1059,6 +1059,156 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>mfc</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>OpenCV sumup</title>
+    <url>/2012/09/04/OpenCV-sumup/</url>
+    <content><![CDATA[<h2 id="Data-types-of-Mat"><a href="#Data-types-of-Mat" class="headerlink" title="Data types of Mat"></a>Data types of Mat</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Name</th>
+<th style="text-align:center">Data Type</th>
+<th style="text-align:center">Bit Size</th>
+<th style="text-align:center">Range</th>
+<th style="text-align:center">Other</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>CV_8U</code></td>
+<td style="text-align:center">uchar / unsigned char</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">0 ~ 255</td>
+<td style="text-align:center">Default for image data</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_8S</code></td>
+<td style="text-align:center">char</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">-128 ~ 127</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_16U</code></td>
+<td style="text-align:center">ushort / unsigned short int</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">0 ~ 65535</td>
+<td style="text-align:center">unsigned short</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_16S</code></td>
+<td style="text-align:center">short int</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">-32768 ~ 32767</td>
+<td style="text-align:center">short</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_32S</code></td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">-2147483648 ~ 2147483647</td>
+<td style="text-align:center">long</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_32F</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">\(1.18\times10^{-38}\) ~ \(3.40\times10^{38}\)</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_64F</code></td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">64</td>
+<td style="text-align:center">\(2.23\times10^{-308}\) ~ \(1.79\times10^{308}\)</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="Conversion-between-Mat-and-IplImage"><a href="#Conversion-between-Mat-and-IplImage" class="headerlink" title="Conversion between Mat and IplImage"></a>Conversion between Mat and IplImage</h2><ol>
+<li><p><strong><code>IplImage *</code> to <code>Mat</code></strong>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *ipl_img;</span><br><span class="line"><span class="function">Mat <span class="title">mat_img</span><span class="params">(ipl_img)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong><code>IplImage</code> to <code>Mat</code></strong>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage ipl_img;</span><br><span class="line">Mat mat_img = cv::cvarrToMat(&amp;ipl_img, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong><code>Mat</code> to <code>IplImage</code></strong>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat mat_img;</span><br><span class="line">IplImage ipl_img = mat_img;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Access-pixel-intensity-values-of-images"><a href="#Access-pixel-intensity-values-of-images" class="headerlink" title="Access pixel intensity values of images"></a>Access pixel intensity values of images</h2><ol>
+<li><p><strong><code>Mat</code></strong> (e.g. <code>Mat img</code>)</p>
+<ul>
+<li><p><strong>Grayscale</strong> (<code>8UC1</code>)</p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = img.at&lt;uchar&gt;(y, x);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Color image</strong> (<strong>BGR</strong> color ordering, the default format returned by <code>imread</code>)</p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Vec3b intensity = img.at&lt;Vec3b&gt;(y, x);</span><br><span class="line">uchar blue = intensity.val[<span class="number">0</span>];</span><br><span class="line">uchar green = intensity.val[<span class="number">1</span>];</span><br><span class="line">uchar red = intensity.val[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+<p>Note: the same method can be used to change pixel intensities.</p>
+</li>
+</ul>
+</li>
+<li><p><strong><code>IplImage</code></strong> (e.g. <code>IplImage* img</code>)</p>
+<ul>
+<li><p><strong>Grayscale</strong></p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = CV_IMAGE_ELEM(img, uchar, h, w);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Color image</strong></p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar blue = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>);</span><br><span class="line">uchar green = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">1</span>);</span><br><span class="line">uchar red = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="Content-transform-between-Mat-row-col-and-vector"><a href="#Content-transform-between-Mat-row-col-and-vector" class="headerlink" title="Content transform between Mat row/col and vector"></a>Content transform between Mat row/col and vector</h2><ol>
+<li><p><strong><code>Mat</code> row/col to <code>Mat</code> row/col</strong><br>cc: <a href="http://opencv.willowgarage.com/documentation/cpp/basic_structures.html" target="_blank" rel="noopener">http://opencv.willowgarage.com/documentation/cpp/basic_structures.html</a></p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// add 5-th row, multiplied by 3 to the 3rd row</span></span><br><span class="line">M.row(<span class="number">3</span>) = M.row(<span class="number">3</span>) + M.row(<span class="number">5</span>)*<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// now copy 7-th column to the 1-st column</span></span><br><span class="line"><span class="comment">// M.col(1) = M.col(7); // this will not work</span></span><br><span class="line">Mat M1 = M.col(<span class="number">1</span>);</span><br><span class="line">M.col(<span class="number">7</span>).copyTo(M1);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong><code>Mat</code> row/col to <code>vector</code></strong></p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">data</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, CV_32F)</span></span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">0</span>) = <span class="number">1</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">1</span>) = <span class="number">2</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">0</span>) = <span class="number">3</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">1</span>) = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second row data to p</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p;  </span><br><span class="line">data.row(<span class="number">1</span>).copyTo(p);</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second col data to p2</span></span><br><span class="line">Mat data_transpose;</span><br><span class="line">transpose(data, data_transpose);</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p2;  </span><br><span class="line">data_transpose.row(<span class="number">1</span>).copyTo(p2);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="About-cv-Rect"><a href="#About-cv-Rect" class="headerlink" title="About cv::Rect"></a>About cv::Rect</h2><p>Note that, the top and left boundary of the rectangle are inclusive, while the right and bottom boundaries are not.</p>
+<ul>
+<li>For <code>cv::Rect rect(x,y,w,h)</code>, its right bottom corner is <code>rect.br() = cv::Point(x+w, y+h)</code>, not <del><code>cv::Point(x+w-1, y+h-1)</code></del>.</li>
+<li><p>To loop over an image ROI in OpenCV (where ROI is specified by <code>rect</code> ) is implemented as:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = roi.y; y &lt; roi.y + roi.height; y++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = roi.x; x &lt; roi.x + roi.width; x++) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="About-CvBox2D"><a href="#About-CvBox2D" class="headerlink" title="About CvBox2D"></a>About CvBox2D</h2><p>The definition of <code>CvBox2D</code> in OpenCV 2.1 is as follows:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">CvBox2D</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    CvPoint2D32f center; <span class="comment">/* center of the box */</span></span><br><span class="line">    CvSize2D32f size; <span class="comment">/* box width and length */</span></span><br><span class="line">    <span class="keyword">float</span> angle; <span class="comment">/* angle between the horizontal axis and the first side (i.e. length) in radians */</span></span><br><span class="line">&#125;</span><br><span class="line">CvBox2D;</span><br></pre></td></tr></table></figure>
+<p>However, there are several inconsistencies when using in practice (i.e. angle), where I found that:</p>
+<ol>
+<li><code>center</code>: no problem.</li>
+<li><code>size</code>, take care of two things:<ul>
+<li><code>size</code> is for the <strong>full size</strong>, not <del><strong>the half size</strong></del>. (Extremtly useful for ellipses respresented by <code>CvBox2D</code>).</li>
+<li><code>size</code> is consisted of <code>width</code> and <code>height</code>. Note that no perticular garantee for the size relationship amont the two (who is larger), on the other hand, it seems <code>height</code> will be always larger than <code>width</code> obtained by default (need to verify!!!)</li>
+</ul>
+</li>
+<li><p><code>angle</code>, several issues:</p>
+<ul>
+<li>Type: not <del><strong>radians</strong></del>, <strong>degrees</strong> instead.</li>
+<li>Meaning: not <del><strong>angle between the horizontal axis and the first side (i.e. length)</strong></del>, <strong>the angle anticlockwisely from -y($\uparrow$) direction ( see the image plane in the following figure) to the first length edge instead</strong>.</li>
+<li><p>Range: can be any size, but with cycle period of <strong>180 (\(\pi\))</strong>, so better to first <strong>normalize to [0, 180)</strong> in practise.</p>
+<p> <img src="/2012/09/04/OpenCV-sumup/image_plane.png" alt="Image for showing image plane" title="Image plane"></p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="About-Sobel-operator"><a href="#About-Sobel-operator" class="headerlink" title="About Sobel operator"></a>About Sobel operator</h2><p>When using the following old version:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CVAPI(<span class="keyword">void</span>) cvSobel( <span class="keyword">const</span> CvArr* src, CvArr* dst, <span class="keyword">int</span> xorder, <span class="keyword">int</span> yorder, <span class="keyword">int</span> aperture_size CV_DEFAULT(<span class="number">3</span>));</span><br></pre></td></tr></table></figure>
+<p>, remember that, for <code>dst</code> (need to be created by using <code>cvCreateImage</code>), only <code>IPL_DEPTH_32F</code> can be used, which is different from OpenCV’s documentation.</p>
+<p>For new version (together with the old version):</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CV_EXPORTS_W <span class="keyword">void</span> <span class="title">Sobel</span><span class="params">( InputArray src, OutputArray dst, <span class="keyword">int</span> ddepth, <span class="keyword">int</span> dx, <span class="keyword">int</span> dy, <span class="keyword">int</span> ksize=<span class="number">3</span>, <span class="keyword">double</span> scale=<span class="number">1</span>, <span class="keyword">double</span> delta=<span class="number">0</span>, <span class="keyword">int</span> borderType=BORDER_DEFAULT)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>, remember that the following two versions will give the same result</p>
+<ul>
+<li><p>Old version</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *xsobel, *ysobel;</span><br><span class="line">xsobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">ysobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">cvSobel(img_gray, xsobel, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>);</span><br><span class="line">cvSobel(img_gray, ysobel, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>New version</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat xsobel, ysobel;</span><br><span class="line">Sobel(img_gray, xsobel, CV_32F, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br><span class="line">Sobel(img_gray, ysobel, CV_32F, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>opencv</tag>
       </tags>
   </entry>
   <entry>
@@ -1559,293 +1709,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>OpenCV sumup</title>
-    <url>/2012/09/04/OpenCV-sumup/</url>
-    <content><![CDATA[<h2 id="Data-types-of-Mat"><a href="#Data-types-of-Mat" class="headerlink" title="Data types of Mat"></a>Data types of Mat</h2><div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Name</th>
-<th style="text-align:center">Data Type</th>
-<th style="text-align:center">Bit Size</th>
-<th style="text-align:center">Range</th>
-<th style="text-align:center">Other</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>CV_8U</code></td>
-<td style="text-align:center">uchar / unsigned char</td>
-<td style="text-align:center">8</td>
-<td style="text-align:center">0 ~ 255</td>
-<td style="text-align:center">Default for image data</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_8S</code></td>
-<td style="text-align:center">char</td>
-<td style="text-align:center">8</td>
-<td style="text-align:center">-128 ~ 127</td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_16U</code></td>
-<td style="text-align:center">ushort / unsigned short int</td>
-<td style="text-align:center">16</td>
-<td style="text-align:center">0 ~ 65535</td>
-<td style="text-align:center">unsigned short</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_16S</code></td>
-<td style="text-align:center">short int</td>
-<td style="text-align:center">16</td>
-<td style="text-align:center">-32768 ~ 32767</td>
-<td style="text-align:center">short</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_32S</code></td>
-<td style="text-align:center">int</td>
-<td style="text-align:center">32</td>
-<td style="text-align:center">-2147483648 ~ 2147483647</td>
-<td style="text-align:center">long</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_32F</code></td>
-<td style="text-align:center">float</td>
-<td style="text-align:center">32</td>
-<td style="text-align:center">\(1.18\times10^{-38}\) ~ \(3.40\times10^{38}\)</td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_64F</code></td>
-<td style="text-align:center">double</td>
-<td style="text-align:center">64</td>
-<td style="text-align:center">\(2.23\times10^{-308}\) ~ \(1.79\times10^{308}\)</td>
-<td style="text-align:center"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<h2 id="Conversion-between-Mat-and-IplImage"><a href="#Conversion-between-Mat-and-IplImage" class="headerlink" title="Conversion between Mat and IplImage"></a>Conversion between Mat and IplImage</h2><ol>
-<li><p><strong><code>IplImage *</code> to <code>Mat</code></strong>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *ipl_img;</span><br><span class="line"><span class="function">Mat <span class="title">mat_img</span><span class="params">(ipl_img)</span></span>;</span><br></pre></td></tr></table></figure></li>
-<li><p><strong><code>IplImage</code> to <code>Mat</code></strong>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage ipl_img;</span><br><span class="line">Mat mat_img = cv::cvarrToMat(&amp;ipl_img, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong><code>Mat</code> to <code>IplImage</code></strong>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat mat_img;</span><br><span class="line">IplImage ipl_img = mat_img;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Access-pixel-intensity-values-of-images"><a href="#Access-pixel-intensity-values-of-images" class="headerlink" title="Access pixel intensity values of images"></a>Access pixel intensity values of images</h2><ol>
-<li><p><strong><code>Mat</code></strong> (e.g. <code>Mat img</code>)</p>
-<ul>
-<li><p><strong>Grayscale</strong> (<code>8UC1</code>)</p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = img.at&lt;uchar&gt;(y, x);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong>Color image</strong> (<strong>BGR</strong> color ordering, the default format returned by <code>imread</code>)</p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Vec3b intensity = img.at&lt;Vec3b&gt;(y, x);</span><br><span class="line">uchar blue = intensity.val[<span class="number">0</span>];</span><br><span class="line">uchar green = intensity.val[<span class="number">1</span>];</span><br><span class="line">uchar red = intensity.val[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
-<p>Note: the same method can be used to change pixel intensities.</p>
-</li>
-</ul>
-</li>
-<li><p><strong><code>IplImage</code></strong> (e.g. <code>IplImage* img</code>)</p>
-<ul>
-<li><p><strong>Grayscale</strong></p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = CV_IMAGE_ELEM(img, uchar, h, w);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong>Color image</strong></p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar blue = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>);</span><br><span class="line">uchar green = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">1</span>);</span><br><span class="line">uchar red = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="Content-transform-between-Mat-row-col-and-vector"><a href="#Content-transform-between-Mat-row-col-and-vector" class="headerlink" title="Content transform between Mat row/col and vector"></a>Content transform between Mat row/col and vector</h2><ol>
-<li><p><strong><code>Mat</code> row/col to <code>Mat</code> row/col</strong><br>cc: <a href="http://opencv.willowgarage.com/documentation/cpp/basic_structures.html" target="_blank" rel="noopener">http://opencv.willowgarage.com/documentation/cpp/basic_structures.html</a></p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// add 5-th row, multiplied by 3 to the 3rd row</span></span><br><span class="line">M.row(<span class="number">3</span>) = M.row(<span class="number">3</span>) + M.row(<span class="number">5</span>)*<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// now copy 7-th column to the 1-st column</span></span><br><span class="line"><span class="comment">// M.col(1) = M.col(7); // this will not work</span></span><br><span class="line">Mat M1 = M.col(<span class="number">1</span>);</span><br><span class="line">M.col(<span class="number">7</span>).copyTo(M1);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong><code>Mat</code> row/col to <code>vector</code></strong></p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">data</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, CV_32F)</span></span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">0</span>) = <span class="number">1</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">1</span>) = <span class="number">2</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">0</span>) = <span class="number">3</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">1</span>) = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second row data to p</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p;  </span><br><span class="line">data.row(<span class="number">1</span>).copyTo(p);</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second col data to p2</span></span><br><span class="line">Mat data_transpose;</span><br><span class="line">transpose(data, data_transpose);</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p2;  </span><br><span class="line">data_transpose.row(<span class="number">1</span>).copyTo(p2);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="About-cv-Rect"><a href="#About-cv-Rect" class="headerlink" title="About cv::Rect"></a>About cv::Rect</h2><p>Note that, the top and left boundary of the rectangle are inclusive, while the right and bottom boundaries are not.</p>
-<ul>
-<li>For <code>cv::Rect rect(x,y,w,h)</code>, its right bottom corner is <code>rect.br() = cv::Point(x+w, y+h)</code>, not <del><code>cv::Point(x+w-1, y+h-1)</code></del>.</li>
-<li><p>To loop over an image ROI in OpenCV (where ROI is specified by <code>rect</code> ) is implemented as:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = roi.y; y &lt; roi.y + roi.height; y++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = roi.x; x &lt; roi.x + roi.width; x++) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="About-CvBox2D"><a href="#About-CvBox2D" class="headerlink" title="About CvBox2D"></a>About CvBox2D</h2><p>The definition of <code>CvBox2D</code> in OpenCV 2.1 is as follows:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">CvBox2D</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    CvPoint2D32f center; <span class="comment">/* center of the box */</span></span><br><span class="line">    CvSize2D32f size; <span class="comment">/* box width and length */</span></span><br><span class="line">    <span class="keyword">float</span> angle; <span class="comment">/* angle between the horizontal axis and the first side (i.e. length) in radians */</span></span><br><span class="line">&#125;</span><br><span class="line">CvBox2D;</span><br></pre></td></tr></table></figure>
-<p>However, there are several inconsistencies when using in practice (i.e. angle), where I found that:</p>
-<ol>
-<li><code>center</code>: no problem.</li>
-<li><code>size</code>, take care of two things:<ul>
-<li><code>size</code> is for the <strong>full size</strong>, not <del><strong>the half size</strong></del>. (Extremtly useful for ellipses respresented by <code>CvBox2D</code>).</li>
-<li><code>size</code> is consisted of <code>width</code> and <code>height</code>. Note that no perticular garantee for the size relationship amont the two (who is larger), on the other hand, it seems <code>height</code> will be always larger than <code>width</code> obtained by default (need to verify!!!)</li>
-</ul>
-</li>
-<li><p><code>angle</code>, several issues:</p>
-<ul>
-<li>Type: not <del><strong>radians</strong></del>, <strong>degrees</strong> instead.</li>
-<li>Meaning: not <del><strong>angle between the horizontal axis and the first side (i.e. length)</strong></del>, <strong>the angle anticlockwisely from -y($\uparrow$) direction ( see the image plane in the following figure) to the first length edge instead</strong>.</li>
-<li><p>Range: can be any size, but with cycle period of <strong>180 (\(\pi\))</strong>, so better to first <strong>normalize to [0, 180)</strong> in practise.</p>
-<p> <img src="/2012/09/04/OpenCV-sumup/image_plane.png" alt="Image for showing image plane" title="Image plane"></p>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="About-Sobel-operator"><a href="#About-Sobel-operator" class="headerlink" title="About Sobel operator"></a>About Sobel operator</h2><p>When using the following old version:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CVAPI(<span class="keyword">void</span>) cvSobel( <span class="keyword">const</span> CvArr* src, CvArr* dst, <span class="keyword">int</span> xorder, <span class="keyword">int</span> yorder, <span class="keyword">int</span> aperture_size CV_DEFAULT(<span class="number">3</span>));</span><br></pre></td></tr></table></figure>
-<p>, remember that, for <code>dst</code> (need to be created by using <code>cvCreateImage</code>), only <code>IPL_DEPTH_32F</code> can be used, which is different from OpenCV’s documentation.</p>
-<p>For new version (together with the old version):</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CV_EXPORTS_W <span class="keyword">void</span> <span class="title">Sobel</span><span class="params">( InputArray src, OutputArray dst, <span class="keyword">int</span> ddepth, <span class="keyword">int</span> dx, <span class="keyword">int</span> dy, <span class="keyword">int</span> ksize=<span class="number">3</span>, <span class="keyword">double</span> scale=<span class="number">1</span>, <span class="keyword">double</span> delta=<span class="number">0</span>, <span class="keyword">int</span> borderType=BORDER_DEFAULT)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>, remember that the following two versions will give the same result</p>
-<ul>
-<li><p>Old version</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *xsobel, *ysobel;</span><br><span class="line">xsobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">ysobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">cvSobel(img_gray, xsobel, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>);</span><br><span class="line">cvSobel(img_gray, ysobel, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>New version</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat xsobel, ysobel;</span><br><span class="line">Sobel(img_gray, xsobel, CV_32F, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br><span class="line">Sobel(img_gray, ysobel, CV_32F, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>opencv</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Research Topics Related Useful Links</title>
-    <url>/2011/11/15/Research-Topics-Related-Useful-Links/</url>
-    <content><![CDATA[<h2 id="3D-face-facial-expressions-databases"><a href="#3D-face-facial-expressions-databases" class="headerlink" title="3D face (facial expressions) databases"></a>3D face (facial expressions) databases</h2><ul>
-<li><a href="http://bosphorus.ee.boun.edu.tr/" target="_blank" rel="noopener">Bosphorus database (face &amp; hand)</a></li>
-<li><a href="http://faces.cs.unibas.ch/bfm/main.php" target="_blank" rel="noopener">Morphace</a></li>
-<li><a href="http://www.cs.binghamton.edu/~lijun/Research/3DFE/3DFE_Analysis.html" target="_blank" rel="noopener">Analyzing facial expressions in three dimensional space</a></li>
-<li><a href="http://www.frav.es/research/facerecognition/" target="_blank" rel="noopener">Face recognition</a></li>
-<li><a href="http://www.cbsr.ia.ac.cn/english/3DFace%20Databases.asp" target="_blank" rel="noopener">CASIA 3D face database</a></li>
-<li><a href="http://www.bjut.edu.cn/sci/multimedia/mul-lab/3dface/face_database.htm" target="_blank" rel="noopener">BJUT-3D face database</a></li>
-</ul>
-<h2 id="Human-detection"><a href="#Human-detection" class="headerlink" title="Human detection"></a>Human detection</h2><ul>
-<li>Dataset and ground-truth<ul>
-<li><a href="http://www.milanton.de/data.html" target="_blank" rel="noopener">PETS 2009 | TUD | EPFL</a></li>
-</ul>
-</li>
-<li>Papers:<ul>
-<li><a href="http://vision.ucsd.edu/~pdollar/research.html#ObjectDetection" target="_blank" rel="noopener">Piotr Dollár’s work</a><ul>
-<li>09 BMVC - Integral Channel Features</li>
-<li>10 BMVC - The Fastest Pedestrian Detector in the West</li>
-<li>12 ECCV - Crosstalk Cascades for Frame-Rate Pedestrian Detection</li>
-<li>12 PAMI - Pedestrian Detection: An Evaluation of the State of the Art</li>
-<li>14 PAMI - Fast Feature Pyramids for Object Detection</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Other:<ul>
-<li><a href="http://rodrigob.github.io/" target="_blank" rel="noopener">12 CVPR - Pedestrian detection at 100 frames per second</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="Human-Pose-Estimation"><a href="#Human-Pose-Estimation" class="headerlink" title="Human Pose Estimation"></a>Human Pose Estimation</h2><ul>
-<li>Dataset and Benchmark<ul>
-<li><a href="http://human-pose.mpi-inf.mpg.de/" target="_blank" rel="noopener">MPII Human Pose Dataset</a></li>
-</ul>
-</li>
-<li>Papers<ul>
-<li><a href="http://users.cecs.anu.edu.au/~yili/humanpose.html" target="_blank" rel="noopener">13 CVPR - Beyond Physical Connections: Tree Models in Human Pose Estimation</a>: with MATLAB code</li>
-</ul>
-</li>
-</ul>
-<h2 id="Object-tracking"><a href="#Object-tracking" class="headerlink" title="Object tracking"></a>Object tracking</h2><ul>
-<li>Dataset and ground-truth<ul>
-<li><a href="http://www.milanton.de/data.html" target="_blank" rel="noopener">PETS 2009 | TUD-Stadtmitte | TUD-Campus | TUD-Crossing | ETH-Person</a></li>
-</ul>
-</li>
-<li><p>Single camera tracking:</p>
-<ul>
-<li><p>Online object tracking:</p>
-<ul>
-<li><a href="http://cvlab.hanyang.ac.kr/tracker_benchmark/index.html" target="_blank" rel="noopener">Visual Tracker Benchmark</a></li>
-<li><a href="http://www.votchallenge.net/" target="_blank" rel="noopener">Visual Object Tracking (VOT) challenge</a></li>
-<li><a href="http://visual-tracking.net/" target="_blank" rel="noopener">13 CVPR - Online Object Tracking: A Benchmark</a></li>
-<li><p><a href="http://tracking.cs.princeton.edu/eval.php" target="_blank" rel="noopener">13 ICCV - Tracking Revisited using RGBD Camera: Unified Benchmark and Baselines</a></p>
-<blockquote>
-<p>Deep Learning based trackers:</p>
-<ul>
-<li>15 ICML - Online Tracking by Learning Discriminative Saliency Map with Convolutional Neural Network</li>
-<li>15 arXiv - Learning Multi-Domain Convolutional Neural Networks for Visual Tracking</li>
-</ul>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>Tracking-by-detection/data-association:</p>
-<ul>
-<li><a href="http://www.milanton.de/contracking" target="_blank" rel="noopener">14 PAMI - Continuous Energy Minimization for Multi-Target Tracking</a>: with MATLAB code</li>
-<li><a href="https://lrs.icg.tugraz.at/download#motog" target="_blank" rel="noopener">14 CVPR - Occlusion Geodesics for Online Multi-Object Tracking</a>: with MATLAB code</li>
-<li><a href="http://www.milanton.de/dctracking/" target="_blank" rel="noopener">12 CVPR - Discrete-Continuous Energy Minimization for Multi-Target Tracking</a>: with MATLAB code</li>
-<li><a href="http://iris.usc.edu/Outlines/papers/2012/yang-nevatia-cvpr-1-2012.pdf" target="_blank" rel="noopener">12 CVPR - Multi-Target Tracking by Online Learning of Non-linear Motion Patterns and Robust Appearance Models</a></li>
-<li><a href="http://cs-people.bu.edu/jmzhang/tracker_hierarchy/Tracker_Hierarchy.htm" target="_blank" rel="noopener">12 AVSS - Online Multi-Person Tracking by Tracker Hierarchy</a>: with C++ code</li>
-<li><a href="http://people.csail.mit.edu/hpirsiav/papers/tracking_cvpr11.pdf" target="_blank" rel="noopener">11 CVPR - Globally-Optimal Greedy Algorithms for Tracking a Variable Number of Objects</a>: with MATLAB code</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Multiple camera tracking:<ul>
-<li>Metrics and ground-truth labeling: <a href="http://www.milanton.de/files/cvprws2013/cvprws2013-anton.pdf" target="_blank" rel="noopener">13 CVPRW - Challenges of Ground Truth Evaluation of Multi-Target Tracking</a></li>
-<li>Papers:<ul>
-<li><a href="http://cvlab.epfl.ch/research/body/surv" target="_blank" rel="noopener">Tracking People using Multiple Cameras</a></li>
-<li><a href="http://synesis.ru/en/surveillance/contents/mctintro" target="_blank" rel="noopener">The future of video surveillance: multiple camera tracking</a></li>
-<li><a href="http://www.sentinelave.com/ave.html" target="_blank" rel="noopener">AVE Video Fusion</a></li>
-<li><a href="http://www.cs.cmu.edu/~vsam/OldVsamWeb/vsamhome.html" target="_blank" rel="noopener">Video Surveillance and Monitoring (VSAM)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="Saliency-detection"><a href="#Saliency-detection" class="headerlink" title="Saliency detection"></a>Saliency detection</h2><ul>
-<li><a href="http://cs-people.bu.edu/jmzhang/fastmbd.html" target="_blank" rel="noopener">15 ICCV - Minimum Barrier Salient Object Detection at 80 FPS</a>: with exe</li>
-</ul>
-<h2 id="Image-feature-detection-and-description-1"><a href="#Image-feature-detection-and-description-1" class="headerlink" title="Image feature detection and description 1"></a>Image feature detection and description <sup><a href="#fn_1" id="reffn_1">1</a></sup></h2><h3 id="Keypoint-detectors"><a href="#Keypoint-detectors" class="headerlink" title="Keypoint detectors"></a>Keypoint detectors</h3><ul>
-<li><a href="http://www.edwardrosten.com/work/fast.html" target="_blank" rel="noopener">FAST</a>: high-speed corner detector, in OpenCV</li>
-<li><a href="http://www6.in.tum.de/Main/ResearchAgast" target="_blank" rel="noopener">AGAST</a>: even faster than the FAST. A multi-scale version of this method is used for the BRISK descriptor (10 ECCV).</li>
-</ul>
-<h3 id="Binary-descriptors"><a href="#Binary-descriptors" class="headerlink" title="Binary descriptors"></a>Binary descriptors</h3><ul>
-<li><a href="http://cvlab.epfl.ch/research/detect/brief" target="_blank" rel="noopener">BRIEF</a> – fast and accurate interest point descriptor (not invariant to rotations and scale)</li>
-<li><a href="http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html" target="_blank" rel="noopener">ORB</a> – Oriented-Brief descriptor (invariant to rotations, but not scale), in OpenCV</li>
-<li><a href="http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html" target="_blank" rel="noopener">BRISK</a> – efficient binary descriptor invariant to rotations and scale, in OpenCV</li>
-<li><a href="http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html" target="_blank" rel="noopener">FREAK</a> – faster than BRISK (invariant to rotations and scale), in OpenCV</li>
-</ul>
-<h3 id="SIFT-amp-SURF-Implementations"><a href="#SIFT-amp-SURF-Implementations" class="headerlink" title="SIFT &amp; SURF Implementations"></a>SIFT &amp; SURF Implementations</h3><ul>
-<li>SIFT: <a href="http://www.cs.ubc.ca/~lowe/keypoints/" target="_blank" rel="noopener">Original code by David Lowe</a> |  <a href="http://docs.opencv.org/modules/nonfree/doc/feature_detection.html" target="_blank" rel="noopener">OpenCV</a> | <a href="http://robwhess.github.com/opensift/" target="_blank" rel="noopener">OpenSIFT</a> | <a href="http://cs.unc.edu/~ccwu/siftgpu/" target="_blank" rel="noopener">GPU</a></li>
-<li>SURF: <a href="http://www.vision.ee.ethz.ch/~surf/index.html" target="_blank" rel="noopener">Herbert Bay’s code</a> | <a href="http://docs.opencv.org/modules/nonfree/doc/feature_detection.html" target="_blank" rel="noopener">OpenCV</a> | <a href="(https://www.mpi-inf.mpg.de/departments/computer-vision-and-multimodal-computing/research/object-recognition-and-scene-understanding/cuda-surf-a-real-time-implementation-for-surf/">CUDA</a></li>
-</ul>
-<h3 id="Other-Local-Feature-Detectors-and-Descriptors"><a href="#Other-Local-Feature-Detectors-and-Descriptors" class="headerlink" title="Other Local Feature Detectors and Descriptors"></a>Other Local Feature Detectors and Descriptors</h3><ul>
-<li><a href="http://www.robots.ox.ac.uk/~vgg/research/affine/" target="_blank" rel="noopener">VGG Affine Covariant features</a> – Oxford code for various affine covariant feature detectors and descriptors</li>
-<li><a href="http://zhwang.me/publication/liop/index.html" target="_blank" rel="noopener">LIOP descriptor</a> – Local Intensity Order Pattern (LIOP) descriptor</li>
-<li><a href="http://www.cs.cornell.edu/projects/symfeat/" target="_blank" rel="noopener">Local Symmetry Features</a> – matching of local symmetry features under large variations in lighting, age, and genTocHereg style</li>
-</ul>
-<h3 id="Global-Image-Descriptors"><a href="#Global-Image-Descriptors" class="headerlink" title="Global Image Descriptors"></a>Global Image Descriptors</h3><ul>
-<li>GIST: <a href="http://people.csail.mit.edu/torralba/code/spatialenvelope/" target="_blank" rel="noopener">MATLAB</a> | <a href="http://lear.inrialpes.fr/src/lear_gist-1.2.tgz" target="_blank" rel="noopener">C++</a> (Lear’s version)</li>
-<li><a href="https://sites.google.com/site/wujx2001/home/libhik" target="_blank" rel="noopener">CENTRIST</a> (in <code>libHIK</code>) – global visual descriptor for scene categorization and object detection. Another version can be found <a href="http://dovgalecs.com/blog/centrist-visual-descriptor-for-indoors-localization/" target="_blank" rel="noopener">here</a>.</li>
-</ul>
-<h2 id="Image-deblur"><a href="#Image-deblur" class="headerlink" title="Image deblur"></a>Image deblur</h2><ul>
-<li>Overview by cwang: <a href="http://i.cs.hku.hk/~cwang/deblur/index.html" target="_blank" rel="noopener">Deblur-related Materials</a></li>
-</ul>
-<h2 id="Image-Dehaze"><a href="#Image-Dehaze" class="headerlink" title="Image Dehaze"></a>Image Dehaze</h2><ul>
-<li><a href="http://research.microsoft.com/en-us/um/people/kahe/cvpr09/index.html" target="_blank" rel="noopener">09 CVPR - Single Image Haze Removal using Dark Channel Prior</a> | <a href="http://blog.csdn.net/polly_yang/article/details/48933383" target="_blank" rel="noopener">Blog</a></li>
-</ul>
-<h2 id="Steoro-matching"><a href="#Steoro-matching" class="headerlink" title="Steoro matching"></a>Steoro matching</h2><ul>
-<li><a href="http://www.cs.cityu.edu.hk/~qiyang/publications/cvpr-12/pami/" target="_blank" rel="noopener">14 PAMI - Stereo Matching Using Tree Filtering</a></li>
-<li><a href="http://cs.brown.edu/~pff/bp/index.html" target="_blank" rel="noopener">04 CVPR - Eﬃcient Belief Propagation for Early Vision</a></li>
-</ul>
-<h2 id="Filtering"><a href="#Filtering" class="headerlink" title="Filtering"></a>Filtering</h2><ul>
-<li>Bilateral Filtering: <a href="http://www.cs.cityu.edu.hk/~qiyang/publications/hebf/" target="_blank" rel="noopener">14 PAMI - Hardware-Efficient Bilateral Filtering for Stereo Matching</a> (integrated)</li>
-</ul>
-<hr>
-<blockquote id="fn_1">
-<sup>1</sup>. Source page of SYSU: <a href="http://gitl.sysu.edu.cn/downloads" target="_blank" rel="noopener">http://gitl.sysu.edu.cn/downloads</a>.<a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>research</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>OpenGL sumup</title>
     <url>/2011/10/09/OpenGL-sumup/</url>
     <content><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://gitlab.com/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
@@ -2053,6 +1916,143 @@ The difference is that: the first method <strong>only copy the listed files</str
 ]]></content>
       <tags>
         <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Research Topics Related Useful Links</title>
+    <url>/2011/11/15/Research-Topics-Related-Useful-Links/</url>
+    <content><![CDATA[<h2 id="3D-face-facial-expressions-databases"><a href="#3D-face-facial-expressions-databases" class="headerlink" title="3D face (facial expressions) databases"></a>3D face (facial expressions) databases</h2><ul>
+<li><a href="http://bosphorus.ee.boun.edu.tr/" target="_blank" rel="noopener">Bosphorus database (face &amp; hand)</a></li>
+<li><a href="http://faces.cs.unibas.ch/bfm/main.php" target="_blank" rel="noopener">Morphace</a></li>
+<li><a href="http://www.cs.binghamton.edu/~lijun/Research/3DFE/3DFE_Analysis.html" target="_blank" rel="noopener">Analyzing facial expressions in three dimensional space</a></li>
+<li><a href="http://www.frav.es/research/facerecognition/" target="_blank" rel="noopener">Face recognition</a></li>
+<li><a href="http://www.cbsr.ia.ac.cn/english/3DFace%20Databases.asp" target="_blank" rel="noopener">CASIA 3D face database</a></li>
+<li><a href="http://www.bjut.edu.cn/sci/multimedia/mul-lab/3dface/face_database.htm" target="_blank" rel="noopener">BJUT-3D face database</a></li>
+</ul>
+<h2 id="Human-detection"><a href="#Human-detection" class="headerlink" title="Human detection"></a>Human detection</h2><ul>
+<li>Dataset and ground-truth<ul>
+<li><a href="http://www.milanton.de/data.html" target="_blank" rel="noopener">PETS 2009 | TUD | EPFL</a></li>
+</ul>
+</li>
+<li>Papers:<ul>
+<li><a href="http://vision.ucsd.edu/~pdollar/research.html#ObjectDetection" target="_blank" rel="noopener">Piotr Dollár’s work</a><ul>
+<li>09 BMVC - Integral Channel Features</li>
+<li>10 BMVC - The Fastest Pedestrian Detector in the West</li>
+<li>12 ECCV - Crosstalk Cascades for Frame-Rate Pedestrian Detection</li>
+<li>12 PAMI - Pedestrian Detection: An Evaluation of the State of the Art</li>
+<li>14 PAMI - Fast Feature Pyramids for Object Detection</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Other:<ul>
+<li><a href="http://rodrigob.github.io/" target="_blank" rel="noopener">12 CVPR - Pedestrian detection at 100 frames per second</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="Human-Pose-Estimation"><a href="#Human-Pose-Estimation" class="headerlink" title="Human Pose Estimation"></a>Human Pose Estimation</h2><ul>
+<li>Dataset and Benchmark<ul>
+<li><a href="http://human-pose.mpi-inf.mpg.de/" target="_blank" rel="noopener">MPII Human Pose Dataset</a></li>
+</ul>
+</li>
+<li>Papers<ul>
+<li><a href="http://users.cecs.anu.edu.au/~yili/humanpose.html" target="_blank" rel="noopener">13 CVPR - Beyond Physical Connections: Tree Models in Human Pose Estimation</a>: with MATLAB code</li>
+</ul>
+</li>
+</ul>
+<h2 id="Object-tracking"><a href="#Object-tracking" class="headerlink" title="Object tracking"></a>Object tracking</h2><ul>
+<li>Dataset and ground-truth<ul>
+<li><a href="http://www.milanton.de/data.html" target="_blank" rel="noopener">PETS 2009 | TUD-Stadtmitte | TUD-Campus | TUD-Crossing | ETH-Person</a></li>
+</ul>
+</li>
+<li><p>Single camera tracking:</p>
+<ul>
+<li><p>Online object tracking:</p>
+<ul>
+<li><a href="http://cvlab.hanyang.ac.kr/tracker_benchmark/index.html" target="_blank" rel="noopener">Visual Tracker Benchmark</a></li>
+<li><a href="http://www.votchallenge.net/" target="_blank" rel="noopener">Visual Object Tracking (VOT) challenge</a></li>
+<li><a href="http://visual-tracking.net/" target="_blank" rel="noopener">13 CVPR - Online Object Tracking: A Benchmark</a></li>
+<li><p><a href="http://tracking.cs.princeton.edu/eval.php" target="_blank" rel="noopener">13 ICCV - Tracking Revisited using RGBD Camera: Unified Benchmark and Baselines</a></p>
+<blockquote>
+<p>Deep Learning based trackers:</p>
+<ul>
+<li>15 ICML - Online Tracking by Learning Discriminative Saliency Map with Convolutional Neural Network</li>
+<li>15 arXiv - Learning Multi-Domain Convolutional Neural Networks for Visual Tracking</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>Tracking-by-detection/data-association:</p>
+<ul>
+<li><a href="http://www.milanton.de/contracking" target="_blank" rel="noopener">14 PAMI - Continuous Energy Minimization for Multi-Target Tracking</a>: with MATLAB code</li>
+<li><a href="https://lrs.icg.tugraz.at/download#motog" target="_blank" rel="noopener">14 CVPR - Occlusion Geodesics for Online Multi-Object Tracking</a>: with MATLAB code</li>
+<li><a href="http://www.milanton.de/dctracking/" target="_blank" rel="noopener">12 CVPR - Discrete-Continuous Energy Minimization for Multi-Target Tracking</a>: with MATLAB code</li>
+<li><a href="http://iris.usc.edu/Outlines/papers/2012/yang-nevatia-cvpr-1-2012.pdf" target="_blank" rel="noopener">12 CVPR - Multi-Target Tracking by Online Learning of Non-linear Motion Patterns and Robust Appearance Models</a></li>
+<li><a href="http://cs-people.bu.edu/jmzhang/tracker_hierarchy/Tracker_Hierarchy.htm" target="_blank" rel="noopener">12 AVSS - Online Multi-Person Tracking by Tracker Hierarchy</a>: with C++ code</li>
+<li><a href="http://people.csail.mit.edu/hpirsiav/papers/tracking_cvpr11.pdf" target="_blank" rel="noopener">11 CVPR - Globally-Optimal Greedy Algorithms for Tracking a Variable Number of Objects</a>: with MATLAB code</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Multiple camera tracking:<ul>
+<li>Metrics and ground-truth labeling: <a href="http://www.milanton.de/files/cvprws2013/cvprws2013-anton.pdf" target="_blank" rel="noopener">13 CVPRW - Challenges of Ground Truth Evaluation of Multi-Target Tracking</a></li>
+<li>Papers:<ul>
+<li><a href="http://cvlab.epfl.ch/research/body/surv" target="_blank" rel="noopener">Tracking People using Multiple Cameras</a></li>
+<li><a href="http://synesis.ru/en/surveillance/contents/mctintro" target="_blank" rel="noopener">The future of video surveillance: multiple camera tracking</a></li>
+<li><a href="http://www.sentinelave.com/ave.html" target="_blank" rel="noopener">AVE Video Fusion</a></li>
+<li><a href="http://www.cs.cmu.edu/~vsam/OldVsamWeb/vsamhome.html" target="_blank" rel="noopener">Video Surveillance and Monitoring (VSAM)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Saliency-detection"><a href="#Saliency-detection" class="headerlink" title="Saliency detection"></a>Saliency detection</h2><ul>
+<li><a href="http://cs-people.bu.edu/jmzhang/fastmbd.html" target="_blank" rel="noopener">15 ICCV - Minimum Barrier Salient Object Detection at 80 FPS</a>: with exe</li>
+</ul>
+<h2 id="Image-feature-detection-and-description-1"><a href="#Image-feature-detection-and-description-1" class="headerlink" title="Image feature detection and description 1"></a>Image feature detection and description <sup><a href="#fn_1" id="reffn_1">1</a></sup></h2><h3 id="Keypoint-detectors"><a href="#Keypoint-detectors" class="headerlink" title="Keypoint detectors"></a>Keypoint detectors</h3><ul>
+<li><a href="http://www.edwardrosten.com/work/fast.html" target="_blank" rel="noopener">FAST</a>: high-speed corner detector, in OpenCV</li>
+<li><a href="http://www6.in.tum.de/Main/ResearchAgast" target="_blank" rel="noopener">AGAST</a>: even faster than the FAST. A multi-scale version of this method is used for the BRISK descriptor (10 ECCV).</li>
+</ul>
+<h3 id="Binary-descriptors"><a href="#Binary-descriptors" class="headerlink" title="Binary descriptors"></a>Binary descriptors</h3><ul>
+<li><a href="http://cvlab.epfl.ch/research/detect/brief" target="_blank" rel="noopener">BRIEF</a> – fast and accurate interest point descriptor (not invariant to rotations and scale)</li>
+<li><a href="http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html" target="_blank" rel="noopener">ORB</a> – Oriented-Brief descriptor (invariant to rotations, but not scale), in OpenCV</li>
+<li><a href="http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html" target="_blank" rel="noopener">BRISK</a> – efficient binary descriptor invariant to rotations and scale, in OpenCV</li>
+<li><a href="http://docs.opencv.org/modules/features2d/doc/feature_detection_and_description.html" target="_blank" rel="noopener">FREAK</a> – faster than BRISK (invariant to rotations and scale), in OpenCV</li>
+</ul>
+<h3 id="SIFT-amp-SURF-Implementations"><a href="#SIFT-amp-SURF-Implementations" class="headerlink" title="SIFT &amp; SURF Implementations"></a>SIFT &amp; SURF Implementations</h3><ul>
+<li>SIFT: <a href="http://www.cs.ubc.ca/~lowe/keypoints/" target="_blank" rel="noopener">Original code by David Lowe</a> |  <a href="http://docs.opencv.org/modules/nonfree/doc/feature_detection.html" target="_blank" rel="noopener">OpenCV</a> | <a href="http://robwhess.github.com/opensift/" target="_blank" rel="noopener">OpenSIFT</a> | <a href="http://cs.unc.edu/~ccwu/siftgpu/" target="_blank" rel="noopener">GPU</a></li>
+<li>SURF: <a href="http://www.vision.ee.ethz.ch/~surf/index.html" target="_blank" rel="noopener">Herbert Bay’s code</a> | <a href="http://docs.opencv.org/modules/nonfree/doc/feature_detection.html" target="_blank" rel="noopener">OpenCV</a> | <a href="(https://www.mpi-inf.mpg.de/departments/computer-vision-and-multimodal-computing/research/object-recognition-and-scene-understanding/cuda-surf-a-real-time-implementation-for-surf/">CUDA</a></li>
+</ul>
+<h3 id="Other-Local-Feature-Detectors-and-Descriptors"><a href="#Other-Local-Feature-Detectors-and-Descriptors" class="headerlink" title="Other Local Feature Detectors and Descriptors"></a>Other Local Feature Detectors and Descriptors</h3><ul>
+<li><a href="http://www.robots.ox.ac.uk/~vgg/research/affine/" target="_blank" rel="noopener">VGG Affine Covariant features</a> – Oxford code for various affine covariant feature detectors and descriptors</li>
+<li><a href="http://zhwang.me/publication/liop/index.html" target="_blank" rel="noopener">LIOP descriptor</a> – Local Intensity Order Pattern (LIOP) descriptor</li>
+<li><a href="http://www.cs.cornell.edu/projects/symfeat/" target="_blank" rel="noopener">Local Symmetry Features</a> – matching of local symmetry features under large variations in lighting, age, and genTocHereg style</li>
+</ul>
+<h3 id="Global-Image-Descriptors"><a href="#Global-Image-Descriptors" class="headerlink" title="Global Image Descriptors"></a>Global Image Descriptors</h3><ul>
+<li>GIST: <a href="http://people.csail.mit.edu/torralba/code/spatialenvelope/" target="_blank" rel="noopener">MATLAB</a> | <a href="http://lear.inrialpes.fr/src/lear_gist-1.2.tgz" target="_blank" rel="noopener">C++</a> (Lear’s version)</li>
+<li><a href="https://sites.google.com/site/wujx2001/home/libhik" target="_blank" rel="noopener">CENTRIST</a> (in <code>libHIK</code>) – global visual descriptor for scene categorization and object detection. Another version can be found <a href="http://dovgalecs.com/blog/centrist-visual-descriptor-for-indoors-localization/" target="_blank" rel="noopener">here</a>.</li>
+</ul>
+<h2 id="Image-deblur"><a href="#Image-deblur" class="headerlink" title="Image deblur"></a>Image deblur</h2><ul>
+<li>Overview by cwang: <a href="http://i.cs.hku.hk/~cwang/deblur/index.html" target="_blank" rel="noopener">Deblur-related Materials</a></li>
+</ul>
+<h2 id="Image-Dehaze"><a href="#Image-Dehaze" class="headerlink" title="Image Dehaze"></a>Image Dehaze</h2><ul>
+<li><a href="http://research.microsoft.com/en-us/um/people/kahe/cvpr09/index.html" target="_blank" rel="noopener">09 CVPR - Single Image Haze Removal using Dark Channel Prior</a> | <a href="http://blog.csdn.net/polly_yang/article/details/48933383" target="_blank" rel="noopener">Blog</a></li>
+</ul>
+<h2 id="Steoro-matching"><a href="#Steoro-matching" class="headerlink" title="Steoro matching"></a>Steoro matching</h2><ul>
+<li><a href="http://www.cs.cityu.edu.hk/~qiyang/publications/cvpr-12/pami/" target="_blank" rel="noopener">14 PAMI - Stereo Matching Using Tree Filtering</a></li>
+<li><a href="http://cs.brown.edu/~pff/bp/index.html" target="_blank" rel="noopener">04 CVPR - Eﬃcient Belief Propagation for Early Vision</a></li>
+</ul>
+<h2 id="Filtering"><a href="#Filtering" class="headerlink" title="Filtering"></a>Filtering</h2><ul>
+<li>Bilateral Filtering: <a href="http://www.cs.cityu.edu.hk/~qiyang/publications/hebf/" target="_blank" rel="noopener">14 PAMI - Hardware-Efficient Bilateral Filtering for Stereo Matching</a> (integrated)</li>
+</ul>
+<hr>
+<blockquote id="fn_1">
+<sup>1</sup>. Source page of SYSU: <a href="http://gitl.sysu.edu.cn/downloads" target="_blank" rel="noopener">http://gitl.sysu.edu.cn/downloads</a>.<a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>research</tag>
       </tags>
   </entry>
   <entry>
