@@ -30,8 +30,8 @@
 <meta property="article:published_time" content="2014-09-25T04:55:34.000Z">
 <meta property="article:modified_time" content="2020-04-29T04:56:31.160Z">
 <meta property="article:author" content="Yongtao Hu">
-<meta property="article:tag" content="coding">
 <meta property="article:tag" content="cmake">
+<meta property="article:tag" content="coding">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://blog-tommyhu.github.io/2014/09/25/CMake-sumup/">
@@ -228,6 +228,20 @@
               <span class="post-meta-item-text">Views: </span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2014/09/25/CMake-sumup/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2014/09/25/CMake-sumup/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
 
         </div>
       </header>
@@ -268,8 +282,8 @@ The difference is that: the first method <strong>only copy the listed files</str
       <footer class="post-footer">
           
           <div class="post-tags">
-              <a href="/tags/coding/" rel="tag"><i class="fa fa-tag"></i> coding</a>
               <a href="/tags/cmake/" rel="tag"><i class="fa fa-tag"></i> cmake</a>
+              <a href="/tags/coding/" rel="tag"><i class="fa fa-tag"></i> coding</a>
           </div>
 
         
@@ -297,6 +311,13 @@ The difference is that: the first method <strong>only copy the listed files</str
 
           </div>
           
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -359,14 +380,14 @@ The difference is that: the first method <strong>only copy the listed files</str
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">26</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -480,6 +501,37 @@ The difference is that: the first method <strong>only copy the listed files</str
   
 
   
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-tommyhu.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog-tommyhu.github.io/2014/09/25/CMake-sumup/";
+    this.page.identifier = "2014/09/25/CMake-sumup/";
+    this.page.title = "CMake sumup";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-tommyhu.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
 
 </body>
 </html>
