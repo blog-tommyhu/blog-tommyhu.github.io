@@ -53,6 +53,36 @@
       </tags>
   </entry>
   <entry>
+    <title>CMake sumup</title>
+    <url>/2014/09/25/CMake-sumup/</url>
+    <content><![CDATA[<h2 id="CMakeLists-txt-for-Lib-project"><a href="#CMakeLists-txt-for-Lib-project" class="headerlink" title="CMakeLists.txt for Lib project:"></a>CMakeLists.txt for Lib project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># add path of headers to include_directories</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC for static lib, and SHARED for dynamic</span></span><br><span class="line"><span class="keyword">FILE</span>(GLOB SOURCES</span><br><span class="line">	src/*.h</span><br><span class="line">    src/*.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># link libs, list all of them</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(mylib</span><br><span class="line">    -lib-name-.lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="CMakeLists-txt-for-EXE-project"><a href="#CMakeLists-txt-for-EXE-project" class="headerlink" title="CMakeLists.txt for EXE project:"></a>CMakeLists.txt for EXE project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Set the minimum required version of cmake.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the entire solution name.</span></span><br><span class="line"><span class="keyword">project</span>(testProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add path of headers to include_directories.</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"><span class="keyword">include_directories</span>(lib/mylib)</span><br><span class="line"><span class="keyword">include_directories</span>(external/-external-lib-/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add an executable to the project using the specified source files.</span></span><br><span class="line"><span class="keyword">file</span>(GLOB SOURCES</span><br><span class="line">    src/*.*</span><br><span class="line">	lib/-external-lib-/source/*.h</span><br><span class="line">    lib/-external-lib-/source/*.cpp</span><br><span class="line">    <span class="keyword">test</span>/main.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add mylib lib project</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(lib/mylib)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> mylib)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add opencv lib</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV <span class="number">2</span> REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;OPENCV_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;OPENCV_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;OPENCV_DEFINITIONS&#125;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span><span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><ol>
+<li>For <strong><code>add_executable()</code></strong>: actually there is no need to add headers here, but is essential to load them also in project view.</li>
+<li>To use name that contains spaces, use <code>\</code> before spaces to escape them.</li>
+<li>To group source files in VS (e.g. put given source files into new folder under VS), use<ul>
+<li><code>source_group(&lt;name&gt; FILES &lt;src&gt;...)</code> (use <code>${SOURCES}</code> for  files list defined earlier), or</li>
+<li><code>source_group(&lt;name&gt; REGULAR_EXPRESSION &lt;regex&gt;)</code> (e.g. use <code>.*..*</code> for normal <code>*.*</code>)</li>
+</ul>
+</li>
+<li>Link different libraries for Debug and Release mode: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">  <span class="keyword">target_link_libraries</span>(testProj</span><br><span class="line">      debug -path-to-debug-lib-/lib_debug.lib</span><br><span class="line">optimized -path-to-release-lib-/lib.lib</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></li>
+<li>CMake for setting highest warning level can be: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># set highest warnings level, and treat them as errors</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="comment"># c++</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_CXX_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># c</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_C_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUCC <span class="keyword">OR</span> CMAKE_COMPILER_IS_GNUCXX)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
+<li>Enable OpenMP: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># enable openmp</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenMP)</span><br><span class="line"><span class="keyword">if</span> (OPENMP_FOUND)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; $&#123;OpenMP_C_FLAGS&#125;"</span>)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; $&#123;OpenMP_CXX_FLAGS&#125;"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
+<li>for copying all needed data files to binary dir (when <code>cmake</code>), there are two ways:<ul>
+<li>List all the files, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data/*.*</span><br><span class="line">	lib/-external-lib-/models/*.dat</span><br><span class="line">	lib/-matlab-/*.m</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure></li>
+<li>List only the folders that contain the data, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data</span><br><span class="line">	lib/-external-lib-/models</span><br><span class="line">	lib/-matlab-</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure>
+The difference is that: the first method <strong>only copy the listed files</strong> to the binary dir <strong>without directory structure</strong>, while the second will <strong>copy all the files in these folders</strong>, as well as <strong>with directory structure</strong> (only the least parent will retain), i.e. there will be three folders named <code>test-data</code>, <code>models</code> and <code>-matlab-</code> in the binary dir after copying.</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>cmake</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Blogging via Hexo</title>
     <url>/2020/04/29/Blogging-via-Hexo/</url>
     <content><![CDATA[<p>I recently moved my blog here using <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> instead of previous <a href="http://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a>, though the old version is still <a href="http://blog-ythu.github.io/" target="_blank" rel="noopener">available</a>. Hexo is a fast, simple &amp; powerful blog framework. Compared with Jekyll, Hexo is more flexible in terms of setup, post writing via Markdown, tags, themes, content searching, 3rd-part plugin support, etc.</p>
@@ -160,36 +190,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CMake sumup</title>
-    <url>/2014/09/25/CMake-sumup/</url>
-    <content><![CDATA[<h2 id="CMakeLists-txt-for-Lib-project"><a href="#CMakeLists-txt-for-Lib-project" class="headerlink" title="CMakeLists.txt for Lib project:"></a>CMakeLists.txt for Lib project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># add path of headers to include_directories</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC for static lib, and SHARED for dynamic</span></span><br><span class="line"><span class="keyword">FILE</span>(GLOB SOURCES</span><br><span class="line">	src/*.h</span><br><span class="line">    src/*.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># link libs, list all of them</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(mylib</span><br><span class="line">    -lib-name-.lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<a id="more"></a>
-<h2 id="CMakeLists-txt-for-EXE-project"><a href="#CMakeLists-txt-for-EXE-project" class="headerlink" title="CMakeLists.txt for EXE project:"></a>CMakeLists.txt for EXE project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Set the minimum required version of cmake.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the entire solution name.</span></span><br><span class="line"><span class="keyword">project</span>(testProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add path of headers to include_directories.</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"><span class="keyword">include_directories</span>(lib/mylib)</span><br><span class="line"><span class="keyword">include_directories</span>(external/-external-lib-/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add an executable to the project using the specified source files.</span></span><br><span class="line"><span class="keyword">file</span>(GLOB SOURCES</span><br><span class="line">    src/*.*</span><br><span class="line">	lib/-external-lib-/source/*.h</span><br><span class="line">    lib/-external-lib-/source/*.cpp</span><br><span class="line">    <span class="keyword">test</span>/main.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add mylib lib project</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(lib/mylib)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> mylib)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add opencv lib</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV <span class="number">2</span> REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;OPENCV_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;OPENCV_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;OPENCV_DEFINITIONS&#125;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span><span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><ol>
-<li>For <strong><code>add_executable()</code></strong>: actually there is no need to add headers here, but is essential to load them also in project view.</li>
-<li>To use name that contains spaces, use <code>\</code> before spaces to escape them.</li>
-<li>To group source files in VS (e.g. put given source files into new folder under VS), use<ul>
-<li><code>source_group(&lt;name&gt; FILES &lt;src&gt;...)</code> (use <code>${SOURCES}</code> for  files list defined earlier), or</li>
-<li><code>source_group(&lt;name&gt; REGULAR_EXPRESSION &lt;regex&gt;)</code> (e.g. use <code>.*..*</code> for normal <code>*.*</code>)</li>
-</ul>
-</li>
-<li>Link different libraries for Debug and Release mode: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">  <span class="keyword">target_link_libraries</span>(testProj</span><br><span class="line">      debug -path-to-debug-lib-/lib_debug.lib</span><br><span class="line">optimized -path-to-release-lib-/lib.lib</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></li>
-<li>CMake for setting highest warning level can be: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># set highest warnings level, and treat them as errors</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="comment"># c++</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_CXX_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># c</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_C_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUCC <span class="keyword">OR</span> CMAKE_COMPILER_IS_GNUCXX)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
-<li>Enable OpenMP: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># enable openmp</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenMP)</span><br><span class="line"><span class="keyword">if</span> (OPENMP_FOUND)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; $&#123;OpenMP_C_FLAGS&#125;"</span>)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; $&#123;OpenMP_CXX_FLAGS&#125;"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
-<li>for copying all needed data files to binary dir (when <code>cmake</code>), there are two ways:<ul>
-<li>List all the files, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data/*.*</span><br><span class="line">	lib/-external-lib-/models/*.dat</span><br><span class="line">	lib/-matlab-/*.m</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure></li>
-<li>List only the folders that contain the data, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data</span><br><span class="line">	lib/-external-lib-/models</span><br><span class="line">	lib/-matlab-</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure>
-The difference is that: the first method <strong>only copy the listed files</strong> to the binary dir <strong>without directory structure</strong>, while the second will <strong>copy all the files in these folders</strong>, as well as <strong>with directory structure</strong> (only the least parent will retain), i.e. there will be three folders named <code>test-data</code>, <code>models</code> and <code>-matlab-</code> in the binary dir after copying.</li>
-</ul>
-</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>cmake</tag>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Character encodings of text files</title>
     <url>/2013/01/21/Character-encodings-of-text-files/</url>
     <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
@@ -209,21 +209,90 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>DOS sumup</title>
-    <url>/2012/04/06/DOS-sumup/</url>
-    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
-<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
-<li><p>Get all file names</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+    <title>Good PC tools</title>
+    <url>/2013/05/24/Good-PC-tools/</url>
+    <content><![CDATA[<h2 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h2><ul>
+<li><a href="http://www.ctex.org/CTeXDownload" target="_blank" rel="noopener"><strong>CTeX</strong></a>: LaTex editing</li>
+<li><a href="http://notepad-plus-plus.org/download" target="_blank" rel="noopener"><strong>Notepad++</strong></a>: advanced text editor</li>
+<li><a href="https://code.visualstudio.com/" target="_blank" rel="noopener"><strong>Visual Studio Code</strong></a>: advanced editor for structured code</li>
+</ul>
+<a id="more"></a>
+<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><ul>
+<li><a href="http://www.mythicsoft.com/agentransack/download" target="_blank" rel="noopener"><strong>Agent Ransack</strong></a>: fast content search in files</li>
+<li><a href="http://www.bulkrenameutility.co.uk/Download.php" target="_blank" rel="noopener"><strong>Bulk Rename Utility</strong></a>: batch file and folder renaming</li>
+<li><a href="http://ejie.me/" target="_blank" rel="noopener"><strong>Clover</strong></a>: add multi-tab functionality for Windows Explorer</li>
+<li><a href="http://www.voidtools.com/downloads/" target="_blank" rel="noopener"><strong>Everything</strong></a>: fast file search</li>
+<li><a href="http://www.lopesoft.com/en/filemenutools/download" target="_blank" rel="noopener"><strong>FileMenu Tools</strong></a>: file/folder right click menus manager</li>
+<li><a href="http://www.listary.com/download" target="_blank" rel="noopener"><strong>Listary</strong></a>: file managing/browsing…</li>
+<li><a href="https://www.piriform.com/recuva/download" target="_blank" rel="noopener"><strong>Recuva</strong></a>: restore deleted files</li>
+</ul>
+<h2 id="System"><a href="#System" class="headerlink" title="System"></a>System</h2><ul>
+<li><a href="https://toolslib.net/downloads/viewdownload/1-adwcleaner/" target="_blank" rel="noopener"><strong>AdwCleaner</strong></a>: remove toolbars and hijackers</li>
+<li><a href="http://www.disktool.cn/feature.html" target="_blank" rel="noopener"><strong>Disk Tool</strong></a>: disk partition management</li>
+<li><a href="http://www.displayfusion.com/Download/" target="_blank" rel="noopener"><strong>DisplayFusion</strong></a>: multi-monitor taskbars, title-bar buttons…</li>
+<li><strong>EaseUS Partition Master</strong>: disk partition management, good for converting dynamic disks to basic mode</li>
+<li><a href="http://www.microsoft.com/en-hk/download/details.aspx?id=35460" target="_blank" rel="noopener"><strong>Mouse without Borders</strong></a>: control multiple PCs using single mouse</li>
+<li><a href="http://www.rapidee.com/en/download" target="_blank" rel="noopener"><strong>Rapid Environment Editor</strong></a>: environment variables management</li>
+<li><a href="https://rufus.akeo.ie/" target="_blank" rel="noopener"><strong>Rufus</strong></a>: create bootable USB (in case <em>Windows 7 USB DVD Download Tool</em> fails)</li>
+<li><a href="https://www.realtimesoft.com/ultramon/download.asp" target="_blank" rel="noopener"><strong>UltraMon</strong></a>: multi-toolbars for multi-monitors</li>
+</ul>
+<h2 id="Viewer-Player-Editor"><a href="#Viewer-Player-Editor" class="headerlink" title="Viewer / Player / Editor"></a>Viewer / Player / Editor</h2><ul>
+<li><strong>Adobe Audition</strong>: real-time multi-channel audio recording &amp; audio editing</li>
+<li><a href="http://audacity.sourceforge.net/download/" target="_blank" rel="noopener"><strong>Audacity</strong></a>: audio editing, e.g. cutting, resampling, changing speed…</li>
+<li><strong>CorelDRAW</strong>: vector diagram drawing</li>
+<li><a href="https://en.bandisoft.com/bandizip/" target="_blank" rel="noopener"><strong>Bandizip</strong></a>: compress/extract files</li>
+<li><a href="http://www.tracker-software.com/product/pdf-xchange-editor" target="_blank" rel="noopener"><strong>PDF-XChange Editor</strong></a>: pdf viewer and editor</li>
+<li><a href="http://potplayer.daum.net/" target="_blank" rel="noopener"><strong>PotPlayer</strong></a>: video player</li>
+<li><a href="http://www.xnview.com/en/xnview/" target="_blank" rel="noopener"><strong>XnView</strong></a>: image viewer</li>
+</ul>
+<h2 id="Coding"><a href="#Coding" class="headerlink" title="Coding"></a>Coding</h2><ul>
+<li><a href="https://github.com/lucasg/Dependencies" target="_blank" rel="noopener"><strong>Dependencies</strong></a>: track dependent dlls, good for exporting cross-platform apps</li>
+<li><strong>Matlab Plugins</strong>:<ul>
+<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig" target="_blank" rel="noopener">export_fig</a>: exports figures nicely to a number of vector &amp; bitmap formats</li>
+<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/8028-mmread" target="_blank" rel="noopener">mmread</a>: read virtually any media file in Windows, Linux, or Mac</li>
+</ul>
 </li>
-<li><p>Get all file full paths</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+<li><a href="https://www.syntevo.com/smartgit/" target="_blank" rel="noopener"><strong>SmartGit</strong></a>: Git &amp; Mercurial client</li>
+<li><a href="http://tortoisesvn.net/downloads.html" target="_blank" rel="noopener"><strong>TortoiseSVN</strong></a>: SVN repo browser, check out…</li>
+<li><strong>Visual Studio Extensions</strong>:<ul>
+<li><strong>C# outline</strong>: add braces {} outlining for C#</li>
+<li><strong>Code alignment</strong>: format code vertically</li>
+<li><strong>Code Compare</strong>: code comparison and automatic merging</li>
+<li><strong>Image Watch</strong>: watch window for viewing in-memory OpenCV images</li>
+<li><strong>Indent Guides</strong>: display indent and page width guides</li>
+<li><strong>Productivity Power Tools</strong>: code structure visualizer (better disabled as conflict with Indent Guides), scrollbar markers, double-click to maximize windows, ctrl + click to peek definition, show matched margin, color printing</li>
+<li><strong>ReSharper</strong>: to-do explorer, color picker in C#/WPF, unit testing</li>
+<li><strong>Visual Assist X</strong>: navigate, refactor, generate code, coding assistance</li>
+<li><strong>VSCommands</strong>: main menu enhancements, code block end tagger, build assistance, output window enhancement</li>
+</ul>
+</li>
+</ul>
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><ul>
+<li><a href="http://bing.msn.cn/dict/desktop/" target="_blank" rel="noopener"><strong>BingDict</strong></a>: Chinese/English Dictionary</li>
+<li><strong>Camtasia Studio</strong>: screen recording</li>
+<li><strong>Chrome Plugins</strong>:<ul>
+<li><a href="https://chrome.google.com/webstore/detail/adblock/gighmmpiobklfepjocnamgkkbiglidom" target="_blank" rel="noopener">AdBlock</a>: Ads blocking</li>
+<li><a href="https://chrome.google.com/webstore/detail/checker-plus-for-gmail/oeopbcgkkoapgobdbedcemjljbihmemj" target="_blank" rel="noopener">Checker Plus for Gmail</a>: email checking</li>
+<li><a href="https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj" target="_blank" rel="noopener">Linkclump</a>: roi links copying/openning (can be self-defined)</li>
+<li><a href="https://chrome.google.com/webstore/detail/remove-cookies-for-site/lmfdblomdpkcniknaenceeogpgepocmm" target="_blank" rel="noopener">Remove cookies for site</a>: remove cookies for given site</li>
+<li><a href="https://chrome.google.com/webstore/detail/webmail-ad-blocker/cbhfdchmklhpcngcgjmpdbjakdggkkjp" target="_blank" rel="noopener">Webmail Ad Blocker</a>: Ads blocking for webmails</li>
+</ul>
+</li>
+<li><strong>DVD Decrypter</strong>: extract data from DVD</li>
+<li><strong>Duck Capture</strong>: screenshot, good to capture whole webpage (multi-page)</li>
+<li><a href="https://filezilla-project.org/" target="_blank" rel="noopener"><strong>FileZilla</strong></a>: ftp connect client</li>
+<li><a href="http://www.pcfreetime.com/download.html" target="_blank" rel="noopener"><strong>FormatFactory</strong></a>: picture/audio/video file format converting</li>
+<li><a href="http://www.fraps.com/download.php" target="_blank" rel="noopener"><strong>Fraps</strong></a>: screen capture…, really useful to capture screen under full-screen mode</li>
+<li><strong>Image Composite Editor</strong>: advanced panoramic image stitcher</li>
+<li><a href="https://www.bunkus.org/videotools/mkvtoolnix/downloads.html" target="_blank" rel="noopener"><strong>mkvtoolnix</strong></a>: video processing, e.g. extracting given channel audio from movie…</li>
+<li><a href="http://www.teamviewer.com/en/download/windows.aspx" target="_blank" rel="noopener"><strong>TeamViewer</strong></a>: cross-domain remote desktop connector</li>
+<li><a href="http://wkhtmltopdf.org/downloads.html" target="_blank" rel="noopener"><strong>WKhtmlTOpdf</strong></a>: convent HTML to PDF with style retained, using<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">wkhtmltopdf.exe www.website.url.com out.pdf</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 ]]></content>
       <tags>
-        <tag>coding</tag>
-        <tag>dos</tag>
+        <tag>tools</tag>
+        <tag>pc</tag>
       </tags>
   </entry>
   <entry>
@@ -491,93 +560,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Good PC tools</title>
-    <url>/2013/05/24/Good-PC-tools/</url>
-    <content><![CDATA[<h2 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h2><ul>
-<li><a href="http://www.ctex.org/CTeXDownload" target="_blank" rel="noopener"><strong>CTeX</strong></a>: LaTex editing</li>
-<li><a href="http://notepad-plus-plus.org/download" target="_blank" rel="noopener"><strong>Notepad++</strong></a>: advanced text editor</li>
-<li><a href="https://code.visualstudio.com/" target="_blank" rel="noopener"><strong>Visual Studio Code</strong></a>: advanced editor for structured code</li>
-</ul>
-<a id="more"></a>
-<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><ul>
-<li><a href="http://www.mythicsoft.com/agentransack/download" target="_blank" rel="noopener"><strong>Agent Ransack</strong></a>: fast content search in files</li>
-<li><a href="http://www.bulkrenameutility.co.uk/Download.php" target="_blank" rel="noopener"><strong>Bulk Rename Utility</strong></a>: batch file and folder renaming</li>
-<li><a href="http://ejie.me/" target="_blank" rel="noopener"><strong>Clover</strong></a>: add multi-tab functionality for Windows Explorer</li>
-<li><a href="http://www.voidtools.com/downloads/" target="_blank" rel="noopener"><strong>Everything</strong></a>: fast file search</li>
-<li><a href="http://www.lopesoft.com/en/filemenutools/download" target="_blank" rel="noopener"><strong>FileMenu Tools</strong></a>: file/folder right click menus manager</li>
-<li><a href="http://www.listary.com/download" target="_blank" rel="noopener"><strong>Listary</strong></a>: file managing/browsing…</li>
-<li><a href="https://www.piriform.com/recuva/download" target="_blank" rel="noopener"><strong>Recuva</strong></a>: restore deleted files</li>
-</ul>
-<h2 id="System"><a href="#System" class="headerlink" title="System"></a>System</h2><ul>
-<li><a href="https://toolslib.net/downloads/viewdownload/1-adwcleaner/" target="_blank" rel="noopener"><strong>AdwCleaner</strong></a>: remove toolbars and hijackers</li>
-<li><a href="http://www.disktool.cn/feature.html" target="_blank" rel="noopener"><strong>Disk Tool</strong></a>: disk partition management</li>
-<li><a href="http://www.displayfusion.com/Download/" target="_blank" rel="noopener"><strong>DisplayFusion</strong></a>: multi-monitor taskbars, title-bar buttons…</li>
-<li><strong>EaseUS Partition Master</strong>: disk partition management, good for converting dynamic disks to basic mode</li>
-<li><a href="http://www.microsoft.com/en-hk/download/details.aspx?id=35460" target="_blank" rel="noopener"><strong>Mouse without Borders</strong></a>: control multiple PCs using single mouse</li>
-<li><a href="http://www.rapidee.com/en/download" target="_blank" rel="noopener"><strong>Rapid Environment Editor</strong></a>: environment variables management</li>
-<li><a href="https://rufus.akeo.ie/" target="_blank" rel="noopener"><strong>Rufus</strong></a>: create bootable USB (in case <em>Windows 7 USB DVD Download Tool</em> fails)</li>
-<li><a href="https://www.realtimesoft.com/ultramon/download.asp" target="_blank" rel="noopener"><strong>UltraMon</strong></a>: multi-toolbars for multi-monitors</li>
-</ul>
-<h2 id="Viewer-Player-Editor"><a href="#Viewer-Player-Editor" class="headerlink" title="Viewer / Player / Editor"></a>Viewer / Player / Editor</h2><ul>
-<li><strong>Adobe Audition</strong>: real-time multi-channel audio recording &amp; audio editing</li>
-<li><a href="http://audacity.sourceforge.net/download/" target="_blank" rel="noopener"><strong>Audacity</strong></a>: audio editing, e.g. cutting, resampling, changing speed…</li>
-<li><strong>CorelDRAW</strong>: vector diagram drawing</li>
-<li><a href="https://en.bandisoft.com/bandizip/" target="_blank" rel="noopener"><strong>Bandizip</strong></a>: compress/extract files</li>
-<li><a href="http://www.tracker-software.com/product/pdf-xchange-editor" target="_blank" rel="noopener"><strong>PDF-XChange Editor</strong></a>: pdf viewer and editor</li>
-<li><a href="http://potplayer.daum.net/" target="_blank" rel="noopener"><strong>PotPlayer</strong></a>: video player</li>
-<li><a href="http://www.xnview.com/en/xnview/" target="_blank" rel="noopener"><strong>XnView</strong></a>: image viewer</li>
-</ul>
-<h2 id="Coding"><a href="#Coding" class="headerlink" title="Coding"></a>Coding</h2><ul>
-<li><a href="https://github.com/lucasg/Dependencies" target="_blank" rel="noopener"><strong>Dependencies</strong></a>: track dependent dlls, good for exporting cross-platform apps</li>
-<li><strong>Matlab Plugins</strong>:<ul>
-<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig" target="_blank" rel="noopener">export_fig</a>: exports figures nicely to a number of vector &amp; bitmap formats</li>
-<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/8028-mmread" target="_blank" rel="noopener">mmread</a>: read virtually any media file in Windows, Linux, or Mac</li>
-</ul>
-</li>
-<li><a href="https://www.syntevo.com/smartgit/" target="_blank" rel="noopener"><strong>SmartGit</strong></a>: Git &amp; Mercurial client</li>
-<li><a href="http://tortoisesvn.net/downloads.html" target="_blank" rel="noopener"><strong>TortoiseSVN</strong></a>: SVN repo browser, check out…</li>
-<li><strong>Visual Studio Extensions</strong>:<ul>
-<li><strong>C# outline</strong>: add braces {} outlining for C#</li>
-<li><strong>Code alignment</strong>: format code vertically</li>
-<li><strong>Code Compare</strong>: code comparison and automatic merging</li>
-<li><strong>Image Watch</strong>: watch window for viewing in-memory OpenCV images</li>
-<li><strong>Indent Guides</strong>: display indent and page width guides</li>
-<li><strong>Productivity Power Tools</strong>: code structure visualizer (better disabled as conflict with Indent Guides), scrollbar markers, double-click to maximize windows, ctrl + click to peek definition, show matched margin, color printing</li>
-<li><strong>ReSharper</strong>: to-do explorer, color picker in C#/WPF, unit testing</li>
-<li><strong>Visual Assist X</strong>: navigate, refactor, generate code, coding assistance</li>
-<li><strong>VSCommands</strong>: main menu enhancements, code block end tagger, build assistance, output window enhancement</li>
-</ul>
-</li>
-</ul>
-<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><ul>
-<li><a href="http://bing.msn.cn/dict/desktop/" target="_blank" rel="noopener"><strong>BingDict</strong></a>: Chinese/English Dictionary</li>
-<li><strong>Camtasia Studio</strong>: screen recording</li>
-<li><strong>Chrome Plugins</strong>:<ul>
-<li><a href="https://chrome.google.com/webstore/detail/adblock/gighmmpiobklfepjocnamgkkbiglidom" target="_blank" rel="noopener">AdBlock</a>: Ads blocking</li>
-<li><a href="https://chrome.google.com/webstore/detail/checker-plus-for-gmail/oeopbcgkkoapgobdbedcemjljbihmemj" target="_blank" rel="noopener">Checker Plus for Gmail</a>: email checking</li>
-<li><a href="https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj" target="_blank" rel="noopener">Linkclump</a>: roi links copying/openning (can be self-defined)</li>
-<li><a href="https://chrome.google.com/webstore/detail/remove-cookies-for-site/lmfdblomdpkcniknaenceeogpgepocmm" target="_blank" rel="noopener">Remove cookies for site</a>: remove cookies for given site</li>
-<li><a href="https://chrome.google.com/webstore/detail/webmail-ad-blocker/cbhfdchmklhpcngcgjmpdbjakdggkkjp" target="_blank" rel="noopener">Webmail Ad Blocker</a>: Ads blocking for webmails</li>
-</ul>
-</li>
-<li><strong>DVD Decrypter</strong>: extract data from DVD</li>
-<li><strong>Duck Capture</strong>: screenshot, good to capture whole webpage (multi-page)</li>
-<li><a href="https://filezilla-project.org/" target="_blank" rel="noopener"><strong>FileZilla</strong></a>: ftp connect client</li>
-<li><a href="http://www.pcfreetime.com/download.html" target="_blank" rel="noopener"><strong>FormatFactory</strong></a>: picture/audio/video file format converting</li>
-<li><a href="http://www.fraps.com/download.php" target="_blank" rel="noopener"><strong>Fraps</strong></a>: screen capture…, really useful to capture screen under full-screen mode</li>
-<li><strong>Image Composite Editor</strong>: advanced panoramic image stitcher</li>
-<li><a href="https://www.bunkus.org/videotools/mkvtoolnix/downloads.html" target="_blank" rel="noopener"><strong>mkvtoolnix</strong></a>: video processing, e.g. extracting given channel audio from movie…</li>
-<li><a href="http://www.teamviewer.com/en/download/windows.aspx" target="_blank" rel="noopener"><strong>TeamViewer</strong></a>: cross-domain remote desktop connector</li>
-<li><a href="http://wkhtmltopdf.org/downloads.html" target="_blank" rel="noopener"><strong>WKhtmlTOpdf</strong></a>: convent HTML to PDF with style retained, using<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">wkhtmltopdf.exe www.website.url.com out.pdf</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>tools</tag>
-        <tag>pc</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Handle Chinese bookmarks in Latex</title>
     <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
     <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
@@ -772,6 +754,53 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
+    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
+    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
+<ol>
+<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
+</li>
+<li><p>call MATLAB directly in VC++.</p>
+</li>
+</ol>
+<hr>
+<p>This blog will focus on the second approach (also the easier one).</p>
+<a id="more"></a>
+<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
+<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
+<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
+<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
+<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
+<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
+<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
+<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
+<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
+<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
+<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
+<ul>
+<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
+<li><code>string</code></li>
+<li>matrix</li>
+<li>gray-scale image</li>
+<li>RGB image</li>
+</ul>
+</li>
+</ol>
+<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
+<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>mixed_programming</tag>
+        <tag>matlab</tag>
+        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>IO sumup</title>
     <url>/2012/01/01/IO-sumup/</url>
     <content><![CDATA[<h2 id="using-C-FILE-stdio-h"><a href="#using-C-FILE-stdio-h" class="headerlink" title="using C - FILE (stdio.h)"></a>using C - FILE (stdio.h)</h2><ul>
@@ -849,220 +878,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>matlab</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
-    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
-    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
-<ol>
-<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
-</li>
-<li><p>call MATLAB directly in VC++.</p>
-</li>
-</ol>
-<hr>
-<p>This blog will focus on the second approach (also the easier one).</p>
-<a id="more"></a>
-<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
-<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
-<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
-<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
-<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
-<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
-<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
-<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
-<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
-<ul>
-<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
-<li><code>string</code></li>
-<li>matrix</li>
-<li>gray-scale image</li>
-<li>RGB image</li>
-</ul>
-</li>
-</ol>
-<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
-<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>matlab</tag>
-        <tag>mixed_programming</tag>
-        <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MFC sumup</title>
-    <url>/2011/10/09/MFC-sumup/</url>
-    <content><![CDATA[<h2 id="代码组织"><a href="#代码组织" class="headerlink" title="代码组织"></a>代码组织</h2><ul>
-<li><strong>代码</strong>: 写在 <code>View</code> 中</li>
-<li><strong>数据</strong>: 写在 <code>Doc</code> 中</li>
-<li><strong>变量</strong>: 在 <code>View.h</code> 中申明, 在 <code>View.cpp</code> 的构造函数中初始化, 在 <code>View.cpp</code> 的析构函数中释放</li>
-</ul>
-<h2 id="添加消息函数"><a href="#添加消息函数" class="headerlink" title="添加消息函数"></a>添加消息函数</h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image001.png"><strong>Messages</strong>图标</a> &gt; 找相应的</p>
-<h2 id="注册函数-ON-COMMAND"><a href="#注册函数-ON-COMMAND" class="headerlink" title="注册函数 ON_COMMAND"></a>注册函数 <code>ON_COMMAND</code></h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image002.png"><strong>Events</strong>图标</a> &gt; 找相应的<br>(注: 比如menu设置N选1型(menu 中选择其中之一会打钩$\checkmark$), 类似操作, 在每个项目的第二个点击添加, 然后代码类似如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnUpdateButtonLighton</span><span class="params">(CCmdUI *pCmdUI)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your command update UI handler code here</span></span><br><span class="line">    pCmdUI-&gt;SetCheck(m_nLightState == LIGHT_ON);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="添加状态栏提示信息"><a href="#添加状态栏提示信息" class="headerlink" title="添加状态栏提示信息"></a>添加状态栏提示信息</h2><ul>
-<li><p>在<code>MainFrm.cpp</code>中添加文字占位符, 粗体为新添加</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> UINT indicators[] =</span><br><span class="line">&#123;</span><br><span class="line">    ID_SEPARATOR, <span class="comment">// status line indicator</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for CGAL 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_INDICATOR_CAPS,</span><br><span class="line">    ID_INDICATOR_NUM,</span><br><span class="line">    ID_INDICATOR_SCRL,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
-<li><p>在 <code>int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)</code> 中设置所添加的占位符的宽度, 不设的话为默认值; 最后一个值是宽度值.</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">1</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">2</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>在想显示提示信息的地方添加如下代码即可:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CStatusBar * pStatus=(CStatusBar*) AfxGetApp()-&gt;m_pMainWnd-&gt;GetDescendantWindow(AFX_IDW_STATUS_BAR );</span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">1</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set first</span></span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">2</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set second</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="Menu中的功能想放到Toolbars上"><a href="#Menu中的功能想放到Toolbars上" class="headerlink" title="Menu中的功能想放到Toolbars上"></a>Menu中的功能想放到Toolbars上</h2><p>可以先增加<strong>Toolbar</strong>, 再增加<strong>Menu</strong>, 使得两者的ID一样就OK.</p>
-<h2 id="Warning提示信息"><a href="#Warning提示信息" class="headerlink" title="Warning提示信息"></a>Warning提示信息</h2><p>方式可以</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">MessageBox(<span class="string">"Could not delete RC"</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="键盘处理"><a href="#键盘处理" class="headerlink" title="键盘处理"></a>键盘处理</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">bool</span> keyDown[<span class="number">256</span>];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyDown</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span> &amp;&amp; nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">true</span>;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnKeyDown(nChar, nRepCnt, nFlags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyUp</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span>&amp;&amp;nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>再在画的函数中进行真正处理:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::RenderScene</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (keyDown[<span class="string">'w'</span>])</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// handling here...</span></span><br><span class="line">    &#125;    </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="鼠标处理"><a href="#鼠标处理" class="headerlink" title="鼠标处理"></a>鼠标处理</h2><ul>
-<li><p>左键处理: (中键 – 右键 类似)</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> buttonState;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonDown</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    SetCapture();</span><br><span class="line">    buttonState = GLUT_LEFT_BUTTON;</span><br><span class="line">    CView::OnLButtonDown(nFlags, point);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonUp</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=CPoint(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    ReleaseCapture();</span><br><span class="line">    buttonState = <span class="number">-1</span>;</span><br><span class="line">    CView::OnLButtonUp(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>真正的处理在 <code>OnMouseMove()</code> 函数中:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnMouseMove</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="comment">// Check if we have captured the mouse</span></span><br><span class="line">    <span class="keyword">if</span> (GetCapture()==<span class="keyword">this</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">float</span> dx, dy;</span><br><span class="line">        dx = point.x - m_MouseDownPoint.x;</span><br><span class="line">        dy = point.y - m_MouseDownPoint.y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_LEFT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_MIDDLE_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_RIGHT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnMouseMove(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="打开文件对话框"><a href="#打开文件对话框" class="headerlink" title="打开文件对话框"></a>打开文件对话框</h2><p>添加方法如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    CString meshPath= fOpenDlg.GetPathName();</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>注: 若想能同时打开多个文件, 同时可以设置同时打开的上限, 默认20个, 方法如下(同样包含如何挨个获得每个文件的Path):</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_ALLOWMULTISELECT|OFN_EXPLORER|OFN_ENABLEHOOK, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="comment">//extend to be able to open 100 files at a time, default only 20</span></span><br><span class="line">fOpenDlg.m_ofn.nMaxFile=<span class="number">100</span>*MAX_PATH;</span><br><span class="line">fOpenDlg.m_ofn.lpstrFile=<span class="keyword">new</span> TCHAR[fOpenDlg.m_ofn.nMaxFile];</span><br><span class="line">ZeroMemory(fOpenDlg.m_ofn.lpstrFile, <span class="keyword">sizeof</span>(TCHAR)*fOpenDlg.m_ofn.nMaxFile);</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Retrieve file name(s).</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;CString&gt; meshPath;</span><br><span class="line">    POSITION fileNamesPosition = fOpenDlg.GetStartPosition();</span><br><span class="line">    <span class="keyword">while</span>(fileNamesPosition != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        CString stub = fOpenDlg.GetNextPathName(fileNamesPosition);</span><br><span class="line">        meshPath.push_back((CString)stub);</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>mfc</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MATLAB/C++ Mixed Programming: distribute MATLAB code into independent C++ shared library</title>
-    <url>/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/</url>
-    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
-<ol>
-<li>distribute MATLAB code into MATLAB independent C++ shared library.</li>
-<li>call MATLAB directly in VC++. Refer to the <a href="https://blog-tommyhu.github.io/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/">this blog</a> for details.</li>
-</ol>
-<p>This blog will focus on the first approach.</p>
-<hr>
-<p>Distributing MATLAB code into C++ libraries will enable us to call MATLAB in C++. This is further can be done to be MATLAB independent, which means we can call these libraries on any PC without MATLAB pre-installed. Also, good news is that, according to <a href="http://www.mathworks.com/support/solutions/en/data/1-GQC9MB/index.html" target="_blank" rel="noopener">MATLAB Support</a>, all deployed components and applications can be distributed free of charge. So, in this way, we can integrate MATLAB codes into our own product without concerning the license problem.</p>
-<hr>
-<p>In the following, I will show you how you can do this step by step.</p>
-<!-- add TOC here -->
-<div id="genTocHere"></div>
-
-<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><p>Take the following MATLAB function <code>myadd2.m</code> as an example, from which we want to generate MATLAB independent C++ shared library.</p>
-<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="Deploy-in-MATLAB"><a href="#Deploy-in-MATLAB" class="headerlink" title="Deploy in MATLAB:"></a>Deploy in MATLAB:</h2><ol>
-<li>Setup mex in MATLAB if needed, see <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-mex.html" target="_blank" rel="noopener">MATLAB/C++ Mixed Programming: setup mex in MATLAB</a>.</li>
-<li>>&gt; <code>mcc -C -W cpplib:libmyadd2 -T link:lib myadd2.m</code> (<code>-C</code> option is needed to generate <code>.ctf</code> file).</li>
-<li><p>Done. We can find the following files generated in the file folder.</p>
-<ul>
-<li><strong>libmyadd2.h</strong></li>
-<li><strong>libmyadd2.ctf</strong></li>
-<li><strong>libmyadd2.dll</strong></li>
-<li><strong>libmyadd2.lib</strong></li>
-<li>libmyadd2_mcc_component_data.c</li>
-<li>libmyadd2.cpp</li>
-<li>libmyadd2.exports</li>
-<li>libmyadd2.exp</li>
-<li><p>libmyadd2.prj</p>
-<p>Among these, only the first 4 will be needed to be called in VC.</p>
-</li>
-</ul>
-</li>
-</ol>
-<p>NOTE: alternately, we can use MATLAB <strong>deploytool</strong> to do this:</p>
-<ol>
-<li>>&gt; <code>deploytool</code></li>
-<li>Pre-setup: In the <strong>Deployment Project</strong> window, edit project <code>Name</code> (also the name for the generated .h/.lib/.dll files, <code>libmyadd2</code> here), <code>Location</code> and most importantly choose the deployment <code>Type</code> to be <code>C++ shared library</code> (4 types in total to choose from including <code>Windows Standalone Application</code>, <code>Console Application</code>, <code>C Shared Library and C++ Shared Library</code>; the other 3 are not fully tested).</li>
-<li>Add files: In the <strong>C++ Shared Library</strong> window, under <code>Build</code> menu, click <code>[Add files]</code> to add <code>myadd2.m</code> as our exported functions.</li>
-<li>Setup: Click <code>Actions</code> Button in the <code>C++ Shared Library</code> window <code>&gt; Settings… &gt; General &gt;</code> uncheck the <code>&#39;Embed CTF archive into the Application&#39;</code>. Note that if we leave this option checked by default, it will not generate <code>.ctf</code> file. Their differences are:<ul>
-<li>Without <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in system Temp folder, i.e. <code>C:\Users\tommyhu\AppData\Local\Temp\tommyhu\mcrCache7.17\myadd20</code>.</li>
-<li>With <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in VC++ solution folder, i.e. <code>C:\Users\tommyhu\Documents\visual studio 2010\Projects\test\libmyadd2_mcr</code>.</li>
-</ul>
-</li>
-<li>Build: Click <strong>Build</strong> Button in the <strong>C++ Shared Library window</strong> to do real building.</li>
-<li>Done. Under <code>..\folderWeSet\libmyadd2\distrib</code>, we will find all files we need including:<ul>
-<li><strong>libmyadd2.h</strong></li>
-<li><strong>libmyadd2.ctf</strong></li>
-<li><strong>libmyadd2.dll</strong></li>
-<li><strong>libmyadd2.lib</strong></li>
-</ul>
-</li>
-</ol>
-<h2 id="Setup-client-PC"><a href="#Setup-client-PC" class="headerlink" title="Setup client PC:"></a>Setup client PC:</h2><p>Note: skip this step if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version.</p>
-<ul>
-<li>Copy <strong>MCRInstaller.exe</strong> to client PC and install. Note that <strong>MCRInstaller.exe</strong> should be consistent with the MATLAB version. Usually you can find it under path like<code>…\MATLAB\R2012a\toolbox\compiler\deploy\win64</code>.</li>
-</ul>
-<p>Note: although we have generated MATLAB independent C++ shared libraries, we still need to slightly setup client PC in order to make it work. Actually we still need to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) of it, but at least not full of it, make it portable enough. In reality, we can package it together with our product (and install automatically).</p>
-<h2 id="Call-in-VC"><a href="#Call-in-VC" class="headerlink" title="Call in VC++:"></a>Call in VC++:</h2><ol>
-<li>Libraries preparation: copy the above 4 files into VC project.</li>
-<li>VC setup:<ul>
-<li>Add MATLAB Compiler Runtime include folder to project <code>Include files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\include</code>.</li>
-<li>Add MATLAB Compiler Runtime library folder to project <code>Library files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\lib\win64\microsoft</code>.</li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\runtime\win64;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\bin\win64</code>.</li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code>. (Note also to add <code>libmx.lib</code> and <code>libmat.lib</code> if you plan to use <code>mxArray</code> in your code.)</li>
-<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code>.</li>
-</ul>
-</li>
-<li>Calling: please refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB.cpp" target="_blank" rel="noopener"><code>VC_call_MATLAB.cpp</code></a>.</li>
-</ol>
-<p>Note that, if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version, you don’t need step 2 to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) because these have been included when you install MATLAB. Under this condition, instead, you can setup VC as follows:</p>
-<ul>
-<li>VC setup:<ul>
-<li>Add MATLAB include folder to project <strong>Include files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\include</code></li>
-<li>Add MATLAB library folder to project <strong>Library files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <strong>Linker&gt;Input&gt;Additional Dependencies</strong>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code></li>
-<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code></li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h2><ol>
-<li>When .m file that we want to distribute also calls several other .m files, we don’t need to particularly to indicate. The steps are the same: only the final .m file is need to be distributed.</li>
-<li>Different distributed shared libraries perform independently, i.e., they cannot share variables to work together. For example, it is impossible for one library to use the data created by another library, which will be released when its library ends.</li>
-<li><p><strong>Thread-safety</strong>: According to <a href="http://www.mathworks.com/help/matlab/matlab_external/using-matlab-engine.html" target="_blank" rel="noopener">MATLAB documentation</a>, MATLAB libraries are not thread-safe. If you create multithreaded applications, make sure only one thread accesses the engine application. For example, if you want to use the above <code>libmyadd2.lib</code>, use <code>ThreadLock.h/.cpp</code> as follows:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ThreadLock.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> ThreadLock Lock;</span><br><span class="line">Lock.Lock();</span><br><span class="line">myadd2(<span class="number">2</span>, y, z, a, b);</span><br><span class="line">Lock.Unlock();</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>Type passing</strong>: Passing C++ native types to <code>mwArray</code> in order to call MATLAB</p>
-<ul>
-<li><p>When passing a grayscale <code>Mat</code> image, can use <code>mxINT8_CLASS</code> as follows.</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// assume we want to passing Mat img(rows, cols, CV_8UC1)</span></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">imgP</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(mat, mat);</span><br><span class="line">imgP.SetData(mat.ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>When passing a color <code>Mat</code> image (assume in format <code>CV_RGB</code>), currently no way is found to pass it directly. Possible way is to pass the r, g, b channels independently and then combine them to be a color image in MATLAB as follows.</p>
-<ul>
-<li><p>In VC++:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// suppose we want to pass Mat img</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Mat&gt; channels; <span class="comment">// R, G, B channels</span></span><br><span class="line">split(img, channels);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">image_R</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_G</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_B</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(channels[<span class="number">0</span>], channels[<span class="number">0</span>]);</span><br><span class="line">transpose(channels[<span class="number">1</span>], channels[<span class="number">1</span>]);</span><br><span class="line">transpose(channels[<span class="number">2</span>], channels[<span class="number">2</span>]);</span><br><span class="line">image_R.SetData(channels[<span class="number">0</span>].ptr(), rows*cols);</span><br><span class="line">image_G.SetData(channels[<span class="number">1</span>].ptr(), rows*cols);</span><br><span class="line">image_B.SetData(channels[<span class="number">2</span>].ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>In MATLAB:</p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">image(:,:,<span class="number">1</span>) = image_R;</span><br><span class="line">image(:,:,<span class="number">2</span>) = image_G;</span><br><span class="line">image(:,:,<span class="number">3</span>) = image_B;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>The way to define the input parameter based on a <code>string</code> or <code>char []</code> is as follows:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ini input parameter: im_path based on string aString or char aString[]</span></span><br><span class="line"><span class="function">mwArray <span class="title">im_path</span><span class="params">(aString.c_str())</span></span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>For passing other types, we had better to use double (<code>mxDOUBLE_CLASS</code>) instead of int (<code>mxINT8_CLASS</code>) even though it actually is a int.</p>
-</li>
-<li><p>For passing complex values:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// passing to MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rdata[<span class="number">4</span>] = &#123;<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>&#125;;</span><br><span class="line"><span class="keyword">double</span> idata[<span class="number">4</span>] = &#123;<span class="number">10.0</span>, <span class="number">20.0</span>, <span class="number">30.0</span>, <span class="number">40.0</span>&#125;;</span><br><span class="line"><span class="function">mwArray <span class="title">a</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, mxDOUBLE_CLASS, mxCOMPLEX)</span></span>;</span><br><span class="line">a.Real().SetData(rdata, <span class="number">4</span>);</span><br><span class="line">a.Imag().SetData(idata, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// get back from MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rbuffer[<span class="number">4</span>];</span><br><span class="line"><span class="keyword">double</span> ibuffer[<span class="number">4</span>];</span><br><span class="line">a.Real().GetData(rbuffer,<span class="number">4</span>);</span><br><span class="line">a.Imag().GetData(ibuffer,<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>matlab</tag>
-        <tag>mixed_programming</tag>
-        <tag>c++</tag>
       </tags>
   </entry>
   <entry>
@@ -1563,22 +1378,170 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>OpenGL sumup</title>
-    <url>/2011/10/09/OpenGL-sumup/</url>
-    <content><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://gitlab.com/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
-<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p><code>RenderScene()</code> 函数里面只放绘制的东西, 计算的所有代码独立出去, 保证速度!</p>
-<h2 id="加速显示"><a href="#加速显示" class="headerlink" title="加速显示"></a>加速显示</h2><p>用显示列表, 把要绘制的语句写进显示列表, 然后只需要在 <code>RenderScene()</code> 中调用显示列表就行了, 如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// create one display list</span></span><br><span class="line">GLuint index = glGenLists(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// compile the display list, store a triangle in it</span></span><br><span class="line">glNewList(index, GL_COMPILE);</span><br><span class="line">glBegin(GL_TRIANGLES);</span><br><span class="line">glVertex3fv(v0);</span><br><span class="line">glVertex3fv(v1);</span><br><span class="line">glVertex3fv(v2);</span><br><span class="line">glEnd();</span><br><span class="line">glEndList();</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the display list</span></span><br><span class="line">glCallList(index);</span><br><span class="line"></span><br><span class="line"><span class="comment">// delete it if it is not used any more</span></span><br><span class="line">glDeleteLists(index, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="glPushMatrix-…-glPopMatrix-使用说明"><a href="#glPushMatrix-…-glPopMatrix-使用说明" class="headerlink" title="glPushMatrix(); … glPopMatrix();使用说明"></a><code>glPushMatrix(); … glPopMatrix();</code>使用说明</h2><p>这对语句使用目的是保存当前的View Matrix, 以后中间的代码会出现类似 <code>glRotatef; glTranslatef; glScalef;</code> 等改变View Matrix 的语句.</p>
-<h2 id="3D世界坐标转换成2D屏幕坐标方法"><a href="#3D世界坐标转换成2D屏幕坐标方法" class="headerlink" title="3D世界坐标转换成2D屏幕坐标方法"></a>3D世界坐标转换成2D屏幕坐标方法</h2><p><code>beginWinCoords()</code>方法3D-&gt;2D, <code>endWinCoords()</code>方法2D-&gt;3D, 这两个方法直接的所有代码都会按2D屏幕绘制, 不会被3D干扰, 也不会有闪烁.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::beginWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glTranslatef(<span class="number">0.0</span>, winHeight - <span class="number">1</span>, <span class="number">0.0</span>);</span><br><span class="line">    glScalef(<span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glOrtho(<span class="number">0</span>, winWidth, <span class="number">0</span>, winHeight, <span class="number">-1</span>, <span class="number">1</span>);</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::endWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="往2D屏幕上打印TXT"><a href="#往2D屏幕上打印TXT" class="headerlink" title="往2D屏幕上打印TXT"></a>往2D屏幕上打印TXT</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> *m_font;</span><br><span class="line">m_font = (<span class="keyword">void</span> *) GLUT_BITMAP_9_BY_15;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::printTo2DWindow</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">float</span> * color)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    beginWinCoords();</span><br><span class="line">    glColor3f(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">    glPrint(x, y, s, m_font);</span><br><span class="line">    endWinCoords();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::glPrint</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">void</span> * font)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glRasterPos2f(x, y);</span><br><span class="line">    <span class="keyword">int</span> len = (<span class="keyword">int</span>) <span class="built_in">strlen</span>(s);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        glutBitmapCharacter(font, s[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="绘制带边框Border的图形"><a href="#绘制带边框Border的图形" class="headerlink" title="绘制带边框Border的图形"></a>绘制带边框Border的图形</h2><p>例如绘制带边框的四边形, 方法如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">glEnable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glPolygonOffset(<span class="number">1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon as normal</span></span><br><span class="line"><span class="comment">/* e.g. :</span></span><br><span class="line"><span class="comment">    glBegin(GL_POLYGON);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glEnd();</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">glDisable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glColor3v(yourColor); <span class="comment">//Color for your polygon border</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon with same procedure, as in above</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);</span><br></pre></td></tr></table></figure>
+    <title>MATLAB/C++ Mixed Programming: distribute MATLAB code into independent C++ shared library</title>
+    <url>/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/</url>
+    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
+<ol>
+<li>distribute MATLAB code into MATLAB independent C++ shared library.</li>
+<li>call MATLAB directly in VC++. Refer to the <a href="https://blog-tommyhu.github.io/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/">this blog</a> for details.</li>
+</ol>
+<p>This blog will focus on the first approach.</p>
+<hr>
+<p>Distributing MATLAB code into C++ libraries will enable us to call MATLAB in C++. This is further can be done to be MATLAB independent, which means we can call these libraries on any PC without MATLAB pre-installed. Also, good news is that, according to <a href="http://www.mathworks.com/support/solutions/en/data/1-GQC9MB/index.html" target="_blank" rel="noopener">MATLAB Support</a>, all deployed components and applications can be distributed free of charge. So, in this way, we can integrate MATLAB codes into our own product without concerning the license problem.</p>
+<hr>
+<p>In the following, I will show you how you can do this step by step.</p>
+<!-- add TOC here -->
+<div id="genTocHere"></div>
+
+<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><p>Take the following MATLAB function <code>myadd2.m</code> as an example, from which we want to generate MATLAB independent C++ shared library.</p>
+<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="Deploy-in-MATLAB"><a href="#Deploy-in-MATLAB" class="headerlink" title="Deploy in MATLAB:"></a>Deploy in MATLAB:</h2><ol>
+<li>Setup mex in MATLAB if needed, see <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-mex.html" target="_blank" rel="noopener">MATLAB/C++ Mixed Programming: setup mex in MATLAB</a>.</li>
+<li>>&gt; <code>mcc -C -W cpplib:libmyadd2 -T link:lib myadd2.m</code> (<code>-C</code> option is needed to generate <code>.ctf</code> file).</li>
+<li><p>Done. We can find the following files generated in the file folder.</p>
+<ul>
+<li><strong>libmyadd2.h</strong></li>
+<li><strong>libmyadd2.ctf</strong></li>
+<li><strong>libmyadd2.dll</strong></li>
+<li><strong>libmyadd2.lib</strong></li>
+<li>libmyadd2_mcc_component_data.c</li>
+<li>libmyadd2.cpp</li>
+<li>libmyadd2.exports</li>
+<li>libmyadd2.exp</li>
+<li><p>libmyadd2.prj</p>
+<p>Among these, only the first 4 will be needed to be called in VC.</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>NOTE: alternately, we can use MATLAB <strong>deploytool</strong> to do this:</p>
+<ol>
+<li>>&gt; <code>deploytool</code></li>
+<li>Pre-setup: In the <strong>Deployment Project</strong> window, edit project <code>Name</code> (also the name for the generated .h/.lib/.dll files, <code>libmyadd2</code> here), <code>Location</code> and most importantly choose the deployment <code>Type</code> to be <code>C++ shared library</code> (4 types in total to choose from including <code>Windows Standalone Application</code>, <code>Console Application</code>, <code>C Shared Library and C++ Shared Library</code>; the other 3 are not fully tested).</li>
+<li>Add files: In the <strong>C++ Shared Library</strong> window, under <code>Build</code> menu, click <code>[Add files]</code> to add <code>myadd2.m</code> as our exported functions.</li>
+<li>Setup: Click <code>Actions</code> Button in the <code>C++ Shared Library</code> window <code>&gt; Settings… &gt; General &gt;</code> uncheck the <code>&#39;Embed CTF archive into the Application&#39;</code>. Note that if we leave this option checked by default, it will not generate <code>.ctf</code> file. Their differences are:<ul>
+<li>Without <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in system Temp folder, i.e. <code>C:\Users\tommyhu\AppData\Local\Temp\tommyhu\mcrCache7.17\myadd20</code>.</li>
+<li>With <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in VC++ solution folder, i.e. <code>C:\Users\tommyhu\Documents\visual studio 2010\Projects\test\libmyadd2_mcr</code>.</li>
+</ul>
+</li>
+<li>Build: Click <strong>Build</strong> Button in the <strong>C++ Shared Library window</strong> to do real building.</li>
+<li>Done. Under <code>..\folderWeSet\libmyadd2\distrib</code>, we will find all files we need including:<ul>
+<li><strong>libmyadd2.h</strong></li>
+<li><strong>libmyadd2.ctf</strong></li>
+<li><strong>libmyadd2.dll</strong></li>
+<li><strong>libmyadd2.lib</strong></li>
+</ul>
+</li>
+</ol>
+<h2 id="Setup-client-PC"><a href="#Setup-client-PC" class="headerlink" title="Setup client PC:"></a>Setup client PC:</h2><p>Note: skip this step if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version.</p>
+<ul>
+<li>Copy <strong>MCRInstaller.exe</strong> to client PC and install. Note that <strong>MCRInstaller.exe</strong> should be consistent with the MATLAB version. Usually you can find it under path like<code>…\MATLAB\R2012a\toolbox\compiler\deploy\win64</code>.</li>
+</ul>
+<p>Note: although we have generated MATLAB independent C++ shared libraries, we still need to slightly setup client PC in order to make it work. Actually we still need to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) of it, but at least not full of it, make it portable enough. In reality, we can package it together with our product (and install automatically).</p>
+<h2 id="Call-in-VC"><a href="#Call-in-VC" class="headerlink" title="Call in VC++:"></a>Call in VC++:</h2><ol>
+<li>Libraries preparation: copy the above 4 files into VC project.</li>
+<li>VC setup:<ul>
+<li>Add MATLAB Compiler Runtime include folder to project <code>Include files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\include</code>.</li>
+<li>Add MATLAB Compiler Runtime library folder to project <code>Library files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\lib\win64\microsoft</code>.</li>
+<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\runtime\win64;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\bin\win64</code>.</li>
+<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code>. (Note also to add <code>libmx.lib</code> and <code>libmat.lib</code> if you plan to use <code>mxArray</code> in your code.)</li>
+<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code>.</li>
+</ul>
+</li>
+<li>Calling: please refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB.cpp" target="_blank" rel="noopener"><code>VC_call_MATLAB.cpp</code></a>.</li>
+</ol>
+<p>Note that, if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version, you don’t need step 2 to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) because these have been included when you install MATLAB. Under this condition, instead, you can setup VC as follows:</p>
+<ul>
+<li>VC setup:<ul>
+<li>Add MATLAB include folder to project <strong>Include files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\include</code></li>
+<li>Add MATLAB library folder to project <strong>Library files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\lib\win64\microsoft</code></li>
+<li>Add relevant libraries to <strong>Linker&gt;Input&gt;Additional Dependencies</strong>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code></li>
+<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h2><ol>
+<li>When .m file that we want to distribute also calls several other .m files, we don’t need to particularly to indicate. The steps are the same: only the final .m file is need to be distributed.</li>
+<li>Different distributed shared libraries perform independently, i.e., they cannot share variables to work together. For example, it is impossible for one library to use the data created by another library, which will be released when its library ends.</li>
+<li><p><strong>Thread-safety</strong>: According to <a href="http://www.mathworks.com/help/matlab/matlab_external/using-matlab-engine.html" target="_blank" rel="noopener">MATLAB documentation</a>, MATLAB libraries are not thread-safe. If you create multithreaded applications, make sure only one thread accesses the engine application. For example, if you want to use the above <code>libmyadd2.lib</code>, use <code>ThreadLock.h/.cpp</code> as follows:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ThreadLock.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> ThreadLock Lock;</span><br><span class="line">Lock.Lock();</span><br><span class="line">myadd2(<span class="number">2</span>, y, z, a, b);</span><br><span class="line">Lock.Unlock();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Type passing</strong>: Passing C++ native types to <code>mwArray</code> in order to call MATLAB</p>
+<ul>
+<li><p>When passing a grayscale <code>Mat</code> image, can use <code>mxINT8_CLASS</code> as follows.</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// assume we want to passing Mat img(rows, cols, CV_8UC1)</span></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">imgP</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(mat, mat);</span><br><span class="line">imgP.SetData(mat.ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>When passing a color <code>Mat</code> image (assume in format <code>CV_RGB</code>), currently no way is found to pass it directly. Possible way is to pass the r, g, b channels independently and then combine them to be a color image in MATLAB as follows.</p>
+<ul>
+<li><p>In VC++:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// suppose we want to pass Mat img</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Mat&gt; channels; <span class="comment">// R, G, B channels</span></span><br><span class="line">split(img, channels);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">image_R</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_G</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_B</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(channels[<span class="number">0</span>], channels[<span class="number">0</span>]);</span><br><span class="line">transpose(channels[<span class="number">1</span>], channels[<span class="number">1</span>]);</span><br><span class="line">transpose(channels[<span class="number">2</span>], channels[<span class="number">2</span>]);</span><br><span class="line">image_R.SetData(channels[<span class="number">0</span>].ptr(), rows*cols);</span><br><span class="line">image_G.SetData(channels[<span class="number">1</span>].ptr(), rows*cols);</span><br><span class="line">image_B.SetData(channels[<span class="number">2</span>].ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>In MATLAB:</p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">image(:,:,<span class="number">1</span>) = image_R;</span><br><span class="line">image(:,:,<span class="number">2</span>) = image_G;</span><br><span class="line">image(:,:,<span class="number">3</span>) = image_B;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>The way to define the input parameter based on a <code>string</code> or <code>char []</code> is as follows:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ini input parameter: im_path based on string aString or char aString[]</span></span><br><span class="line"><span class="function">mwArray <span class="title">im_path</span><span class="params">(aString.c_str())</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>For passing other types, we had better to use double (<code>mxDOUBLE_CLASS</code>) instead of int (<code>mxINT8_CLASS</code>) even though it actually is a int.</p>
+</li>
+<li><p>For passing complex values:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// passing to MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rdata[<span class="number">4</span>] = &#123;<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>&#125;;</span><br><span class="line"><span class="keyword">double</span> idata[<span class="number">4</span>] = &#123;<span class="number">10.0</span>, <span class="number">20.0</span>, <span class="number">30.0</span>, <span class="number">40.0</span>&#125;;</span><br><span class="line"><span class="function">mwArray <span class="title">a</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, mxDOUBLE_CLASS, mxCOMPLEX)</span></span>;</span><br><span class="line">a.Real().SetData(rdata, <span class="number">4</span>);</span><br><span class="line">a.Imag().SetData(idata, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// get back from MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rbuffer[<span class="number">4</span>];</span><br><span class="line"><span class="keyword">double</span> ibuffer[<span class="number">4</span>];</span><br><span class="line">a.Real().GetData(rbuffer,<span class="number">4</span>);</span><br><span class="line">a.Imag().GetData(ibuffer,<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>opengl</tag>
+        <tag>mixed_programming</tag>
+        <tag>matlab</tag>
+        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MFC sumup</title>
+    <url>/2011/10/09/MFC-sumup/</url>
+    <content><![CDATA[<h2 id="代码组织"><a href="#代码组织" class="headerlink" title="代码组织"></a>代码组织</h2><ul>
+<li><strong>代码</strong>: 写在 <code>View</code> 中</li>
+<li><strong>数据</strong>: 写在 <code>Doc</code> 中</li>
+<li><strong>变量</strong>: 在 <code>View.h</code> 中申明, 在 <code>View.cpp</code> 的构造函数中初始化, 在 <code>View.cpp</code> 的析构函数中释放</li>
+</ul>
+<h2 id="添加消息函数"><a href="#添加消息函数" class="headerlink" title="添加消息函数"></a>添加消息函数</h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image001.png"><strong>Messages</strong>图标</a> &gt; 找相应的</p>
+<h2 id="注册函数-ON-COMMAND"><a href="#注册函数-ON-COMMAND" class="headerlink" title="注册函数 ON_COMMAND"></a>注册函数 <code>ON_COMMAND</code></h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image002.png"><strong>Events</strong>图标</a> &gt; 找相应的<br>(注: 比如menu设置N选1型(menu 中选择其中之一会打钩$\checkmark$), 类似操作, 在每个项目的第二个点击添加, 然后代码类似如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnUpdateButtonLighton</span><span class="params">(CCmdUI *pCmdUI)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your command update UI handler code here</span></span><br><span class="line">    pCmdUI-&gt;SetCheck(m_nLightState == LIGHT_ON);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="添加状态栏提示信息"><a href="#添加状态栏提示信息" class="headerlink" title="添加状态栏提示信息"></a>添加状态栏提示信息</h2><ul>
+<li><p>在<code>MainFrm.cpp</code>中添加文字占位符, 粗体为新添加</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> UINT indicators[] =</span><br><span class="line">&#123;</span><br><span class="line">    ID_SEPARATOR, <span class="comment">// status line indicator</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for CGAL 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_INDICATOR_CAPS,</span><br><span class="line">    ID_INDICATOR_NUM,</span><br><span class="line">    ID_INDICATOR_SCRL,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>在 <code>int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)</code> 中设置所添加的占位符的宽度, 不设的话为默认值; 最后一个值是宽度值.</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">1</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">2</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>在想显示提示信息的地方添加如下代码即可:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CStatusBar * pStatus=(CStatusBar*) AfxGetApp()-&gt;m_pMainWnd-&gt;GetDescendantWindow(AFX_IDW_STATUS_BAR );</span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">1</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set first</span></span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">2</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set second</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Menu中的功能想放到Toolbars上"><a href="#Menu中的功能想放到Toolbars上" class="headerlink" title="Menu中的功能想放到Toolbars上"></a>Menu中的功能想放到Toolbars上</h2><p>可以先增加<strong>Toolbar</strong>, 再增加<strong>Menu</strong>, 使得两者的ID一样就OK.</p>
+<h2 id="Warning提示信息"><a href="#Warning提示信息" class="headerlink" title="Warning提示信息"></a>Warning提示信息</h2><p>方式可以</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">MessageBox(<span class="string">"Could not delete RC"</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="键盘处理"><a href="#键盘处理" class="headerlink" title="键盘处理"></a>键盘处理</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">bool</span> keyDown[<span class="number">256</span>];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyDown</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span> &amp;&amp; nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">true</span>;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnKeyDown(nChar, nRepCnt, nFlags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyUp</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span>&amp;&amp;nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再在画的函数中进行真正处理:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::RenderScene</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (keyDown[<span class="string">'w'</span>])</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// handling here...</span></span><br><span class="line">    &#125;    </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="鼠标处理"><a href="#鼠标处理" class="headerlink" title="鼠标处理"></a>鼠标处理</h2><ul>
+<li><p>左键处理: (中键 – 右键 类似)</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> buttonState;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonDown</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    SetCapture();</span><br><span class="line">    buttonState = GLUT_LEFT_BUTTON;</span><br><span class="line">    CView::OnLButtonDown(nFlags, point);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonUp</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=CPoint(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    ReleaseCapture();</span><br><span class="line">    buttonState = <span class="number">-1</span>;</span><br><span class="line">    CView::OnLButtonUp(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>真正的处理在 <code>OnMouseMove()</code> 函数中:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnMouseMove</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="comment">// Check if we have captured the mouse</span></span><br><span class="line">    <span class="keyword">if</span> (GetCapture()==<span class="keyword">this</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">float</span> dx, dy;</span><br><span class="line">        dx = point.x - m_MouseDownPoint.x;</span><br><span class="line">        dy = point.y - m_MouseDownPoint.y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_LEFT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_MIDDLE_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_RIGHT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnMouseMove(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="打开文件对话框"><a href="#打开文件对话框" class="headerlink" title="打开文件对话框"></a>打开文件对话框</h2><p>添加方法如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    CString meshPath= fOpenDlg.GetPathName();</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注: 若想能同时打开多个文件, 同时可以设置同时打开的上限, 默认20个, 方法如下(同样包含如何挨个获得每个文件的Path):</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_ALLOWMULTISELECT|OFN_EXPLORER|OFN_ENABLEHOOK, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="comment">//extend to be able to open 100 files at a time, default only 20</span></span><br><span class="line">fOpenDlg.m_ofn.nMaxFile=<span class="number">100</span>*MAX_PATH;</span><br><span class="line">fOpenDlg.m_ofn.lpstrFile=<span class="keyword">new</span> TCHAR[fOpenDlg.m_ofn.nMaxFile];</span><br><span class="line">ZeroMemory(fOpenDlg.m_ofn.lpstrFile, <span class="keyword">sizeof</span>(TCHAR)*fOpenDlg.m_ofn.nMaxFile);</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Retrieve file name(s).</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;CString&gt; meshPath;</span><br><span class="line">    POSITION fileNamesPosition = fOpenDlg.GetStartPosition();</span><br><span class="line">    <span class="keyword">while</span>(fileNamesPosition != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        CString stub = fOpenDlg.GetNextPathName(fileNamesPosition);</span><br><span class="line">        meshPath.push_back((CString)stub);</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>mfc</tag>
       </tags>
   </entry>
   <entry>
@@ -1732,24 +1695,22 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Run SH/shell-script in Win10</title>
-    <url>/2020/03/10/Run-SH-shell-script-in-Win10/</url>
-    <content><![CDATA[<h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>Install <strong>Windows Subsystem for Linux (WSL)</strong></p>
-<ol>
-<li><strong>Settings</strong> -&gt; <strong>Turn Windows features on or off</strong> -&gt; check on <strong>Windows Subsystem for Linux</strong> -&gt; Reboot.</li>
-<li><p>If has error <strong>Windows Subsystem for Linux has no installed distributions</strong>, run in cmd</p>
- <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lxrun /install</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Note: in Windows 10 1803 and later, <code>lxrun</code> is deprecated, will need to install it via Windows App Store following the link showing on the screen.</p>
-</blockquote>
-</li>
-</ol>
-<a id="more"></a>
-<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><p>Run cmd <code>sh</code> file folder<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">bash xxx.sh</span><br></pre></td></tr></table></figure></p>
+    <title>OpenGL sumup</title>
+    <url>/2011/10/09/OpenGL-sumup/</url>
+    <content><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://gitlab.com/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
+<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p><code>RenderScene()</code> 函数里面只放绘制的东西, 计算的所有代码独立出去, 保证速度!</p>
+<h2 id="加速显示"><a href="#加速显示" class="headerlink" title="加速显示"></a>加速显示</h2><p>用显示列表, 把要绘制的语句写进显示列表, 然后只需要在 <code>RenderScene()</code> 中调用显示列表就行了, 如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// create one display list</span></span><br><span class="line">GLuint index = glGenLists(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// compile the display list, store a triangle in it</span></span><br><span class="line">glNewList(index, GL_COMPILE);</span><br><span class="line">glBegin(GL_TRIANGLES);</span><br><span class="line">glVertex3fv(v0);</span><br><span class="line">glVertex3fv(v1);</span><br><span class="line">glVertex3fv(v2);</span><br><span class="line">glEnd();</span><br><span class="line">glEndList();</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the display list</span></span><br><span class="line">glCallList(index);</span><br><span class="line"></span><br><span class="line"><span class="comment">// delete it if it is not used any more</span></span><br><span class="line">glDeleteLists(index, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="glPushMatrix-…-glPopMatrix-使用说明"><a href="#glPushMatrix-…-glPopMatrix-使用说明" class="headerlink" title="glPushMatrix(); … glPopMatrix();使用说明"></a><code>glPushMatrix(); … glPopMatrix();</code>使用说明</h2><p>这对语句使用目的是保存当前的View Matrix, 以后中间的代码会出现类似 <code>glRotatef; glTranslatef; glScalef;</code> 等改变View Matrix 的语句.</p>
+<h2 id="3D世界坐标转换成2D屏幕坐标方法"><a href="#3D世界坐标转换成2D屏幕坐标方法" class="headerlink" title="3D世界坐标转换成2D屏幕坐标方法"></a>3D世界坐标转换成2D屏幕坐标方法</h2><p><code>beginWinCoords()</code>方法3D-&gt;2D, <code>endWinCoords()</code>方法2D-&gt;3D, 这两个方法直接的所有代码都会按2D屏幕绘制, 不会被3D干扰, 也不会有闪烁.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::beginWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glTranslatef(<span class="number">0.0</span>, winHeight - <span class="number">1</span>, <span class="number">0.0</span>);</span><br><span class="line">    glScalef(<span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glOrtho(<span class="number">0</span>, winWidth, <span class="number">0</span>, winHeight, <span class="number">-1</span>, <span class="number">1</span>);</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::endWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="往2D屏幕上打印TXT"><a href="#往2D屏幕上打印TXT" class="headerlink" title="往2D屏幕上打印TXT"></a>往2D屏幕上打印TXT</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> *m_font;</span><br><span class="line">m_font = (<span class="keyword">void</span> *) GLUT_BITMAP_9_BY_15;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::printTo2DWindow</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">float</span> * color)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    beginWinCoords();</span><br><span class="line">    glColor3f(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">    glPrint(x, y, s, m_font);</span><br><span class="line">    endWinCoords();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::glPrint</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">void</span> * font)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glRasterPos2f(x, y);</span><br><span class="line">    <span class="keyword">int</span> len = (<span class="keyword">int</span>) <span class="built_in">strlen</span>(s);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        glutBitmapCharacter(font, s[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="绘制带边框Border的图形"><a href="#绘制带边框Border的图形" class="headerlink" title="绘制带边框Border的图形"></a>绘制带边框Border的图形</h2><p>例如绘制带边框的四边形, 方法如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">glEnable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glPolygonOffset(<span class="number">1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon as normal</span></span><br><span class="line"><span class="comment">/* e.g. :</span></span><br><span class="line"><span class="comment">    glBegin(GL_POLYGON);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glEnd();</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">glDisable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glColor3v(yourColor); <span class="comment">//Color for your polygon border</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon with same procedure, as in above</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);</span><br></pre></td></tr></table></figure>
 ]]></content>
       <tags>
-        <tag>setup</tag>
-        <tag>sh</tag>
+        <tag>coding</tag>
+        <tag>opengl</tag>
       </tags>
   </entry>
   <entry>
@@ -1955,22 +1916,42 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Track memory leaks in VS</title>
-    <url>/2015/06/23/Track-memory-leaks-in-VS/</url>
-    <content><![CDATA[<p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
-<a id="more"></a>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
-<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
-<p>Note that:</p>
+    <title>Run SH/shell-script in Win10</title>
+    <url>/2020/03/10/Run-SH-shell-script-in-Win10/</url>
+    <content><![CDATA[<h1 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h1><p>Install <strong>Windows Subsystem for Linux (WSL)</strong></p>
 <ol>
-<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
-<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
+<li><strong>Settings</strong> -&gt; <strong>Turn Windows features on or off</strong> -&gt; check on <strong>Windows Subsystem for Linux</strong> -&gt; Reboot.</li>
+<li><p>If has error <strong>Windows Subsystem for Linux has no installed distributions</strong>, run in cmd</p>
+ <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lxrun /install</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Note: in Windows 10 1803 and later, <code>lxrun</code> is deprecated, will need to install it via Windows App Store following the link showing on the screen.</p>
+</blockquote>
+</li>
 </ol>
-<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
+<a id="more"></a>
+<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><p>Run cmd <code>sh</code> file folder<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">bash xxx.sh</span><br></pre></td></tr></table></figure></p>
+]]></content>
+      <tags>
+        <tag>setup</tag>
+        <tag>sh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>DOS sumup</title>
+    <url>/2012/04/06/DOS-sumup/</url>
+    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
+<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
+<li><p>Get all file names</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Get all file full paths</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
 ]]></content>
       <tags>
         <tag>coding</tag>
+        <tag>dos</tag>
       </tags>
   </entry>
   <entry>
@@ -2106,6 +2087,25 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>Track memory leaks in VS</title>
+    <url>/2015/06/23/Track-memory-leaks-in-VS/</url>
+    <content><![CDATA[<p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
+<a id="more"></a>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
+<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
+<p>Note that:</p>
+<ol>
+<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
+<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
+</ol>
+<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Using Libxml2 library in VC++</title>
     <url>/2012/06/18/Using-Libxml2-library-in-VC/</url>
     <content><![CDATA[<p><a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform), it is free software available under the MIT License. We can use it to read/write data from XML data file.</p>
@@ -2125,29 +2125,6 @@ The difference is that: the first method <strong>only copy the listed files</str
 </li>
 <li>Do like <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs" target="_blank" rel="noopener">project</a> to read/write data from/to XML files.</li>
 </ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>xml</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Using MSXML to read/write XML files</title>
-    <url>/2012/07/11/Using-MSXML-to-read-write-XML-files/</url>
-    <content><![CDATA[<p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
-<p>In the followings, I will show how to use MSXML to read/write xml files.</p>
-<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
-<li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
-<li>Add <code>#import &lt;msxml3.dll&gt;</code> to the beginning part of your code.</li>
-<li><p>Use the following xml files as an example:</p>
-  <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Appearance_model</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"6"</span> <span class="attr">weight</span>=<span class="string">"0.017783"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"10"</span> <span class="attr">weight</span>=<span class="string">"0.003343"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Appearance_model</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="Read-from-xml-files"><a href="#Read-from-xml-files" class="headerlink" title="Read from xml files:"></a>Read from xml files:</h2><p>For example, we want to load the above xml data to a <code>vector&lt;pair&lt;int, float&gt;&gt;</code> (<code>name</code> to a string), do like the following code, where input parameter gives the path of above xml file.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">vector&lt;pair&lt;int, float&gt;&gt; load_appearance_model_from_xml(string file, string &amp; name)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model;</span><br><span class="line"></span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line">    spXMLDoc-&gt;load(file.c_str());</span><br><span class="line"></span><br><span class="line">    MSXML2::IXMLDOMElementPtr spRoot = spXMLDoc-&gt;documentElement; <span class="comment">//root node</span></span><br><span class="line">    <span class="keyword">if</span> (spRoot-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        MSXML2::IXMLDOMNodeListPtr spNodeList = spRoot-&gt;childNodes;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// traverse child's nodes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i != spNodeList-&gt;length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMNodePtr spNode = spNodeList-&gt;item[i];</span><br><span class="line">            <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                name = (<span class="keyword">char</span> *) spNode-&gt;Gettext();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> index;</span><br><span class="line">                <span class="keyword">float</span> weight;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// traverse node's attributes</span></span><br><span class="line">                MSXML2::IXMLDOMNamedNodeMapPtr spNameNodeMap = spNode-&gt;attributes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">long</span> j = <span class="number">0</span>; j != spNameNodeMap-&gt;length; ++j)</span><br><span class="line">                &#123;</span><br><span class="line">                    MSXML2::IXMLDOMNodePtr spNode2 = spNameNodeMap-&gt;item[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"index"</span>)</span><br><span class="line">                        index = (<span class="keyword">int</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"weight"</span>)</span><br><span class="line">                        weight = (<span class="keyword">float</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                app_model.push_back(make_pair(index, weight));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app_model;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Write-to-xml-files"><a href="#Write-to-xml-files" class="headerlink" title="Write to xml files:"></a>Write to xml files:</h2><p>Do like the following code, where input parameter file gives the file name that you want to save.</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_appearance_model_to_xml</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model, <span class="built_in">string</span> name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    MSXML2::IXMLDOMElementPtr  spRoot;</span><br><span class="line">    HRESULT hr = spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SUCCEEDED(hr))</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Unable to create xml file.\n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>, &amp;spRoot);</span><br><span class="line">        spXMLDoc-&gt;raw_appendChild(spRoot, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        MSXML2::IXMLDOMElementPtr childNode2;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>, &amp;childNode2);</span><br><span class="line">        childNode2-&gt;put_text((<span class="keyword">_bstr_t</span>)xxx);</span><br><span class="line">        spRoot-&gt;appendChild(childNode2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;app_model.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMElementPtr childNode;</span><br><span class="line">            spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>, &amp;childNode);</span><br><span class="line"></span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"index"</span>, app_model[i].first);</span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"weight"</span>, app_model[i].second);</span><br><span class="line"></span><br><span class="line">            spRoot-&gt;appendChild(childNode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        spXMLDoc-&gt;save(file.c_str());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>Note:</strong> Above writing xml with <code>&lt;name&gt;xxx&lt;/name&gt;</code> style is not fully tested.</p>
 ]]></content>
       <tags>
         <tag>coding</tag>
@@ -2201,6 +2178,29 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>debugging</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Using MSXML to read/write XML files</title>
+    <url>/2012/07/11/Using-MSXML-to-read-write-XML-files/</url>
+    <content><![CDATA[<p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
+<p>In the followings, I will show how to use MSXML to read/write xml files.</p>
+<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
+<li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
+<li>Add <code>#import &lt;msxml3.dll&gt;</code> to the beginning part of your code.</li>
+<li><p>Use the following xml files as an example:</p>
+  <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Appearance_model</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"6"</span> <span class="attr">weight</span>=<span class="string">"0.017783"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"10"</span> <span class="attr">weight</span>=<span class="string">"0.003343"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Appearance_model</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Read-from-xml-files"><a href="#Read-from-xml-files" class="headerlink" title="Read from xml files:"></a>Read from xml files:</h2><p>For example, we want to load the above xml data to a <code>vector&lt;pair&lt;int, float&gt;&gt;</code> (<code>name</code> to a string), do like the following code, where input parameter gives the path of above xml file.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">vector&lt;pair&lt;int, float&gt;&gt; load_appearance_model_from_xml(string file, string &amp; name)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model;</span><br><span class="line"></span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line">    spXMLDoc-&gt;load(file.c_str());</span><br><span class="line"></span><br><span class="line">    MSXML2::IXMLDOMElementPtr spRoot = spXMLDoc-&gt;documentElement; <span class="comment">//root node</span></span><br><span class="line">    <span class="keyword">if</span> (spRoot-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        MSXML2::IXMLDOMNodeListPtr spNodeList = spRoot-&gt;childNodes;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// traverse child's nodes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i != spNodeList-&gt;length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMNodePtr spNode = spNodeList-&gt;item[i];</span><br><span class="line">            <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                name = (<span class="keyword">char</span> *) spNode-&gt;Gettext();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> index;</span><br><span class="line">                <span class="keyword">float</span> weight;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// traverse node's attributes</span></span><br><span class="line">                MSXML2::IXMLDOMNamedNodeMapPtr spNameNodeMap = spNode-&gt;attributes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">long</span> j = <span class="number">0</span>; j != spNameNodeMap-&gt;length; ++j)</span><br><span class="line">                &#123;</span><br><span class="line">                    MSXML2::IXMLDOMNodePtr spNode2 = spNameNodeMap-&gt;item[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"index"</span>)</span><br><span class="line">                        index = (<span class="keyword">int</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"weight"</span>)</span><br><span class="line">                        weight = (<span class="keyword">float</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                app_model.push_back(make_pair(index, weight));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app_model;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Write-to-xml-files"><a href="#Write-to-xml-files" class="headerlink" title="Write to xml files:"></a>Write to xml files:</h2><p>Do like the following code, where input parameter file gives the file name that you want to save.</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_appearance_model_to_xml</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model, <span class="built_in">string</span> name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    MSXML2::IXMLDOMElementPtr  spRoot;</span><br><span class="line">    HRESULT hr = spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SUCCEEDED(hr))</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Unable to create xml file.\n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>, &amp;spRoot);</span><br><span class="line">        spXMLDoc-&gt;raw_appendChild(spRoot, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        MSXML2::IXMLDOMElementPtr childNode2;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>, &amp;childNode2);</span><br><span class="line">        childNode2-&gt;put_text((<span class="keyword">_bstr_t</span>)xxx);</span><br><span class="line">        spRoot-&gt;appendChild(childNode2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;app_model.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMElementPtr childNode;</span><br><span class="line">            spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>, &amp;childNode);</span><br><span class="line"></span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"index"</span>, app_model[i].first);</span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"weight"</span>, app_model[i].second);</span><br><span class="line"></span><br><span class="line">            spRoot-&gt;appendChild(childNode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        spXMLDoc-&gt;save(file.c_str());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Note:</strong> Above writing xml with <code>&lt;name&gt;xxx&lt;/name&gt;</code> style is not fully tested.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>xml</tag>
       </tags>
   </entry>
   <entry>
