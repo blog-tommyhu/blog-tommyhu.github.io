@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CMake sumup</title>
+    <url>/2014/09/25/CMake-sumup/</url>
+    <content><![CDATA[<h2 id="CMakeLists-txt-for-Lib-project"><a href="#CMakeLists-txt-for-Lib-project" class="headerlink" title="CMakeLists.txt for Lib project:"></a>CMakeLists.txt for Lib project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># add path of headers to include_directories</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC for static lib, and SHARED for dynamic</span></span><br><span class="line"><span class="keyword">FILE</span>(GLOB SOURCES</span><br><span class="line">	src/*.h</span><br><span class="line">    src/*.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># link libs, list all of them</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(mylib</span><br><span class="line">    -lib-name-.lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="CMakeLists-txt-for-EXE-project"><a href="#CMakeLists-txt-for-EXE-project" class="headerlink" title="CMakeLists.txt for EXE project:"></a>CMakeLists.txt for EXE project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Set the minimum required version of cmake.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the entire solution name.</span></span><br><span class="line"><span class="keyword">project</span>(testProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add path of headers to include_directories.</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"><span class="keyword">include_directories</span>(lib/mylib)</span><br><span class="line"><span class="keyword">include_directories</span>(external/-external-lib-/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add an executable to the project using the specified source files.</span></span><br><span class="line"><span class="keyword">file</span>(GLOB SOURCES</span><br><span class="line">    src/*.*</span><br><span class="line">	lib/-external-lib-/source/*.h</span><br><span class="line">    lib/-external-lib-/source/*.cpp</span><br><span class="line">    <span class="keyword">test</span>/main.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add mylib lib project</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(lib/mylib)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> mylib)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add opencv lib</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV <span class="number">2</span> REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;OPENCV_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;OPENCV_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;OPENCV_DEFINITIONS&#125;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span><span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><ol>
+<li>For <strong><code>add_executable()</code></strong>: actually there is no need to add headers here, but is essential to load them also in project view.</li>
+<li>To use name that contains spaces, use <code>\</code> before spaces to escape them.</li>
+<li>To group source files in VS (e.g. put given source files into new folder under VS), use<ul>
+<li><code>source_group(&lt;name&gt; FILES &lt;src&gt;...)</code> (use <code>${SOURCES}</code> for  files list defined earlier), or</li>
+<li><code>source_group(&lt;name&gt; REGULAR_EXPRESSION &lt;regex&gt;)</code> (e.g. use <code>.*..*</code> for normal <code>*.*</code>)</li>
+</ul>
+</li>
+<li>Link different libraries for Debug and Release mode: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">  <span class="keyword">target_link_libraries</span>(testProj</span><br><span class="line">      debug -path-to-debug-lib-/lib_debug.lib</span><br><span class="line">optimized -path-to-release-lib-/lib.lib</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></li>
+<li>CMake for setting highest warning level can be: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># set highest warnings level, and treat them as errors</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="comment"># c++</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_CXX_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># c</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_C_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUCC <span class="keyword">OR</span> CMAKE_COMPILER_IS_GNUCXX)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
+<li>Enable OpenMP: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># enable openmp</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenMP)</span><br><span class="line"><span class="keyword">if</span> (OPENMP_FOUND)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; $&#123;OpenMP_C_FLAGS&#125;"</span>)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; $&#123;OpenMP_CXX_FLAGS&#125;"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
+<li>for copying all needed data files to binary dir (when <code>cmake</code>), there are two ways:<ul>
+<li>List all the files, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data/*.*</span><br><span class="line">	lib/-external-lib-/models/*.dat</span><br><span class="line">	lib/-matlab-/*.m</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure></li>
+<li>List only the folders that contain the data, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data</span><br><span class="line">	lib/-external-lib-/models</span><br><span class="line">	lib/-matlab-</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure>
+The difference is that: the first method <strong>only copy the listed files</strong> to the binary dir <strong>without directory structure</strong>, while the second will <strong>copy all the files in these folders</strong>, as well as <strong>with directory structure</strong> (only the least parent will retain), i.e. there will be three folders named <code>test-data</code>, <code>models</code> and <code>-matlab-</code> in the binary dir after copying.</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>cmake</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Blogging via Hexo</title>
     <url>/2020/04/29/Blogging-via-Hexo/</url>
     <content><![CDATA[<p>I recently moved my blog here using <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> instead of previous <a href="http://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a>, though the old version is still <a href="http://blog-ythu.github.io/" target="_blank" rel="noopener">available</a>. Hexo is a fast, simple &amp; powerful blog framework. Compared with Jekyll, Hexo is more flexible in terms of setup, post writing via Markdown, tags, themes, content searching, 3rd-part plugin support, etc.</p>
@@ -160,178 +190,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Character encodings of text files</title>
-    <url>/2013/01/21/Character-encodings-of-text-files/</url>
-    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
-<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
-<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
-<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>encoding</tag>
-        <tag>text</tag>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Good PC tools</title>
-    <url>/2013/05/24/Good-PC-tools/</url>
-    <content><![CDATA[<h2 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h2><ul>
-<li><a href="http://www.ctex.org/CTeXDownload" target="_blank" rel="noopener"><strong>CTeX</strong></a>: LaTex editing</li>
-<li><a href="http://notepad-plus-plus.org/download" target="_blank" rel="noopener"><strong>Notepad++</strong></a>: advanced text editor</li>
-<li><a href="https://code.visualstudio.com/" target="_blank" rel="noopener"><strong>Visual Studio Code</strong></a>: advanced editor for structured code</li>
-</ul>
-<a id="more"></a>
-<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><ul>
-<li><a href="http://www.mythicsoft.com/agentransack/download" target="_blank" rel="noopener"><strong>Agent Ransack</strong></a>: fast content search in files</li>
-<li><a href="http://www.bulkrenameutility.co.uk/Download.php" target="_blank" rel="noopener"><strong>Bulk Rename Utility</strong></a>: batch file and folder renaming</li>
-<li><a href="http://ejie.me/" target="_blank" rel="noopener"><strong>Clover</strong></a>: add multi-tab functionality for Windows Explorer</li>
-<li><a href="http://www.voidtools.com/downloads/" target="_blank" rel="noopener"><strong>Everything</strong></a>: fast file search</li>
-<li><a href="http://www.lopesoft.com/en/filemenutools/download" target="_blank" rel="noopener"><strong>FileMenu Tools</strong></a>: file/folder right click menus manager</li>
-<li><a href="http://www.listary.com/download" target="_blank" rel="noopener"><strong>Listary</strong></a>: file managing/browsing…</li>
-<li><a href="https://www.piriform.com/recuva/download" target="_blank" rel="noopener"><strong>Recuva</strong></a>: restore deleted files</li>
-</ul>
-<h2 id="System"><a href="#System" class="headerlink" title="System"></a>System</h2><ul>
-<li><a href="https://toolslib.net/downloads/viewdownload/1-adwcleaner/" target="_blank" rel="noopener"><strong>AdwCleaner</strong></a>: remove toolbars and hijackers</li>
-<li><a href="http://www.disktool.cn/feature.html" target="_blank" rel="noopener"><strong>Disk Tool</strong></a>: disk partition management</li>
-<li><a href="http://www.displayfusion.com/Download/" target="_blank" rel="noopener"><strong>DisplayFusion</strong></a>: multi-monitor taskbars, title-bar buttons…</li>
-<li><strong>EaseUS Partition Master</strong>: disk partition management, good for converting dynamic disks to basic mode</li>
-<li><a href="http://www.microsoft.com/en-hk/download/details.aspx?id=35460" target="_blank" rel="noopener"><strong>Mouse without Borders</strong></a>: control multiple PCs using single mouse</li>
-<li><a href="http://www.rapidee.com/en/download" target="_blank" rel="noopener"><strong>Rapid Environment Editor</strong></a>: environment variables management</li>
-<li><a href="https://rufus.akeo.ie/" target="_blank" rel="noopener"><strong>Rufus</strong></a>: create bootable USB (in case <em>Windows 7 USB DVD Download Tool</em> fails)</li>
-<li><a href="https://www.realtimesoft.com/ultramon/download.asp" target="_blank" rel="noopener"><strong>UltraMon</strong></a>: multi-toolbars for multi-monitors</li>
-</ul>
-<h2 id="Viewer-Player-Editor"><a href="#Viewer-Player-Editor" class="headerlink" title="Viewer / Player / Editor"></a>Viewer / Player / Editor</h2><ul>
-<li><strong>Adobe Audition</strong>: real-time multi-channel audio recording &amp; audio editing</li>
-<li><a href="http://audacity.sourceforge.net/download/" target="_blank" rel="noopener"><strong>Audacity</strong></a>: audio editing, e.g. cutting, resampling, changing speed…</li>
-<li><strong>CorelDRAW</strong>: vector diagram drawing</li>
-<li><a href="https://en.bandisoft.com/bandizip/" target="_blank" rel="noopener"><strong>Bandizip</strong></a>: compress/extract files</li>
-<li><a href="http://www.tracker-software.com/product/pdf-xchange-editor" target="_blank" rel="noopener"><strong>PDF-XChange Editor</strong></a>: pdf viewer and editor</li>
-<li><a href="http://potplayer.daum.net/" target="_blank" rel="noopener"><strong>PotPlayer</strong></a>: video player</li>
-<li><a href="http://www.xnview.com/en/xnview/" target="_blank" rel="noopener"><strong>XnView</strong></a>: image viewer</li>
-</ul>
-<h2 id="Coding"><a href="#Coding" class="headerlink" title="Coding"></a>Coding</h2><ul>
-<li><a href="https://github.com/lucasg/Dependencies" target="_blank" rel="noopener"><strong>Dependencies</strong></a>: track dependent dlls, good for exporting cross-platform apps</li>
-<li><strong>Matlab Plugins</strong>:<ul>
-<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig" target="_blank" rel="noopener">export_fig</a>: exports figures nicely to a number of vector &amp; bitmap formats</li>
-<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/8028-mmread" target="_blank" rel="noopener">mmread</a>: read virtually any media file in Windows, Linux, or Mac</li>
-</ul>
-</li>
-<li><a href="https://www.syntevo.com/smartgit/" target="_blank" rel="noopener"><strong>SmartGit</strong></a>: Git &amp; Mercurial client</li>
-<li><a href="http://tortoisesvn.net/downloads.html" target="_blank" rel="noopener"><strong>TortoiseSVN</strong></a>: SVN repo browser, check out…</li>
-<li><strong>Visual Studio Extensions</strong>:<ul>
-<li><strong>C# outline</strong>: add braces {} outlining for C#</li>
-<li><strong>Code alignment</strong>: format code vertically</li>
-<li><strong>Code Compare</strong>: code comparison and automatic merging</li>
-<li><strong>Image Watch</strong>: watch window for viewing in-memory OpenCV images</li>
-<li><strong>Indent Guides</strong>: display indent and page width guides</li>
-<li><strong>Productivity Power Tools</strong>: code structure visualizer (better disabled as conflict with Indent Guides), scrollbar markers, double-click to maximize windows, ctrl + click to peek definition, show matched margin, color printing</li>
-<li><strong>ReSharper</strong>: to-do explorer, color picker in C#/WPF, unit testing</li>
-<li><strong>Visual Assist X</strong>: navigate, refactor, generate code, coding assistance</li>
-<li><strong>VSCommands</strong>: main menu enhancements, code block end tagger, build assistance, output window enhancement</li>
-</ul>
-</li>
-</ul>
-<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><ul>
-<li><a href="http://bing.msn.cn/dict/desktop/" target="_blank" rel="noopener"><strong>BingDict</strong></a>: Chinese/English Dictionary</li>
-<li><strong>Camtasia Studio</strong>: screen recording</li>
-<li><strong>Chrome Plugins</strong>:<ul>
-<li><a href="https://chrome.google.com/webstore/detail/adblock/gighmmpiobklfepjocnamgkkbiglidom" target="_blank" rel="noopener">AdBlock</a>: Ads blocking</li>
-<li><a href="https://chrome.google.com/webstore/detail/checker-plus-for-gmail/oeopbcgkkoapgobdbedcemjljbihmemj" target="_blank" rel="noopener">Checker Plus for Gmail</a>: email checking</li>
-<li><a href="https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj" target="_blank" rel="noopener">Linkclump</a>: roi links copying/openning (can be self-defined)</li>
-<li><a href="https://chrome.google.com/webstore/detail/remove-cookies-for-site/lmfdblomdpkcniknaenceeogpgepocmm" target="_blank" rel="noopener">Remove cookies for site</a>: remove cookies for given site</li>
-<li><a href="https://chrome.google.com/webstore/detail/webmail-ad-blocker/cbhfdchmklhpcngcgjmpdbjakdggkkjp" target="_blank" rel="noopener">Webmail Ad Blocker</a>: Ads blocking for webmails</li>
-</ul>
-</li>
-<li><strong>DVD Decrypter</strong>: extract data from DVD</li>
-<li><strong>Duck Capture</strong>: screenshot, good to capture whole webpage (multi-page)</li>
-<li><a href="https://filezilla-project.org/" target="_blank" rel="noopener"><strong>FileZilla</strong></a>: ftp connect client</li>
-<li><a href="http://www.pcfreetime.com/download.html" target="_blank" rel="noopener"><strong>FormatFactory</strong></a>: picture/audio/video file format converting</li>
-<li><a href="http://www.fraps.com/download.php" target="_blank" rel="noopener"><strong>Fraps</strong></a>: screen capture…, really useful to capture screen under full-screen mode</li>
-<li><strong>Image Composite Editor</strong>: advanced panoramic image stitcher</li>
-<li><a href="https://www.bunkus.org/videotools/mkvtoolnix/downloads.html" target="_blank" rel="noopener"><strong>mkvtoolnix</strong></a>: video processing, e.g. extracting given channel audio from movie…</li>
-<li><a href="http://www.teamviewer.com/en/download/windows.aspx" target="_blank" rel="noopener"><strong>TeamViewer</strong></a>: cross-domain remote desktop connector</li>
-<li><a href="http://wkhtmltopdf.org/downloads.html" target="_blank" rel="noopener"><strong>WKhtmlTOpdf</strong></a>: convent HTML to PDF with style retained, using<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">wkhtmltopdf.exe www.website.url.com out.pdf</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>tools</tag>
-        <tag>pc</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Good refs on Stack Overflow</title>
-    <url>/2014/04/13/Good-refs-on-Stack-Overflow/</url>
-    <content><![CDATA[<h5 id="C"><a href="#C" class="headerlink" title="C"></a>C</h5><ul>
-<li><a href="http://denniskubes.com/2012/08/20/is-c-pass-by-value-or-reference/" target="_blank" rel="noopener">everything is pass-by-value</a></li>
-<li><a href="http://stackoverflow.com/a/21950708/2589776" target="_blank" rel="noopener">cannot declare functions inside <code>struct</code></a></li>
-</ul>
-<a id="more"></a>
-<h5 id="C-1"><a href="#C-1" class="headerlink" title="C++"></a>C++</h5><ul>
-<li>string literal<ul>
-<li><a href="http://stackoverflow.com/a/164229/2589776" target="_blank" rel="noopener"><code>char *str=&quot;string&quot;;</code> vs. <code>char str[]=&quot;string&quot;;</code></a></li>
-<li><a href="http://stackoverflow.com/a/24760066/2589776" target="_blank" rel="noopener">life-time of string literal</a> [<a href="http://stackoverflow.com/q/9970295/2589776" target="_blank" rel="noopener">2</a>]</li>
-<li><a href="http://stackoverflow.com/a/24804277/2589776" target="_blank" rel="noopener">adjacent string literals are concatenated in translation phase 6</a></li>
-</ul>
-</li>
-<li><a href="http://stackoverflow.com/a/23544364/2589776" target="_blank" rel="noopener">array decayed to pointer: when &amp; when not</a></li>
-<li><a href="http://stackoverflow.com/q/57483/2589776" target="_blank" rel="noopener">pointer vs. reference</a></li>
-<li><a href="http://stackoverflow.com/a/24807698/2589776" target="_blank" rel="noopener">compare pointers</a></li>
-<li><a href="http://stackoverflow.com/a/54596/2589776" target="_blank" rel="noopener"><code>class</code> vs. <code>struct</code></a></li>
-<li><a href="http://stackoverflow.com/q/332030/2589776" target="_blank" rel="noopener"><code>static_cast</code> vs. <code>dynamic_cast</code> vs. <code>const_cast</code> vs. <code>reinterpret_cast</code></a></li>
-<li><a href="http://stackoverflow.com/a/22383496/2589776" target="_blank" rel="noopener"><code>cout double</code> value with full precision</a></li>
-<li><a href="http://stackoverflow.com/a/21375753/2589776" target="_blank" rel="noopener">Why <code>cout</code> works weird for <code>unsigned char</code></a>?</li>
-<li><a href="http://stackoverflow.com/a/162615/2589776" target="_blank" rel="noopener"><code>const</code> reading</a> | <a href="http://stackoverflow.com/a/22419598/2589776" target="_blank" rel="noopener">cvqualifiers</a> | <a href="http://www.parashift.com/c++-faq-lite/const-correctness.html" target="_blank" rel="noopener"><code>const</code> correctness</a> | <a href="http://duramecho.com/ComputerInformation/WhyHowCppConst.html" target="_blank" rel="noopener">The C++ <code>const</code> Declaration: Why &amp; How</a> | <a href="http://stackoverflow.com/a/751783/2589776" target="_blank" rel="noopener"><code>const</code> member function</a></li>
-<li><a href="http://stackoverflow.com/q/22410531/2589776" target="_blank" rel="noopener">get the type of an array element</a></li>
-<li><a href="http://stackoverflow.com/a/47990/2589776" target="_blank" rel="noopener">set, clear, toggle, and check a single bit</a></li>
-<li><a href="http://stackoverflow.com/q/5605125/2589776" target="_blank" rel="noopener"><code>iostream::eof</code> inside a loop condition is wrong!!!</a></li>
-<li><a href="http://stackoverflow.com/a/23042974/2589776" target="_blank" rel="noopener"><code>set</code> with custom comparator</a></li>
-<li><a href="http://stackoverflow.com/q/4176328/2589776" target="_blank" rel="noopener">Undefined Behavior and Sequence Points</a></li>
-<li><a href="http://stackoverflow.com/q/10195343/2589776" target="_blank" rel="noopener">copy files (for all types/without knowing types)</a></li>
-</ul>
-<h5 id="OpenCV"><a href="#OpenCV" class="headerlink" title="OpenCV"></a>OpenCV</h5><ul>
-<li><a href="http://www.anlak.com/2012/10/using-opencv-2-4-x-with-visual-studio-2010-tutorial.html" target="_blank" rel="noopener">setup in VS</a></li>
-<li><a href="http://stackoverflow.com/a/20730585/2589776" target="_blank" rel="noopener">missing dll issues</a></li>
-<li><a href="http://stackoverflow.com/a/23486280/2589776" target="_blank" rel="noopener">automatic memory management (e.g. <code>Mat</code>)</a></li>
-<li><a href="http://stackoverflow.com/a/21336627/2589776" target="_blank" rel="noopener"><code>waitKey()</code></a></li>
-<li><a href="http://stackoverflow.com/a/21421342/2589776" target="_blank" rel="noopener"><code>imwrite()</code> supported types</a></li>
-<li>comma-separated initializer for <code>Mat</code>: <code>Mat mat = (Mat_&lt;float&gt;(2,3) &lt;&lt; 1, 2, 3, 4, 5, 6);</code></li>
-<li><a href="http://stackoverflow.com/a/22329736/2589776" target="_blank" rel="noopener">apply function to each image pixel</a></li>
-<li><a href="http://stackoverflow.com/q/23510571/2589776" target="_blank" rel="noopener">set all <code>Mat</code> values at given channel to given value</a></li>
-<li><a href="http://stackoverflow.com/a/23573442/2589776" target="_blank" rel="noopener">set <code>Mat</code> values given condition</a></li>
-<li><a href="http://stackoverflow.com/a/26685567/2589776" target="_blank" rel="noopener">convertion from <code>Mat</code> to <code>vector</code></a></li>
-<li><a href="http://stackoverflow.com/a/30828747/2589776" target="_blank" rel="noopener">create rotated rectangular or polygonal ROI/mask</a></li>
-<li><a href="http://stackoverflow.com/a/11412325/2589776" target="_blank" rel="noopener"><code>kmeans()</code> on color images (per pixel [RGB] as a sample)</a></li>
-<li><a href="http://stackoverflow.com/a/22374195/2589776" target="_blank" rel="noopener">HOG feature</a> | <a href="http://stackoverflow.com/a/20805153/2589776" target="_blank" rel="noopener"><code>CascadeClassifier::detectMultiScale()</code> parameters</a></li>
-</ul>
-<h5 id="Dos"><a href="#Dos" class="headerlink" title="Dos"></a>Dos</h5><ul>
-<li><a href="http://stackoverflow.com/a/12049845/2589776" target="_blank" rel="noopener">Rename and move files in batch</a></li>
-</ul>
-<h5 id="Mixed-Programming"><a href="#Mixed-Programming" class="headerlink" title="Mixed Programming"></a>Mixed Programming</h5><ul>
-<li><a href="http://stackoverflow.com/a/23063703/2589776" target="_blank" rel="noopener">Matlab/C++ - mixed programming</a></li>
-<li><a href="http://stackoverflow.com/q/27697451/2589776" target="_blank" rel="noopener">Matlab/OpenCV - <code>Mat</code> transfering through XML</a></li>
-</ul>
-<h5 id="Regex"><a href="#Regex" class="headerlink" title="Regex"></a>Regex</h5><ul>
-<li><a href="http://stackoverflow.com/q/22937618/2589776" target="_blank" rel="noopener">reference list</a></li>
-<li><a href="http://stackoverflow.com/a/23563821/2589776" target="_blank" rel="noopener">find/replace in VS</a></li>
-</ul>
-<h5 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h5><ul>
-<li><a href="http://stackoverflow.com/a/20844851/2589776" target="_blank" rel="noopener">Convert recursion to iteration</a></li>
-</ul>
-<hr>
-<p><strong>Note</strong>: If one thread is both applied to C and C++, I will put it in C++.</p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Conversion between image and world coordinates</title>
     <url>/2012/04/06/Conversion-between-image-and-world-coordinates/</url>
     <content><![CDATA[<p>Conversion between Image Coordinates and World Coordinates are fundamental to all image formation problems. Always confused to me. Sumup here for further references.</p>
@@ -461,33 +319,22 @@
       </tags>
   </entry>
   <entry>
-    <title>CMake sumup</title>
-    <url>/2014/09/25/CMake-sumup/</url>
-    <content><![CDATA[<h2 id="CMakeLists-txt-for-Lib-project"><a href="#CMakeLists-txt-for-Lib-project" class="headerlink" title="CMakeLists.txt for Lib project:"></a>CMakeLists.txt for Lib project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># add path of headers to include_directories</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC for static lib, and SHARED for dynamic</span></span><br><span class="line"><span class="keyword">FILE</span>(GLOB SOURCES</span><br><span class="line">	src/*.h</span><br><span class="line">    src/*.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># link libs, list all of them</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(mylib</span><br><span class="line">    -lib-name-.lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<a id="more"></a>
-<h2 id="CMakeLists-txt-for-EXE-project"><a href="#CMakeLists-txt-for-EXE-project" class="headerlink" title="CMakeLists.txt for EXE project:"></a>CMakeLists.txt for EXE project:</h2><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Set the minimum required version of cmake.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the entire solution name.</span></span><br><span class="line"><span class="keyword">project</span>(testProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add path of headers to include_directories.</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"><span class="keyword">include_directories</span>(lib/mylib)</span><br><span class="line"><span class="keyword">include_directories</span>(external/-external-lib-/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add an executable to the project using the specified source files.</span></span><br><span class="line"><span class="keyword">file</span>(GLOB SOURCES</span><br><span class="line">    src/*.*</span><br><span class="line">	lib/-external-lib-/source/*.h</span><br><span class="line">    lib/-external-lib-/source/*.cpp</span><br><span class="line">    <span class="keyword">test</span>/main.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add mylib lib project</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(lib/mylib)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> mylib)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add opencv lib</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV <span class="number">2</span> REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;OPENCV_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;OPENCV_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;OPENCV_DEFINITIONS&#125;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span><span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><ol>
-<li>For <strong><code>add_executable()</code></strong>: actually there is no need to add headers here, but is essential to load them also in project view.</li>
-<li>To use name that contains spaces, use <code>\</code> before spaces to escape them.</li>
-<li>To group source files in VS (e.g. put given source files into new folder under VS), use<ul>
-<li><code>source_group(&lt;name&gt; FILES &lt;src&gt;...)</code> (use <code>${SOURCES}</code> for  files list defined earlier), or</li>
-<li><code>source_group(&lt;name&gt; REGULAR_EXPRESSION &lt;regex&gt;)</code> (e.g. use <code>.*..*</code> for normal <code>*.*</code>)</li>
-</ul>
-</li>
-<li>Link different libraries for Debug and Release mode: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line">  <span class="keyword">target_link_libraries</span>(testProj</span><br><span class="line">      debug -path-to-debug-lib-/lib_debug.lib</span><br><span class="line">optimized -path-to-release-lib-/lib.lib</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></li>
-<li>CMake for setting highest warning level can be: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># set highest warnings level, and treat them as errors</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="comment"># c++</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_CXX_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># c</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_C_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUCC <span class="keyword">OR</span> CMAKE_COMPILER_IS_GNUCXX)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
-<li>Enable OpenMP: <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># enable openmp</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenMP)</span><br><span class="line"><span class="keyword">if</span> (OPENMP_FOUND)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; $&#123;OpenMP_C_FLAGS&#125;"</span>)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; $&#123;OpenMP_CXX_FLAGS&#125;"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
-<li>for copying all needed data files to binary dir (when <code>cmake</code>), there are two ways:<ul>
-<li>List all the files, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data/*.*</span><br><span class="line">	lib/-external-lib-/models/*.dat</span><br><span class="line">	lib/-matlab-/*.m</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure></li>
-<li>List only the folders that contain the data, e.g.,  <figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data</span><br><span class="line">	lib/-external-lib-/models</span><br><span class="line">	lib/-matlab-</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure>
-The difference is that: the first method <strong>only copy the listed files</strong> to the binary dir <strong>without directory structure</strong>, while the second will <strong>copy all the files in these folders</strong>, as well as <strong>with directory structure</strong> (only the least parent will retain), i.e. there will be three folders named <code>test-data</code>, <code>models</code> and <code>-matlab-</code> in the binary dir after copying.</li>
-</ul>
-</li>
+    <title>Character encodings of text files</title>
+    <url>/2013/01/21/Character-encodings-of-text-files/</url>
+    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
+<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
+<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
 </ol>
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>cmake</tag>
+        <tag>encoding</tag>
+        <tag>text</tag>
       </tags>
   </entry>
   <entry>
@@ -506,6 +353,93 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>dos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Good PC tools</title>
+    <url>/2013/05/24/Good-PC-tools/</url>
+    <content><![CDATA[<h2 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h2><ul>
+<li><a href="http://www.ctex.org/CTeXDownload" target="_blank" rel="noopener"><strong>CTeX</strong></a>: LaTex editing</li>
+<li><a href="http://notepad-plus-plus.org/download" target="_blank" rel="noopener"><strong>Notepad++</strong></a>: advanced text editor</li>
+<li><a href="https://code.visualstudio.com/" target="_blank" rel="noopener"><strong>Visual Studio Code</strong></a>: advanced editor for structured code</li>
+</ul>
+<a id="more"></a>
+<h2 id="File"><a href="#File" class="headerlink" title="File"></a>File</h2><ul>
+<li><a href="http://www.mythicsoft.com/agentransack/download" target="_blank" rel="noopener"><strong>Agent Ransack</strong></a>: fast content search in files</li>
+<li><a href="http://www.bulkrenameutility.co.uk/Download.php" target="_blank" rel="noopener"><strong>Bulk Rename Utility</strong></a>: batch file and folder renaming</li>
+<li><a href="http://ejie.me/" target="_blank" rel="noopener"><strong>Clover</strong></a>: add multi-tab functionality for Windows Explorer</li>
+<li><a href="http://www.voidtools.com/downloads/" target="_blank" rel="noopener"><strong>Everything</strong></a>: fast file search</li>
+<li><a href="http://www.lopesoft.com/en/filemenutools/download" target="_blank" rel="noopener"><strong>FileMenu Tools</strong></a>: file/folder right click menus manager</li>
+<li><a href="http://www.listary.com/download" target="_blank" rel="noopener"><strong>Listary</strong></a>: file managing/browsing…</li>
+<li><a href="https://www.piriform.com/recuva/download" target="_blank" rel="noopener"><strong>Recuva</strong></a>: restore deleted files</li>
+</ul>
+<h2 id="System"><a href="#System" class="headerlink" title="System"></a>System</h2><ul>
+<li><a href="https://toolslib.net/downloads/viewdownload/1-adwcleaner/" target="_blank" rel="noopener"><strong>AdwCleaner</strong></a>: remove toolbars and hijackers</li>
+<li><a href="http://www.disktool.cn/feature.html" target="_blank" rel="noopener"><strong>Disk Tool</strong></a>: disk partition management</li>
+<li><a href="http://www.displayfusion.com/Download/" target="_blank" rel="noopener"><strong>DisplayFusion</strong></a>: multi-monitor taskbars, title-bar buttons…</li>
+<li><strong>EaseUS Partition Master</strong>: disk partition management, good for converting dynamic disks to basic mode</li>
+<li><a href="http://www.microsoft.com/en-hk/download/details.aspx?id=35460" target="_blank" rel="noopener"><strong>Mouse without Borders</strong></a>: control multiple PCs using single mouse</li>
+<li><a href="http://www.rapidee.com/en/download" target="_blank" rel="noopener"><strong>Rapid Environment Editor</strong></a>: environment variables management</li>
+<li><a href="https://rufus.akeo.ie/" target="_blank" rel="noopener"><strong>Rufus</strong></a>: create bootable USB (in case <em>Windows 7 USB DVD Download Tool</em> fails)</li>
+<li><a href="https://www.realtimesoft.com/ultramon/download.asp" target="_blank" rel="noopener"><strong>UltraMon</strong></a>: multi-toolbars for multi-monitors</li>
+</ul>
+<h2 id="Viewer-Player-Editor"><a href="#Viewer-Player-Editor" class="headerlink" title="Viewer / Player / Editor"></a>Viewer / Player / Editor</h2><ul>
+<li><strong>Adobe Audition</strong>: real-time multi-channel audio recording &amp; audio editing</li>
+<li><a href="http://audacity.sourceforge.net/download/" target="_blank" rel="noopener"><strong>Audacity</strong></a>: audio editing, e.g. cutting, resampling, changing speed…</li>
+<li><strong>CorelDRAW</strong>: vector diagram drawing</li>
+<li><a href="https://en.bandisoft.com/bandizip/" target="_blank" rel="noopener"><strong>Bandizip</strong></a>: compress/extract files</li>
+<li><a href="http://www.tracker-software.com/product/pdf-xchange-editor" target="_blank" rel="noopener"><strong>PDF-XChange Editor</strong></a>: pdf viewer and editor</li>
+<li><a href="http://potplayer.daum.net/" target="_blank" rel="noopener"><strong>PotPlayer</strong></a>: video player</li>
+<li><a href="http://www.xnview.com/en/xnview/" target="_blank" rel="noopener"><strong>XnView</strong></a>: image viewer</li>
+</ul>
+<h2 id="Coding"><a href="#Coding" class="headerlink" title="Coding"></a>Coding</h2><ul>
+<li><a href="https://github.com/lucasg/Dependencies" target="_blank" rel="noopener"><strong>Dependencies</strong></a>: track dependent dlls, good for exporting cross-platform apps</li>
+<li><strong>Matlab Plugins</strong>:<ul>
+<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig" target="_blank" rel="noopener">export_fig</a>: exports figures nicely to a number of vector &amp; bitmap formats</li>
+<li><a href="http://www.mathworks.com/matlabcentral/fileexchange/8028-mmread" target="_blank" rel="noopener">mmread</a>: read virtually any media file in Windows, Linux, or Mac</li>
+</ul>
+</li>
+<li><a href="https://www.syntevo.com/smartgit/" target="_blank" rel="noopener"><strong>SmartGit</strong></a>: Git &amp; Mercurial client</li>
+<li><a href="http://tortoisesvn.net/downloads.html" target="_blank" rel="noopener"><strong>TortoiseSVN</strong></a>: SVN repo browser, check out…</li>
+<li><strong>Visual Studio Extensions</strong>:<ul>
+<li><strong>C# outline</strong>: add braces {} outlining for C#</li>
+<li><strong>Code alignment</strong>: format code vertically</li>
+<li><strong>Code Compare</strong>: code comparison and automatic merging</li>
+<li><strong>Image Watch</strong>: watch window for viewing in-memory OpenCV images</li>
+<li><strong>Indent Guides</strong>: display indent and page width guides</li>
+<li><strong>Productivity Power Tools</strong>: code structure visualizer (better disabled as conflict with Indent Guides), scrollbar markers, double-click to maximize windows, ctrl + click to peek definition, show matched margin, color printing</li>
+<li><strong>ReSharper</strong>: to-do explorer, color picker in C#/WPF, unit testing</li>
+<li><strong>Visual Assist X</strong>: navigate, refactor, generate code, coding assistance</li>
+<li><strong>VSCommands</strong>: main menu enhancements, code block end tagger, build assistance, output window enhancement</li>
+</ul>
+</li>
+</ul>
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><ul>
+<li><a href="http://bing.msn.cn/dict/desktop/" target="_blank" rel="noopener"><strong>BingDict</strong></a>: Chinese/English Dictionary</li>
+<li><strong>Camtasia Studio</strong>: screen recording</li>
+<li><strong>Chrome Plugins</strong>:<ul>
+<li><a href="https://chrome.google.com/webstore/detail/adblock/gighmmpiobklfepjocnamgkkbiglidom" target="_blank" rel="noopener">AdBlock</a>: Ads blocking</li>
+<li><a href="https://chrome.google.com/webstore/detail/checker-plus-for-gmail/oeopbcgkkoapgobdbedcemjljbihmemj" target="_blank" rel="noopener">Checker Plus for Gmail</a>: email checking</li>
+<li><a href="https://chrome.google.com/webstore/detail/linkclump/lfpjkncokllnfokkgpkobnkbkmelfefj" target="_blank" rel="noopener">Linkclump</a>: roi links copying/openning (can be self-defined)</li>
+<li><a href="https://chrome.google.com/webstore/detail/remove-cookies-for-site/lmfdblomdpkcniknaenceeogpgepocmm" target="_blank" rel="noopener">Remove cookies for site</a>: remove cookies for given site</li>
+<li><a href="https://chrome.google.com/webstore/detail/webmail-ad-blocker/cbhfdchmklhpcngcgjmpdbjakdggkkjp" target="_blank" rel="noopener">Webmail Ad Blocker</a>: Ads blocking for webmails</li>
+</ul>
+</li>
+<li><strong>DVD Decrypter</strong>: extract data from DVD</li>
+<li><strong>Duck Capture</strong>: screenshot, good to capture whole webpage (multi-page)</li>
+<li><a href="https://filezilla-project.org/" target="_blank" rel="noopener"><strong>FileZilla</strong></a>: ftp connect client</li>
+<li><a href="http://www.pcfreetime.com/download.html" target="_blank" rel="noopener"><strong>FormatFactory</strong></a>: picture/audio/video file format converting</li>
+<li><a href="http://www.fraps.com/download.php" target="_blank" rel="noopener"><strong>Fraps</strong></a>: screen capture…, really useful to capture screen under full-screen mode</li>
+<li><strong>Image Composite Editor</strong>: advanced panoramic image stitcher</li>
+<li><a href="https://www.bunkus.org/videotools/mkvtoolnix/downloads.html" target="_blank" rel="noopener"><strong>mkvtoolnix</strong></a>: video processing, e.g. extracting given channel audio from movie…</li>
+<li><a href="http://www.teamviewer.com/en/download/windows.aspx" target="_blank" rel="noopener"><strong>TeamViewer</strong></a>: cross-domain remote desktop connector</li>
+<li><a href="http://wkhtmltopdf.org/downloads.html" target="_blank" rel="noopener"><strong>WKhtmlTOpdf</strong></a>: convent HTML to PDF with style retained, using<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">wkhtmltopdf.exe www.website.url.com out.pdf</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>tools</tag>
+        <tag>pc</tag>
       </tags>
   </entry>
   <entry>
@@ -575,6 +509,107 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>debugging</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Good refs on Stack Overflow</title>
+    <url>/2014/04/13/Good-refs-on-Stack-Overflow/</url>
+    <content><![CDATA[<h5 id="C"><a href="#C" class="headerlink" title="C"></a>C</h5><ul>
+<li><a href="http://denniskubes.com/2012/08/20/is-c-pass-by-value-or-reference/" target="_blank" rel="noopener">everything is pass-by-value</a></li>
+<li><a href="http://stackoverflow.com/a/21950708/2589776" target="_blank" rel="noopener">cannot declare functions inside <code>struct</code></a></li>
+</ul>
+<a id="more"></a>
+<h5 id="C-1"><a href="#C-1" class="headerlink" title="C++"></a>C++</h5><ul>
+<li>string literal<ul>
+<li><a href="http://stackoverflow.com/a/164229/2589776" target="_blank" rel="noopener"><code>char *str=&quot;string&quot;;</code> vs. <code>char str[]=&quot;string&quot;;</code></a></li>
+<li><a href="http://stackoverflow.com/a/24760066/2589776" target="_blank" rel="noopener">life-time of string literal</a> [<a href="http://stackoverflow.com/q/9970295/2589776" target="_blank" rel="noopener">2</a>]</li>
+<li><a href="http://stackoverflow.com/a/24804277/2589776" target="_blank" rel="noopener">adjacent string literals are concatenated in translation phase 6</a></li>
+</ul>
+</li>
+<li><a href="http://stackoverflow.com/a/23544364/2589776" target="_blank" rel="noopener">array decayed to pointer: when &amp; when not</a></li>
+<li><a href="http://stackoverflow.com/q/57483/2589776" target="_blank" rel="noopener">pointer vs. reference</a></li>
+<li><a href="http://stackoverflow.com/a/24807698/2589776" target="_blank" rel="noopener">compare pointers</a></li>
+<li><a href="http://stackoverflow.com/a/54596/2589776" target="_blank" rel="noopener"><code>class</code> vs. <code>struct</code></a></li>
+<li><a href="http://stackoverflow.com/q/332030/2589776" target="_blank" rel="noopener"><code>static_cast</code> vs. <code>dynamic_cast</code> vs. <code>const_cast</code> vs. <code>reinterpret_cast</code></a></li>
+<li><a href="http://stackoverflow.com/a/22383496/2589776" target="_blank" rel="noopener"><code>cout double</code> value with full precision</a></li>
+<li><a href="http://stackoverflow.com/a/21375753/2589776" target="_blank" rel="noopener">Why <code>cout</code> works weird for <code>unsigned char</code></a>?</li>
+<li><a href="http://stackoverflow.com/a/162615/2589776" target="_blank" rel="noopener"><code>const</code> reading</a> | <a href="http://stackoverflow.com/a/22419598/2589776" target="_blank" rel="noopener">cvqualifiers</a> | <a href="http://www.parashift.com/c++-faq-lite/const-correctness.html" target="_blank" rel="noopener"><code>const</code> correctness</a> | <a href="http://duramecho.com/ComputerInformation/WhyHowCppConst.html" target="_blank" rel="noopener">The C++ <code>const</code> Declaration: Why &amp; How</a> | <a href="http://stackoverflow.com/a/751783/2589776" target="_blank" rel="noopener"><code>const</code> member function</a></li>
+<li><a href="http://stackoverflow.com/q/22410531/2589776" target="_blank" rel="noopener">get the type of an array element</a></li>
+<li><a href="http://stackoverflow.com/a/47990/2589776" target="_blank" rel="noopener">set, clear, toggle, and check a single bit</a></li>
+<li><a href="http://stackoverflow.com/q/5605125/2589776" target="_blank" rel="noopener"><code>iostream::eof</code> inside a loop condition is wrong!!!</a></li>
+<li><a href="http://stackoverflow.com/a/23042974/2589776" target="_blank" rel="noopener"><code>set</code> with custom comparator</a></li>
+<li><a href="http://stackoverflow.com/q/4176328/2589776" target="_blank" rel="noopener">Undefined Behavior and Sequence Points</a></li>
+<li><a href="http://stackoverflow.com/q/10195343/2589776" target="_blank" rel="noopener">copy files (for all types/without knowing types)</a></li>
+</ul>
+<h5 id="OpenCV"><a href="#OpenCV" class="headerlink" title="OpenCV"></a>OpenCV</h5><ul>
+<li><a href="http://www.anlak.com/2012/10/using-opencv-2-4-x-with-visual-studio-2010-tutorial.html" target="_blank" rel="noopener">setup in VS</a></li>
+<li><a href="http://stackoverflow.com/a/20730585/2589776" target="_blank" rel="noopener">missing dll issues</a></li>
+<li><a href="http://stackoverflow.com/a/23486280/2589776" target="_blank" rel="noopener">automatic memory management (e.g. <code>Mat</code>)</a></li>
+<li><a href="http://stackoverflow.com/a/21336627/2589776" target="_blank" rel="noopener"><code>waitKey()</code></a></li>
+<li><a href="http://stackoverflow.com/a/21421342/2589776" target="_blank" rel="noopener"><code>imwrite()</code> supported types</a></li>
+<li>comma-separated initializer for <code>Mat</code>: <code>Mat mat = (Mat_&lt;float&gt;(2,3) &lt;&lt; 1, 2, 3, 4, 5, 6);</code></li>
+<li><a href="http://stackoverflow.com/a/22329736/2589776" target="_blank" rel="noopener">apply function to each image pixel</a></li>
+<li><a href="http://stackoverflow.com/q/23510571/2589776" target="_blank" rel="noopener">set all <code>Mat</code> values at given channel to given value</a></li>
+<li><a href="http://stackoverflow.com/a/23573442/2589776" target="_blank" rel="noopener">set <code>Mat</code> values given condition</a></li>
+<li><a href="http://stackoverflow.com/a/26685567/2589776" target="_blank" rel="noopener">convertion from <code>Mat</code> to <code>vector</code></a></li>
+<li><a href="http://stackoverflow.com/a/30828747/2589776" target="_blank" rel="noopener">create rotated rectangular or polygonal ROI/mask</a></li>
+<li><a href="http://stackoverflow.com/a/11412325/2589776" target="_blank" rel="noopener"><code>kmeans()</code> on color images (per pixel [RGB] as a sample)</a></li>
+<li><a href="http://stackoverflow.com/a/22374195/2589776" target="_blank" rel="noopener">HOG feature</a> | <a href="http://stackoverflow.com/a/20805153/2589776" target="_blank" rel="noopener"><code>CascadeClassifier::detectMultiScale()</code> parameters</a></li>
+</ul>
+<h5 id="Dos"><a href="#Dos" class="headerlink" title="Dos"></a>Dos</h5><ul>
+<li><a href="http://stackoverflow.com/a/12049845/2589776" target="_blank" rel="noopener">Rename and move files in batch</a></li>
+</ul>
+<h5 id="Mixed-Programming"><a href="#Mixed-Programming" class="headerlink" title="Mixed Programming"></a>Mixed Programming</h5><ul>
+<li><a href="http://stackoverflow.com/a/23063703/2589776" target="_blank" rel="noopener">Matlab/C++ - mixed programming</a></li>
+<li><a href="http://stackoverflow.com/q/27697451/2589776" target="_blank" rel="noopener">Matlab/OpenCV - <code>Mat</code> transfering through XML</a></li>
+</ul>
+<h5 id="Regex"><a href="#Regex" class="headerlink" title="Regex"></a>Regex</h5><ul>
+<li><a href="http://stackoverflow.com/q/22937618/2589776" target="_blank" rel="noopener">reference list</a></li>
+<li><a href="http://stackoverflow.com/a/23563821/2589776" target="_blank" rel="noopener">find/replace in VS</a></li>
+</ul>
+<h5 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h5><ul>
+<li><a href="http://stackoverflow.com/a/20844851/2589776" target="_blank" rel="noopener">Convert recursion to iteration</a></li>
+</ul>
+<hr>
+<p><strong>Note</strong>: If one thread is both applied to C and C++, I will put it in C++.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Handle Chinese bookmarks in Latex</title>
+    <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
+    <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
+<a id="more"></a>
+<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
+<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
+<p>Correct way to handle is:</p>
+<ol>
+<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
+<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
+<li>Run <code>pdflatex</code> again. Done!</li>
+</ol>
+<hr>
+<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
+<ol>
+<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
+<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
+<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
+<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
+<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
+<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
+</ol>
+<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
+<hr>
+<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
+<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
+<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>latex</tag>
       </tags>
   </entry>
   <entry>
@@ -737,41 +772,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Handle Chinese bookmarks in Latex</title>
-    <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
-    <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
-<a id="more"></a>
-<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
-<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
-<p>Correct way to handle is:</p>
-<ol>
-<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
-<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
-<li>Run <code>pdflatex</code> again. Done!</li>
-</ol>
-<hr>
-<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
-<ol>
-<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
-<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
-<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
-<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
-</ol>
-<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
-<hr>
-<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
-<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
-<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>latex</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>IO sumup</title>
     <url>/2012/01/01/IO-sumup/</url>
     <content><![CDATA[<h2 id="using-C-FILE-stdio-h"><a href="#using-C-FILE-stdio-h" class="headerlink" title="using C - FILE (stdio.h)"></a>using C - FILE (stdio.h)</h2><ul>
@@ -812,43 +812,50 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>MATLAB sumup</title>
-    <url>/2012/08/30/MATLAB-sumup/</url>
-    <content><![CDATA[<h2 id="Get-rect-from-mouse"><a href="#Get-rect-from-mouse" class="headerlink" title="Get rect from mouse"></a>Get rect from mouse</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imshow(<span class="string">'test.jpg'</span>);</span><br><span class="line">rect = getrect;</span><br></pre></td></tr></table></figure>
-<h2 id="对话框-dialog-box"><a href="#对话框-dialog-box" class="headerlink" title="对话框 dialog box"></a>对话框 dialog box</h2><p>cc: <a href="http://hi.baidu.com/7777777_shu/item/ccb713f20ce99e18d7ff8cda" target="_blank" rel="noopener">matlab GUI之对话框</a></p>
-<h2 id="多个string连接"><a href="#多个string连接" class="headerlink" title="多个string连接"></a>多个string连接</h2><ol>
-<li><p><code>sprintf</code></p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br></pre></td></tr></table></figure></li>
-<li><p>strcat</p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br></pre></td></tr></table></figure>
+    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
+    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
+    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
+<ol>
+<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
+</li>
+<li><p>call MATLAB directly in VC++.</p>
 </li>
 </ol>
-<h2 id="获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名"><a href="#获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名" class="headerlink" title="获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)"></a>获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[pathstr,realname,ext] = fileparts(<span class="string">'C:\\images\\test.bmp'</span>);</span><br></pre></td></tr></table></figure>
-<p>=&gt;</p>
-<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">pathstr = <span class="string">'C:\images\'</span></span><br><span class="line"><span class="string">realname = '</span>test'</span><br><span class="line">ext = <span class="string">'.bmp'</span></span><br></pre></td></tr></table></figure>
-<h2 id="UI获取文件名和文件夹"><a href="#UI获取文件名和文件夹" class="headerlink" title="UI获取文件名和文件夹"></a>UI获取文件名和文件夹</h2><ul>
-<li><p>文件</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[filename, pathname] = uigetfile(&#123;<span class="string">'*.*'</span>;<span class="string">'*.avi'</span>;<span class="string">'*.mpg'</span>;<span class="string">'*.wmv'</span>;<span class="string">'*.asf'</span>;<span class="string">'*.asx'</span>;<span class="string">'*.mj2'</span>&#125;, <span class="string">'Select a VIDEO file...'</span>);</span><br><span class="line">video_file_name = fullfile(pathname, filename); <span class="comment">% use fullfile for OS independent</span></span><br></pre></td></tr></table></figure></li>
-<li><p>文件夹</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">output_images_folder = uigetdir(pwd, <span class="string">'Select the FOLDER where to save images...'</span>)</span><br></pre></td></tr></table></figure>
+<hr>
+<p>This blog will focus on the second approach (also the easier one).</p>
+<a id="more"></a>
+<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
+<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
+<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
+<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h2 id="遍历文件夹内所有-指定类型-文件"><a href="#遍历文件夹内所有-指定类型-文件" class="headerlink" title="遍历文件夹内所有(指定类型)文件"></a>遍历文件夹内所有(指定类型)文件</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">data_pwd = uigetdir;</span><br><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br><span class="line">filearray = dir(file_temp);</span><br><span class="line">s=<span class="built_in">max</span>(<span class="built_in">size</span>(filearray));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:s</span><br><span class="line">    imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="获取image的长-宽和channel数"><a href="#获取image的长-宽和channel数" class="headerlink" title="获取image的长, 宽和channel数"></a>获取image的长, 宽和channel数</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">img = imread(<span class="string">'C:\Users\tommyhu\Desktop\test\frame_0000.bmp'</span>);</span><br><span class="line">[h, w, c] = <span class="built_in">size</span>(img);</span><br></pre></td></tr></table></figure>
-<h2 id="遍历video的每一帧"><a href="#遍历video的每一帧" class="headerlink" title="遍历video的每一帧"></a>遍历video的每一帧</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">mov = VideoReader(video_file_name);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:mov.numberofframes</span><br><span class="line">    b=read(mov,<span class="built_in">i</span>);</span><br><span class="line">	... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="获取用户输入"><a href="#获取用户输入" class="headerlink" title="获取用户输入"></a>获取用户输入</h2><ul>
-<li><p>命令行方式</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">strResponse = input(<span class="string">'Do you want more? Y/N [Y]: '</span>, <span class="string">'s'</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>UI方式</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">prompt = &#123; <span class="string">'from:'</span>,<span class="string">'to:'</span>,<span class="string">'step'</span>&#125;;</span><br><span class="line">dlg_title = <span class="string">'choose images'</span>;</span><br><span class="line">num_lines = [<span class="number">4</span> <span class="number">1</span> <span class="number">3</span>]; <span class="comment">% can be a scaler number that applies to all</span></span><br><span class="line">defAns = &#123;<span class="string">'0'</span>, <span class="string">''</span>, <span class="string">'1'</span>&#125;;</span><br><span class="line">options = <span class="string">'on'</span>; <span class="comment">% enable to resize window</span></span><br><span class="line">answer = inputdlg(prompt,dlg_title,num_lines,defAns);</span><br><span class="line"></span><br><span class="line">from=str2num(cell2mat(answer(<span class="number">1</span>)));</span><br><span class="line">to=str2num(cell2mat(answer(<span class="number">2</span>)));</span><br><span class="line">stepsize=str2num(cell2mat(answer(<span class="number">3</span>)));</span><br></pre></td></tr></table></figure>
-</li>
+<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
+<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
+<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
+<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
+<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
+<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
+<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
+<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
+<ul>
+<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
+<li><code>string</code></li>
+<li>matrix</li>
+<li>gray-scale image</li>
+<li>RGB image</li>
 </ul>
-<h2 id="输出到txt"><a href="#输出到txt" class="headerlink" title="输出到txt"></a>输出到txt</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">fileID = fopen(<span class="string">'faces.txt'</span>, <span class="string">'w'</span>);</span><br><span class="line">fprintf(fileID,<span class="string">'[%4.2f,%d,%d,%d]\n'</span>, x, y, z, t);</span><br><span class="line">fclose(fileID);</span><br></pre></td></tr></table></figure>
-<h2 id="Functions-with-required-and-optional-inputs"><a href="#Functions-with-required-and-optional-inputs" class="headerlink" title="Functions with required and optional inputs"></a>Functions with required and optional inputs</h2><p>Refer to <a href="http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html" target="_blank" rel="noopener">http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html</a>.</p>
+</li>
+</ol>
+<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
+<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
+</ul>
 ]]></content>
       <tags>
         <tag>coding</tag>
+        <tag>mixed_programming</tag>
         <tag>matlab</tag>
+        <tag>c++</tag>
       </tags>
   </entry>
   <entry>
@@ -970,56 +977,92 @@ The difference is that: the first method <strong>only copy the listed files</str
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>matlab</tag>
         <tag>mixed_programming</tag>
+        <tag>matlab</tag>
         <tag>c++</tag>
       </tags>
   </entry>
   <entry>
-    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
-    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
-    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
-<ol>
-<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
-</li>
-<li><p>call MATLAB directly in VC++.</p>
-</li>
-</ol>
-<hr>
-<p>This blog will focus on the second approach (also the easier one).</p>
-<a id="more"></a>
-<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
-<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
-<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
-<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
-<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
-<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
-<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
-<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
-<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
-<ul>
-<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
-<li><code>string</code></li>
-<li>matrix</li>
-<li>gray-scale image</li>
-<li>RGB image</li>
-</ul>
+    <title>MATLAB sumup</title>
+    <url>/2012/08/30/MATLAB-sumup/</url>
+    <content><![CDATA[<h2 id="Get-rect-from-mouse"><a href="#Get-rect-from-mouse" class="headerlink" title="Get rect from mouse"></a>Get rect from mouse</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imshow(<span class="string">'test.jpg'</span>);</span><br><span class="line">rect = getrect;</span><br></pre></td></tr></table></figure>
+<h2 id="对话框-dialog-box"><a href="#对话框-dialog-box" class="headerlink" title="对话框 dialog box"></a>对话框 dialog box</h2><p>cc: <a href="http://hi.baidu.com/7777777_shu/item/ccb713f20ce99e18d7ff8cda" target="_blank" rel="noopener">matlab GUI之对话框</a></p>
+<h2 id="多个string连接"><a href="#多个string连接" class="headerlink" title="多个string连接"></a>多个string连接</h2><ol>
+<li><p><code>sprintf</code></p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br></pre></td></tr></table></figure></li>
+<li><p>strcat</p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br></pre></td></tr></table></figure>
 </li>
 </ol>
-<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
-<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
+<h2 id="获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名"><a href="#获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名" class="headerlink" title="获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)"></a>获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[pathstr,realname,ext] = fileparts(<span class="string">'C:\\images\\test.bmp'</span>);</span><br></pre></td></tr></table></figure>
+<p>=&gt;</p>
+<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">pathstr = <span class="string">'C:\images\'</span></span><br><span class="line"><span class="string">realname = '</span>test'</span><br><span class="line">ext = <span class="string">'.bmp'</span></span><br></pre></td></tr></table></figure>
+<h2 id="UI获取文件名和文件夹"><a href="#UI获取文件名和文件夹" class="headerlink" title="UI获取文件名和文件夹"></a>UI获取文件名和文件夹</h2><ul>
+<li><p>文件</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[filename, pathname] = uigetfile(&#123;<span class="string">'*.*'</span>;<span class="string">'*.avi'</span>;<span class="string">'*.mpg'</span>;<span class="string">'*.wmv'</span>;<span class="string">'*.asf'</span>;<span class="string">'*.asx'</span>;<span class="string">'*.mj2'</span>&#125;, <span class="string">'Select a VIDEO file...'</span>);</span><br><span class="line">video_file_name = fullfile(pathname, filename); <span class="comment">% use fullfile for OS independent</span></span><br></pre></td></tr></table></figure></li>
+<li><p>文件夹</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">output_images_folder = uigetdir(pwd, <span class="string">'Select the FOLDER where to save images...'</span>)</span><br></pre></td></tr></table></figure>
+</li>
 </ul>
+<h2 id="遍历文件夹内所有-指定类型-文件"><a href="#遍历文件夹内所有-指定类型-文件" class="headerlink" title="遍历文件夹内所有(指定类型)文件"></a>遍历文件夹内所有(指定类型)文件</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">data_pwd = uigetdir;</span><br><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br><span class="line">filearray = dir(file_temp);</span><br><span class="line">s=<span class="built_in">max</span>(<span class="built_in">size</span>(filearray));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:s</span><br><span class="line">    imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="获取image的长-宽和channel数"><a href="#获取image的长-宽和channel数" class="headerlink" title="获取image的长, 宽和channel数"></a>获取image的长, 宽和channel数</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">img = imread(<span class="string">'C:\Users\tommyhu\Desktop\test\frame_0000.bmp'</span>);</span><br><span class="line">[h, w, c] = <span class="built_in">size</span>(img);</span><br></pre></td></tr></table></figure>
+<h2 id="遍历video的每一帧"><a href="#遍历video的每一帧" class="headerlink" title="遍历video的每一帧"></a>遍历video的每一帧</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">mov = VideoReader(video_file_name);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:mov.numberofframes</span><br><span class="line">    b=read(mov,<span class="built_in">i</span>);</span><br><span class="line">	... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="获取用户输入"><a href="#获取用户输入" class="headerlink" title="获取用户输入"></a>获取用户输入</h2><ul>
+<li><p>命令行方式</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">strResponse = input(<span class="string">'Do you want more? Y/N [Y]: '</span>, <span class="string">'s'</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>UI方式</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">prompt = &#123; <span class="string">'from:'</span>,<span class="string">'to:'</span>,<span class="string">'step'</span>&#125;;</span><br><span class="line">dlg_title = <span class="string">'choose images'</span>;</span><br><span class="line">num_lines = [<span class="number">4</span> <span class="number">1</span> <span class="number">3</span>]; <span class="comment">% can be a scaler number that applies to all</span></span><br><span class="line">defAns = &#123;<span class="string">'0'</span>, <span class="string">''</span>, <span class="string">'1'</span>&#125;;</span><br><span class="line">options = <span class="string">'on'</span>; <span class="comment">% enable to resize window</span></span><br><span class="line">answer = inputdlg(prompt,dlg_title,num_lines,defAns);</span><br><span class="line"></span><br><span class="line">from=str2num(cell2mat(answer(<span class="number">1</span>)));</span><br><span class="line">to=str2num(cell2mat(answer(<span class="number">2</span>)));</span><br><span class="line">stepsize=str2num(cell2mat(answer(<span class="number">3</span>)));</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="输出到txt"><a href="#输出到txt" class="headerlink" title="输出到txt"></a>输出到txt</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">fileID = fopen(<span class="string">'faces.txt'</span>, <span class="string">'w'</span>);</span><br><span class="line">fprintf(fileID,<span class="string">'[%4.2f,%d,%d,%d]\n'</span>, x, y, z, t);</span><br><span class="line">fclose(fileID);</span><br></pre></td></tr></table></figure>
+<h2 id="Functions-with-required-and-optional-inputs"><a href="#Functions-with-required-and-optional-inputs" class="headerlink" title="Functions with required and optional inputs"></a>Functions with required and optional inputs</h2><p>Refer to <a href="http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html" target="_blank" rel="noopener">http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html</a>.</p>
 ]]></content>
       <tags>
         <tag>coding</tag>
         <tag>matlab</tag>
-        <tag>mixed_programming</tag>
-        <tag>c++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MFC sumup</title>
+    <url>/2011/10/09/MFC-sumup/</url>
+    <content><![CDATA[<h2 id="代码组织"><a href="#代码组织" class="headerlink" title="代码组织"></a>代码组织</h2><ul>
+<li><strong>代码</strong>: 写在 <code>View</code> 中</li>
+<li><strong>数据</strong>: 写在 <code>Doc</code> 中</li>
+<li><strong>变量</strong>: 在 <code>View.h</code> 中申明, 在 <code>View.cpp</code> 的构造函数中初始化, 在 <code>View.cpp</code> 的析构函数中释放</li>
+</ul>
+<h2 id="添加消息函数"><a href="#添加消息函数" class="headerlink" title="添加消息函数"></a>添加消息函数</h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image001.png"><strong>Messages</strong>图标</a> &gt; 找相应的</p>
+<h2 id="注册函数-ON-COMMAND"><a href="#注册函数-ON-COMMAND" class="headerlink" title="注册函数 ON_COMMAND"></a>注册函数 <code>ON_COMMAND</code></h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image002.png"><strong>Events</strong>图标</a> &gt; 找相应的<br>(注: 比如menu设置N选1型(menu 中选择其中之一会打钩$\checkmark$), 类似操作, 在每个项目的第二个点击添加, 然后代码类似如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnUpdateButtonLighton</span><span class="params">(CCmdUI *pCmdUI)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your command update UI handler code here</span></span><br><span class="line">    pCmdUI-&gt;SetCheck(m_nLightState == LIGHT_ON);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="添加状态栏提示信息"><a href="#添加状态栏提示信息" class="headerlink" title="添加状态栏提示信息"></a>添加状态栏提示信息</h2><ul>
+<li><p>在<code>MainFrm.cpp</code>中添加文字占位符, 粗体为新添加</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> UINT indicators[] =</span><br><span class="line">&#123;</span><br><span class="line">    ID_SEPARATOR, <span class="comment">// status line indicator</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for CGAL 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_INDICATOR_CAPS,</span><br><span class="line">    ID_INDICATOR_NUM,</span><br><span class="line">    ID_INDICATOR_SCRL,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>在 <code>int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)</code> 中设置所添加的占位符的宽度, 不设的话为默认值; 最后一个值是宽度值.</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">1</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">2</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>在想显示提示信息的地方添加如下代码即可:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CStatusBar * pStatus=(CStatusBar*) AfxGetApp()-&gt;m_pMainWnd-&gt;GetDescendantWindow(AFX_IDW_STATUS_BAR );</span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">1</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set first</span></span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">2</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set second</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Menu中的功能想放到Toolbars上"><a href="#Menu中的功能想放到Toolbars上" class="headerlink" title="Menu中的功能想放到Toolbars上"></a>Menu中的功能想放到Toolbars上</h2><p>可以先增加<strong>Toolbar</strong>, 再增加<strong>Menu</strong>, 使得两者的ID一样就OK.</p>
+<h2 id="Warning提示信息"><a href="#Warning提示信息" class="headerlink" title="Warning提示信息"></a>Warning提示信息</h2><p>方式可以</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">MessageBox(<span class="string">"Could not delete RC"</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="键盘处理"><a href="#键盘处理" class="headerlink" title="键盘处理"></a>键盘处理</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">bool</span> keyDown[<span class="number">256</span>];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyDown</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span> &amp;&amp; nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">true</span>;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnKeyDown(nChar, nRepCnt, nFlags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyUp</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span>&amp;&amp;nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再在画的函数中进行真正处理:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::RenderScene</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (keyDown[<span class="string">'w'</span>])</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// handling here...</span></span><br><span class="line">    &#125;    </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="鼠标处理"><a href="#鼠标处理" class="headerlink" title="鼠标处理"></a>鼠标处理</h2><ul>
+<li><p>左键处理: (中键 – 右键 类似)</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> buttonState;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonDown</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    SetCapture();</span><br><span class="line">    buttonState = GLUT_LEFT_BUTTON;</span><br><span class="line">    CView::OnLButtonDown(nFlags, point);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonUp</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=CPoint(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    ReleaseCapture();</span><br><span class="line">    buttonState = <span class="number">-1</span>;</span><br><span class="line">    CView::OnLButtonUp(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>真正的处理在 <code>OnMouseMove()</code> 函数中:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnMouseMove</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="comment">// Check if we have captured the mouse</span></span><br><span class="line">    <span class="keyword">if</span> (GetCapture()==<span class="keyword">this</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">float</span> dx, dy;</span><br><span class="line">        dx = point.x - m_MouseDownPoint.x;</span><br><span class="line">        dy = point.y - m_MouseDownPoint.y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_LEFT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_MIDDLE_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_RIGHT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnMouseMove(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="打开文件对话框"><a href="#打开文件对话框" class="headerlink" title="打开文件对话框"></a>打开文件对话框</h2><p>添加方法如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    CString meshPath= fOpenDlg.GetPathName();</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注: 若想能同时打开多个文件, 同时可以设置同时打开的上限, 默认20个, 方法如下(同样包含如何挨个获得每个文件的Path):</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_ALLOWMULTISELECT|OFN_EXPLORER|OFN_ENABLEHOOK, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="comment">//extend to be able to open 100 files at a time, default only 20</span></span><br><span class="line">fOpenDlg.m_ofn.nMaxFile=<span class="number">100</span>*MAX_PATH;</span><br><span class="line">fOpenDlg.m_ofn.lpstrFile=<span class="keyword">new</span> TCHAR[fOpenDlg.m_ofn.nMaxFile];</span><br><span class="line">ZeroMemory(fOpenDlg.m_ofn.lpstrFile, <span class="keyword">sizeof</span>(TCHAR)*fOpenDlg.m_ofn.nMaxFile);</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Retrieve file name(s).</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;CString&gt; meshPath;</span><br><span class="line">    POSITION fileNamesPosition = fOpenDlg.GetStartPosition();</span><br><span class="line">    <span class="keyword">while</span>(fileNamesPosition != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        CString stub = fOpenDlg.GetNextPathName(fileNamesPosition);</span><br><span class="line">        meshPath.push_back((CString)stub);</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>mfc</tag>
       </tags>
   </entry>
   <entry>
@@ -1670,68 +1713,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>OpenGL sumup</title>
-    <url>/2011/10/09/OpenGL-sumup/</url>
-    <content><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://gitlab.com/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
-<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p><code>RenderScene()</code> 函数里面只放绘制的东西, 计算的所有代码独立出去, 保证速度!</p>
-<h2 id="加速显示"><a href="#加速显示" class="headerlink" title="加速显示"></a>加速显示</h2><p>用显示列表, 把要绘制的语句写进显示列表, 然后只需要在 <code>RenderScene()</code> 中调用显示列表就行了, 如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// create one display list</span></span><br><span class="line">GLuint index = glGenLists(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// compile the display list, store a triangle in it</span></span><br><span class="line">glNewList(index, GL_COMPILE);</span><br><span class="line">glBegin(GL_TRIANGLES);</span><br><span class="line">glVertex3fv(v0);</span><br><span class="line">glVertex3fv(v1);</span><br><span class="line">glVertex3fv(v2);</span><br><span class="line">glEnd();</span><br><span class="line">glEndList();</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the display list</span></span><br><span class="line">glCallList(index);</span><br><span class="line"></span><br><span class="line"><span class="comment">// delete it if it is not used any more</span></span><br><span class="line">glDeleteLists(index, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="glPushMatrix-…-glPopMatrix-使用说明"><a href="#glPushMatrix-…-glPopMatrix-使用说明" class="headerlink" title="glPushMatrix(); … glPopMatrix();使用说明"></a><code>glPushMatrix(); … glPopMatrix();</code>使用说明</h2><p>这对语句使用目的是保存当前的View Matrix, 以后中间的代码会出现类似 <code>glRotatef; glTranslatef; glScalef;</code> 等改变View Matrix 的语句.</p>
-<h2 id="3D世界坐标转换成2D屏幕坐标方法"><a href="#3D世界坐标转换成2D屏幕坐标方法" class="headerlink" title="3D世界坐标转换成2D屏幕坐标方法"></a>3D世界坐标转换成2D屏幕坐标方法</h2><p><code>beginWinCoords()</code>方法3D-&gt;2D, <code>endWinCoords()</code>方法2D-&gt;3D, 这两个方法直接的所有代码都会按2D屏幕绘制, 不会被3D干扰, 也不会有闪烁.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::beginWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glTranslatef(<span class="number">0.0</span>, winHeight - <span class="number">1</span>, <span class="number">0.0</span>);</span><br><span class="line">    glScalef(<span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glOrtho(<span class="number">0</span>, winWidth, <span class="number">0</span>, winHeight, <span class="number">-1</span>, <span class="number">1</span>);</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::endWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="往2D屏幕上打印TXT"><a href="#往2D屏幕上打印TXT" class="headerlink" title="往2D屏幕上打印TXT"></a>往2D屏幕上打印TXT</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> *m_font;</span><br><span class="line">m_font = (<span class="keyword">void</span> *) GLUT_BITMAP_9_BY_15;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::printTo2DWindow</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">float</span> * color)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    beginWinCoords();</span><br><span class="line">    glColor3f(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">    glPrint(x, y, s, m_font);</span><br><span class="line">    endWinCoords();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::glPrint</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">void</span> * font)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glRasterPos2f(x, y);</span><br><span class="line">    <span class="keyword">int</span> len = (<span class="keyword">int</span>) <span class="built_in">strlen</span>(s);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        glutBitmapCharacter(font, s[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="绘制带边框Border的图形"><a href="#绘制带边框Border的图形" class="headerlink" title="绘制带边框Border的图形"></a>绘制带边框Border的图形</h2><p>例如绘制带边框的四边形, 方法如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">glEnable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glPolygonOffset(<span class="number">1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon as normal</span></span><br><span class="line"><span class="comment">/* e.g. :</span></span><br><span class="line"><span class="comment">    glBegin(GL_POLYGON);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glEnd();</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">glDisable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glColor3v(yourColor); <span class="comment">//Color for your polygon border</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon with same procedure, as in above</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>opengl</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MFC sumup</title>
-    <url>/2011/10/09/MFC-sumup/</url>
-    <content><![CDATA[<h2 id="代码组织"><a href="#代码组织" class="headerlink" title="代码组织"></a>代码组织</h2><ul>
-<li><strong>代码</strong>: 写在 <code>View</code> 中</li>
-<li><strong>数据</strong>: 写在 <code>Doc</code> 中</li>
-<li><strong>变量</strong>: 在 <code>View.h</code> 中申明, 在 <code>View.cpp</code> 的构造函数中初始化, 在 <code>View.cpp</code> 的析构函数中释放</li>
-</ul>
-<h2 id="添加消息函数"><a href="#添加消息函数" class="headerlink" title="添加消息函数"></a>添加消息函数</h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image001.png"><strong>Messages</strong>图标</a> &gt; 找相应的</p>
-<h2 id="注册函数-ON-COMMAND"><a href="#注册函数-ON-COMMAND" class="headerlink" title="注册函数 ON_COMMAND"></a>注册函数 <code>ON_COMMAND</code></h2><p><strong>Class View</strong>视图 &gt; 右击<code>View</code>类 &gt; <strong>Properties</strong> &gt; 点击<a href="/2011/10/09/MFC-sumup/clip_image002.png"><strong>Events</strong>图标</a> &gt; 找相应的<br>(注: 比如menu设置N选1型(menu 中选择其中之一会打钩$\checkmark$), 类似操作, 在每个项目的第二个点击添加, 然后代码类似如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnUpdateButtonLighton</span><span class="params">(CCmdUI *pCmdUI)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your command update UI handler code here</span></span><br><span class="line">    pCmdUI-&gt;SetCheck(m_nLightState == LIGHT_ON);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="添加状态栏提示信息"><a href="#添加状态栏提示信息" class="headerlink" title="添加状态栏提示信息"></a>添加状态栏提示信息</h2><ul>
-<li><p>在<code>MainFrm.cpp</code>中添加文字占位符, 粗体为新添加</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> UINT indicators[] =</span><br><span class="line">&#123;</span><br><span class="line">    ID_SEPARATOR, <span class="comment">// status line indicator</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_SEPARATOR, <span class="comment">// for CGAL 2D &amp; 3D DT/VD</span></span><br><span class="line">    ID_INDICATOR_CAPS,</span><br><span class="line">    ID_INDICATOR_NUM,</span><br><span class="line">    ID_INDICATOR_SCRL,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
-<li><p>在 <code>int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)</code> 中设置所添加的占位符的宽度, 不设的话为默认值; 最后一个值是宽度值.</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">1</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br><span class="line">m_wndStatusBar.SetPaneInfo(<span class="number">2</span>,ID_SEPARATOR,<span class="number">0</span>,<span class="number">150</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>在想显示提示信息的地方添加如下代码即可:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CStatusBar * pStatus=(CStatusBar*) AfxGetApp()-&gt;m_pMainWnd-&gt;GetDescendantWindow(AFX_IDW_STATUS_BAR );</span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">1</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set first</span></span><br><span class="line">pStatus-&gt;SetPaneText(<span class="number">2</span>, <span class="string">"xxxxxx"</span>); <span class="comment">// set second</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="Menu中的功能想放到Toolbars上"><a href="#Menu中的功能想放到Toolbars上" class="headerlink" title="Menu中的功能想放到Toolbars上"></a>Menu中的功能想放到Toolbars上</h2><p>可以先增加<strong>Toolbar</strong>, 再增加<strong>Menu</strong>, 使得两者的ID一样就OK.</p>
-<h2 id="Warning提示信息"><a href="#Warning提示信息" class="headerlink" title="Warning提示信息"></a>Warning提示信息</h2><p>方式可以</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">MessageBox(<span class="string">"Could not delete RC"</span>);</span><br></pre></td></tr></table></figure>
-<h2 id="键盘处理"><a href="#键盘处理" class="headerlink" title="键盘处理"></a>键盘处理</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">bool</span> keyDown[<span class="number">256</span>];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyDown</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span> &amp;&amp; nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">true</span>;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnKeyDown(nChar, nRepCnt, nFlags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnKeyUp</span><span class="params">(UINT nChar, UINT nRepCnt, UINT nFlags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> nChar2=nChar;</span><br><span class="line">    <span class="keyword">if</span> (!GetAsyncKeyState(VK_LSHIFT) &amp;&amp; nChar2&lt;=<span class="string">'Z'</span>&amp;&amp;nChar2&gt;=<span class="string">'A'</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        nChar2+=<span class="string">'a'</span>-<span class="string">'A'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    keyDown[nChar2] = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>再在画的函数中进行真正处理:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::RenderScene</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">if</span> (keyDown[<span class="string">'w'</span>])</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// handling here...</span></span><br><span class="line">    &#125;    </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="鼠标处理"><a href="#鼠标处理" class="headerlink" title="鼠标处理"></a>鼠标处理</h2><ul>
-<li><p>左键处理: (中键 – 右键 类似)</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> buttonState;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonDown</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    SetCapture();</span><br><span class="line">    buttonState = GLUT_LEFT_BUTTON;</span><br><span class="line">    CView::OnLButtonDown(nFlags, point);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnLButtonUp</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    m_MouseDownPoint=CPoint(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    ReleaseCapture();</span><br><span class="line">    buttonState = <span class="number">-1</span>;</span><br><span class="line">    CView::OnLButtonUp(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>真正的处理在 <code>OnMouseMove()</code> 函数中:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::OnMouseMove</span><span class="params">(UINT nFlags, CPoint point)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> Add your message handler code here and/or call default</span></span><br><span class="line">    <span class="comment">// Check if we have captured the mouse</span></span><br><span class="line">    <span class="keyword">if</span> (GetCapture()==<span class="keyword">this</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">float</span> dx, dy;</span><br><span class="line">        dx = point.x - m_MouseDownPoint.x;</span><br><span class="line">        dy = point.y - m_MouseDownPoint.y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_LEFT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_MIDDLE_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (buttonState == GLUT_RIGHT_BUTTON)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    m_MouseDownPoint=point;</span><br><span class="line">    InvalidateRect(<span class="literal">NULL</span>,FALSE);</span><br><span class="line">    CView::OnMouseMove(nFlags, point);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="打开文件对话框"><a href="#打开文件对话框" class="headerlink" title="打开文件对话框"></a>打开文件对话框</h2><p>添加方法如下:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    CString meshPath= fOpenDlg.GetPathName();</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>注: 若想能同时打开多个文件, 同时可以设置同时打开的上限, 默认20个, 方法如下(同样包含如何挨个获得每个文件的Path):</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CFileDialog <span class="title">fOpenDlg</span><span class="params">(TRUE, <span class="string">"wrl"</span>, <span class="string">""</span>, OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_ALLOWMULTISELECT|OFN_EXPLORER|OFN_ENABLEHOOK, <span class="string">"Mesh Files (*.wrl)|*.wrl|"</span>, <span class="keyword">this</span>)</span></span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrTitle=<span class="string">"Open Mesh Files"</span>;</span><br><span class="line">fOpenDlg.m_ofn.lpstrInitialDir=<span class="string">".\\data\\"</span>;</span><br><span class="line"><span class="comment">//extend to be able to open 100 files at a time, default only 20</span></span><br><span class="line">fOpenDlg.m_ofn.nMaxFile=<span class="number">100</span>*MAX_PATH;</span><br><span class="line">fOpenDlg.m_ofn.lpstrFile=<span class="keyword">new</span> TCHAR[fOpenDlg.m_ofn.nMaxFile];</span><br><span class="line">ZeroMemory(fOpenDlg.m_ofn.lpstrFile, <span class="keyword">sizeof</span>(TCHAR)*fOpenDlg.m_ofn.nMaxFile);</span><br><span class="line"><span class="keyword">if</span>(fOpenDlg.DoModal()==IDOK)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Retrieve file name(s).</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;CString&gt; meshPath;</span><br><span class="line">    POSITION fileNamesPosition = fOpenDlg.GetStartPosition();</span><br><span class="line">    <span class="keyword">while</span>(fileNamesPosition != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        CString stub = fOpenDlg.GetNextPathName(fileNamesPosition);</span><br><span class="line">        meshPath.push_back((CString)stub);</span><br><span class="line">    &#125;</span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>mfc</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Research Topics Related Useful Links</title>
     <url>/2011/11/15/Research-Topics-Related-Useful-Links/</url>
     <content><![CDATA[<h2 id="3D-face-facial-expressions-databases"><a href="#3D-face-facial-expressions-databases" class="headerlink" title="3D face (facial expressions) databases"></a>3D face (facial expressions) databases</h2><ul>
@@ -1866,6 +1847,89 @@ The difference is that: the first method <strong>only copy the listed files</str
 ]]></content>
       <tags>
         <tag>research</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>OpenGL sumup</title>
+    <url>/2011/10/09/OpenGL-sumup/</url>
+    <content><![CDATA[<h2 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h2><p>Please refer to <a href="https://gitlab.com/herohuyongtao/opengl-setup" target="_blank" rel="noopener">here</a> on how to setup OpenGL.</p>
+<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><p><code>RenderScene()</code> 函数里面只放绘制的东西, 计算的所有代码独立出去, 保证速度!</p>
+<h2 id="加速显示"><a href="#加速显示" class="headerlink" title="加速显示"></a>加速显示</h2><p>用显示列表, 把要绘制的语句写进显示列表, 然后只需要在 <code>RenderScene()</code> 中调用显示列表就行了, 如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// create one display list</span></span><br><span class="line">GLuint index = glGenLists(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// compile the display list, store a triangle in it</span></span><br><span class="line">glNewList(index, GL_COMPILE);</span><br><span class="line">glBegin(GL_TRIANGLES);</span><br><span class="line">glVertex3fv(v0);</span><br><span class="line">glVertex3fv(v1);</span><br><span class="line">glVertex3fv(v2);</span><br><span class="line">glEnd();</span><br><span class="line">glEndList();</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the display list</span></span><br><span class="line">glCallList(index);</span><br><span class="line"></span><br><span class="line"><span class="comment">// delete it if it is not used any more</span></span><br><span class="line">glDeleteLists(index, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="glPushMatrix-…-glPopMatrix-使用说明"><a href="#glPushMatrix-…-glPopMatrix-使用说明" class="headerlink" title="glPushMatrix(); … glPopMatrix();使用说明"></a><code>glPushMatrix(); … glPopMatrix();</code>使用说明</h2><p>这对语句使用目的是保存当前的View Matrix, 以后中间的代码会出现类似 <code>glRotatef; glTranslatef; glScalef;</code> 等改变View Matrix 的语句.</p>
+<h2 id="3D世界坐标转换成2D屏幕坐标方法"><a href="#3D世界坐标转换成2D屏幕坐标方法" class="headerlink" title="3D世界坐标转换成2D屏幕坐标方法"></a>3D世界坐标转换成2D屏幕坐标方法</h2><p><code>beginWinCoords()</code>方法3D-&gt;2D, <code>endWinCoords()</code>方法2D-&gt;3D, 这两个方法直接的所有代码都会按2D屏幕绘制, 不会被3D干扰, 也不会有闪烁.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::beginWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glTranslatef(<span class="number">0.0</span>, winHeight - <span class="number">1</span>, <span class="number">0.0</span>);</span><br><span class="line">    glScalef(<span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPushMatrix();</span><br><span class="line">    glLoadIdentity();</span><br><span class="line">    glOrtho(<span class="number">0</span>, winWidth, <span class="number">0</span>, winHeight, <span class="number">-1</span>, <span class="number">1</span>);</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::endWinCoords</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glMatrixMode(GL_PROJECTION);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">    glMatrixMode(GL_MODELVIEW);</span><br><span class="line">    glPopMatrix();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="往2D屏幕上打印TXT"><a href="#往2D屏幕上打印TXT" class="headerlink" title="往2D屏幕上打印TXT"></a>往2D屏幕上打印TXT</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> *m_font;</span><br><span class="line">m_font = (<span class="keyword">void</span> *) GLUT_BITMAP_9_BY_15;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::printTo2DWindow</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">float</span> * color)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    beginWinCoords();</span><br><span class="line">    glColor3f(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">    glPrint(x, y, s, m_font);</span><br><span class="line">    endWinCoords();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">COpenGLView::glPrint</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y, <span class="keyword">const</span> <span class="keyword">char</span> * s, <span class="keyword">void</span> * font)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    glRasterPos2f(x, y);</span><br><span class="line">    <span class="keyword">int</span> len = (<span class="keyword">int</span>) <span class="built_in">strlen</span>(s);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        glutBitmapCharacter(font, s[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="绘制带边框Border的图形"><a href="#绘制带边框Border的图形" class="headerlink" title="绘制带边框Border的图形"></a>绘制带边框Border的图形</h2><p>例如绘制带边框的四边形, 方法如下:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">glEnable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glPolygonOffset(<span class="number">1.0</span>, <span class="number">1.0</span>);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon as normal</span></span><br><span class="line"><span class="comment">/* e.g. :</span></span><br><span class="line"><span class="comment">    glBegin(GL_POLYGON);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y+0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z+0.5);</span></span><br><span class="line"><span class="comment">    glVertex3f(x+0.5, y-0.5, z-0.5);</span></span><br><span class="line"><span class="comment">    glEnd();</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">glDisable(GL_POLYGON_OFFSET_FILL);</span><br><span class="line">glColor3v(yourColor); <span class="comment">//Color for your polygon border</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);</span><br><span class="line">... ...</span><br><span class="line"></span><br><span class="line"><span class="comment">// draw the polygon with same procedure, as in above</span></span><br><span class="line">glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>opengl</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Running Python via Anaconda</title>
+    <url>/2013/10/05/Running-Python-via-Anaconda/</url>
+    <content><![CDATA[<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
+<li>Install <a href="https://www.anaconda.com/products/individual" target="_blank" rel="noopener">Anaconda</a>. (e.g. by default in <code>C:\Users\tommyhu\anaconda3</code>)</li>
+<li>Add the following paths to <strong>Path</strong>:<ul>
+<li><code>C:\Users\tommyhu\anaconda3</code></li>
+<li><code>C:\Users\tommyhu\anaconda3\Scripts</code></li>
+</ul>
+</li>
+</ol>
+<a id="more"></a>
+<h1 id="Add-libs"><a href="#Add-libs" class="headerlink" title="Add libs"></a>Add libs</h1><h2 id="Online-install"><a href="#Online-install" class="headerlink" title="Online install"></a>Online install</h2><h3 id="Install-directly"><a href="#Install-directly" class="headerlink" title="Install directly"></a>Install directly</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install xxx</span><br></pre></td></tr></table></figure>
+<h3 id="Via-Anaconda-cloud"><a href="#Via-Anaconda-cloud" class="headerlink" title="Via Anaconda cloud"></a>Via Anaconda cloud</h3><ol>
+<li>Search the lib on <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a></li>
+<li>Use the command listed on the lib page<blockquote>
+<p>Take OpenCV as an example, run </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install -c conda-forge opencv</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ol>
+<h2 id="Offline-install"><a href="#Offline-install" class="headerlink" title="Offline install"></a>Offline install</h2><h3 id="tar-bz2-type1"><a href="#tar-bz2-type1" class="headerlink" title="tar.bz2 type1"></a><code>tar.bz2</code> type<sup><a href="#fn_1" id="reffn_1">1</a></sup></h3><ol>
+<li>Download lib of type <code>tar.bz2</code> (e.g. search <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a>)<blockquote>
+<p>Note: download the lib with correct PC versions, including</p>
+<ul>
+<li><strong>Python</strong> (e.g. lib name contains like <code>py37</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python</span><br></pre></td></tr></table></figure></li>
+<li><strong>CUDA</strong> (e.g. lib name contains like <code>cuda92</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nvcc --version</span><br></pre></td></tr></table></figure></li>
+</ul>
+</blockquote>
+</li>
+<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install --use-local xxx.tar.bz2</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="whl-type"><a href="#whl-type" class="headerlink" title="whl type"></a><code>whl</code> type</h3><blockquote>
+<p>Some <code>whl</code> libs are available at <a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/" target="_blank" rel="noopener">Unofficial Windows Binaries for Python Extension Packages</a> | <a href="https://pypi.org/simple/dlib/" target="_blank" rel="noopener">dlib</a>.</p>
+</blockquote>
+<ol>
+<li>Download lib of type <code>whl</code> (must match local Python and CUDA versions as above)</li>
+<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pip install xx.whl</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="From-source"><a href="#From-source" class="headerlink" title="From source"></a>From source</h3><p>Take <strong>dlib</strong> as an example</p>
+<ol>
+<li>Download its source <a href="https://pypi.org/project/dlib/" target="_blank" rel="noopener">here</a> (e.g. <strong>dlib-19.19.0.tar.gz</strong>).</li>
+<li>Extract it and run cmd (may need to run twice) in the folder   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><ol>
+<li>Run <strong>Anaconda Command Prompt</strong> or <strong>cmd</strong> (with <code>activate</code> command).</li>
+<li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
+<li>Run   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python xxx.py</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Case-study"><a href="#Case-study" class="headerlink" title="Case study"></a>Case study</h1><p>With Anaconda-3 (integrated with Python v3.7), installing <strong>OpenCV+CUDA+CUDNN+Torch</strong> on my laptop (with NVIDIA GeForce GTX 1050) will be like:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\opencv-3.4.2-py37h6fd60c2_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\py-opencv-3.4.2-py37hc319ecb_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\libopencv-3.4.2-h20b85fd_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\cudatoolkit-10.0.130-0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\cudnn-7.6.5-cuda10.0_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\pytorch-1.2.0-py3.7_cuda100_cudnn7_1.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\pytorch-gpu-1.3.1-0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\torchvision-0.4.0-py37_cu100.tar.bz2"</span></span><br></pre></td></tr></table></figure></p>
+<blockquote id="fn_1">
+<sup>1</sup>. <a href="https://blog.csdn.net/qq_33039859/article/details/80785535" target="_blank" rel="noopener">Conda install 本地压缩包文件tar.bz2</a><a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>setup</tag>
+        <tag>python</tag>
       </tags>
   </entry>
   <entry>
@@ -2045,70 +2109,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>xml</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Running Python via Anaconda</title>
-    <url>/2013/10/05/Running-Python-via-Anaconda/</url>
-    <content><![CDATA[<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
-<li>Install <a href="https://www.anaconda.com/products/individual" target="_blank" rel="noopener">Anaconda</a>. (e.g. by default in <code>C:\Users\Yongtao\Anaconda3</code>)</li>
-<li>Add the following paths to <strong>Path</strong>:<ul>
-<li><code>C:\Users\tommyhu\anaconda3</code></li>
-<li><code>C:\Users\tommyhu\anaconda3\Scripts</code></li>
-</ul>
-</li>
-</ol>
-<a id="more"></a>
-<h1 id="Add-libs"><a href="#Add-libs" class="headerlink" title="Add libs"></a>Add libs</h1><h2 id="Online-install"><a href="#Online-install" class="headerlink" title="Online install"></a>Online install</h2><h3 id="Install-directly"><a href="#Install-directly" class="headerlink" title="Install directly"></a>Install directly</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install xxx</span><br></pre></td></tr></table></figure>
-<h3 id="Via-Anaconda-cloud"><a href="#Via-Anaconda-cloud" class="headerlink" title="Via Anaconda cloud"></a>Via Anaconda cloud</h3><ol>
-<li>Search the lib on <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a></li>
-<li>Use the command listed on the lib page<blockquote>
-<p>Take OpenCV as an example, run </p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install -c conda-forge opencv</span><br></pre></td></tr></table></figure>
-</blockquote>
-</li>
-</ol>
-<h2 id="Offline-install"><a href="#Offline-install" class="headerlink" title="Offline install"></a>Offline install</h2><h3 id="tar-bz2-type1"><a href="#tar-bz2-type1" class="headerlink" title="tar.bz2 type1"></a><code>tar.bz2</code> type<sup><a href="#fn_1" id="reffn_1">1</a></sup></h3><ol>
-<li>Download lib of type <code>tar.bz2</code> (e.g. search <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a>)<blockquote>
-<p>Note: download the lib with correct PC versions, including</p>
-<ul>
-<li><strong>Python</strong> (e.g. lib name contains like <code>py37</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python</span><br></pre></td></tr></table></figure></li>
-<li><strong>CUDA</strong> (e.g. lib name contains like <code>cuda92</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nvcc --version</span><br></pre></td></tr></table></figure></li>
-</ul>
-</blockquote>
-</li>
-<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install --use-local xxx.tar.bz2</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="whl-type"><a href="#whl-type" class="headerlink" title="whl type"></a><code>whl</code> type</h3><blockquote>
-<p>Some <code>whl</code> libs are available at <a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/" target="_blank" rel="noopener">Unofficial Windows Binaries for Python Extension Packages</a> | <a href="https://pypi.org/simple/dlib/" target="_blank" rel="noopener">dlib</a>.</p>
-</blockquote>
-<ol>
-<li>Download lib of type <code>whl</code> (must match local Python and CUDA versions as above)</li>
-<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pip install xx.whl</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="From-source"><a href="#From-source" class="headerlink" title="From source"></a>From source</h3><p>Take <strong>dlib</strong> as an example</p>
-<ol>
-<li>Download its source <a href="https://pypi.org/project/dlib/" target="_blank" rel="noopener">here</a> (e.g. <strong>dlib-19.19.0.tar.gz</strong>).</li>
-<li>Extract it and run cmd (may need to run twice) in the folder   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><ol>
-<li>Run <strong>Anaconda Command Prompt</strong> or <strong>cmd</strong> (with <code>activate</code> command).</li>
-<li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
-<li>Run   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python xxx.py</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="Case-study"><a href="#Case-study" class="headerlink" title="Case study"></a>Case study</h1><p>With Anaconda-3 (integrated with Python v3.7), installing <strong>OpenCV+CUDA+CUDNN+Torch</strong> on my laptop (with NVIDIA GeForce GTX 1050) will be like:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\opencv-3.4.2-py37h6fd60c2_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\py-opencv-3.4.2-py37hc319ecb_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\libopencv-3.4.2-h20b85fd_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\cudatoolkit-10.0.130-0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\cudnn-7.6.5-cuda10.0_0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\pytorch-1.2.0-py3.7_cuda100_cudnn7_1.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\pytorch-gpu-1.3.1-0.tar.bz2"</span></span><br><span class="line">conda install --use-local <span class="string">"&lt;_lib_folder_&gt;\torchvision-0.4.0-py37_cu100.tar.bz2"</span></span><br></pre></td></tr></table></figure></p>
-<blockquote id="fn_1">
-<sup>1</sup>. <a href="https://blog.csdn.net/qq_33039859/article/details/80785535" target="_blank" rel="noopener">Conda install 本地压缩包文件tar.bz2</a><a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
-</blockquote>
-]]></content>
-      <tags>
-        <tag>setup</tag>
-        <tag>coding</tag>
-        <tag>python</tag>
       </tags>
   </entry>
   <entry>
