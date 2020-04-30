@@ -1,6 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Build Boost for x32/x64 VC++ compilers on Windows</title>
+    <url>/2013/01/02/Build-Boost-for-x32-x64-VC-compilers-on-Windows/</url>
+    <content><![CDATA[<p><a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> is a set of libraries for the C++ programming language that provide support for tasks and structures such as linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions, and unit testing. Steps to build Boost for x32/x64 VC++ compilers on Windows are as follows:</p>
+<ol>
+<li>Download <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> and extract it to PC (assume <code>C:\Libs\boost_1_47_0</code>).</li>
+<li>Double click to run <code>bootstrap.bat</code> in Boost’s root folder, which will generate <code>bjam.exe</code> (and <code>b2.exe</code>…) in the same folder.</li>
+<li>Run <strong>VC++</strong>.</li>
+<li><code>VC++ &gt; Tools &gt; Visual Studio Command Prompt</code>.</li>
+<li><p>In the command window, first change working folder to <code>C:\Libs\boost_1_47_0</code> and type the following command (Note: it will take a long time to finish, which is depended on your system, 20min for me.):</p>
+ <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">bjam --build-<span class="built_in">type</span>=complete toolset=msvc-<span class="number">10</span>.<span class="number">0</span> threading=multi link=static address-model=<span class="number">64</span></span><br></pre></td></tr></table></figure></li>
+<li>Setup VC++. Two steps need to be done.<ul>
+<li>Add <code>C:\Libs\boost_1_47_0</code> to project Include files.</li>
+<li>Add <code>C:\Libs\boost_1_47_0\stage\lib</code> to project Library files.</li>
+</ul>
+</li>
+</ol>
+<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><p>The above step will build <strong>static Boost libraries for x64 VC++</strong>. Options can be modified in step 5 to build it for other versions’ VC++, see the following table for details.</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Command</th>
+<th style="text-align:center">Options</th>
+<th style="text-align:center">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">toolset</td>
+<td style="text-align:center"><span style="color:red">msvc-6.5</span> <br> <span style="color:red">msvc-8.0</span> <br> <span style="color:red">msvc-9.0</span> <br> <span style="color:red">msvc-10.0</span> <br> <span style="color:red">msvc-11.0</span> <br> <span style="color:red">msvc-12.0</span></td>
+<td style="text-align:center">Visual Studio 6.0, Service Pack 5 <br> Visual Studio 2005 <br> Visual Studio 2008 <br> Visual Studio 2010 <br> Visual Studio 2012 <br> Visual Studio 2013</td>
+</tr>
+<tr>
+<td style="text-align:center">link</td>
+<td style="text-align:center"><span style="color:red">static</span> <br> <span style="color:red">shared</span></td>
+<td style="text-align:center">static libraries <br> shared libraries</td>
+</tr>
+<tr>
+<td style="text-align:center">address-model</td>
+<td style="text-align:center"><span style="color:red">32</span> <br> <span style="color:red">64</span></td>
+<td style="text-align:center">x32 VC++ compilers <br> x64 VC++ compilers</td>
+</tr>
+</tbody>
+</table>
+</div>
+]]></content>
+      <tags>
+        <tag>setup</tag>
+        <tag>boost</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Character encodings of text files</title>
+    <url>/2013/01/21/Character-encodings-of-text-files/</url>
+    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
+<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
+<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>encoding</tag>
+        <tag>text</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Blogging via Hexo</title>
     <url>/2020/04/29/Blogging-via-Hexo/</url>
     <content><![CDATA[<p>I recently moved my blog here using <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> instead of previous <a href="http://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a>, though the old version is still <a href="http://blog-ythu.github.io/" target="_blank" rel="noopener">available</a>. Hexo is a fast, simple &amp; powerful blog framework. Compared with Jekyll, Hexo is more flexible in terms of setup, post writing via Markdown, tags, themes, content searching, 3rd-part plugin support, etc.</p>
@@ -99,8 +170,8 @@
 </blockquote>
 ]]></content>
       <tags>
-        <tag>hexo</tag>
         <tag>setup</tag>
+        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -129,45 +200,8 @@ The difference is that: the first method <strong>only copy the listed files</str
 </ol>
 ]]></content>
       <tags>
+        <tag>coding</tag>
         <tag>cmake</tag>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>DOS sumup</title>
-    <url>/2012/04/06/DOS-sumup/</url>
-    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
-<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
-<li><p>Get all file names</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Get all file full paths</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>dos</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Character encodings of text files</title>
-    <url>/2013/01/21/Character-encodings-of-text-files/</url>
-    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
-<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
-<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
-<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>encoding</tag>
-        <tag>text</tag>
       </tags>
   </entry>
   <entry>
@@ -300,55 +334,90 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Build Boost for x32/x64 VC++ compilers on Windows</title>
-    <url>/2013/01/02/Build-Boost-for-x32-x64-VC-compilers-on-Windows/</url>
-    <content><![CDATA[<p><a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> is a set of libraries for the C++ programming language that provide support for tasks and structures such as linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions, and unit testing. Steps to build Boost for x32/x64 VC++ compilers on Windows are as follows:</p>
-<ol>
-<li>Download <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> and extract it to PC (assume <code>C:\Libs\boost_1_47_0</code>).</li>
-<li>Double click to run <code>bootstrap.bat</code> in Boost’s root folder, which will generate <code>bjam.exe</code> (and <code>b2.exe</code>…) in the same folder.</li>
-<li>Run <strong>VC++</strong>.</li>
-<li><code>VC++ &gt; Tools &gt; Visual Studio Command Prompt</code>.</li>
-<li><p>In the command window, first change working folder to <code>C:\Libs\boost_1_47_0</code> and type the following command (Note: it will take a long time to finish, which is depended on your system, 20min for me.):</p>
- <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">bjam --build-<span class="built_in">type</span>=complete toolset=msvc-<span class="number">10</span>.<span class="number">0</span> threading=multi link=static address-model=<span class="number">64</span></span><br></pre></td></tr></table></figure></li>
-<li>Setup VC++. Two steps need to be done.<ul>
-<li>Add <code>C:\Libs\boost_1_47_0</code> to project Include files.</li>
-<li>Add <code>C:\Libs\boost_1_47_0\stage\lib</code> to project Library files.</li>
-</ul>
+    <title>DOS sumup</title>
+    <url>/2012/04/06/DOS-sumup/</url>
+    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
+<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
+<li><p>Get all file names</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
 </li>
-</ol>
-<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><p>The above step will build <strong>static Boost libraries for x64 VC++</strong>. Options can be modified in step 5 to build it for other versions’ VC++, see the following table for details.</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Command</th>
-<th style="text-align:center">Options</th>
-<th style="text-align:center">Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">toolset</td>
-<td style="text-align:center"><span style="color:red">msvc-6.5</span> <br> <span style="color:red">msvc-8.0</span> <br> <span style="color:red">msvc-9.0</span> <br> <span style="color:red">msvc-10.0</span> <br> <span style="color:red">msvc-11.0</span> <br> <span style="color:red">msvc-12.0</span></td>
-<td style="text-align:center">Visual Studio 6.0, Service Pack 5 <br> Visual Studio 2005 <br> Visual Studio 2008 <br> Visual Studio 2010 <br> Visual Studio 2012 <br> Visual Studio 2013</td>
-</tr>
-<tr>
-<td style="text-align:center">link</td>
-<td style="text-align:center"><span style="color:red">static</span> <br> <span style="color:red">shared</span></td>
-<td style="text-align:center">static libraries <br> shared libraries</td>
-</tr>
-<tr>
-<td style="text-align:center">address-model</td>
-<td style="text-align:center"><span style="color:red">32</span> <br> <span style="color:red">64</span></td>
-<td style="text-align:center">x32 VC++ compilers <br> x64 VC++ compilers</td>
-</tr>
-</tbody>
-</table>
-</div>
+<li><p>Get all file full paths</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
 ]]></content>
       <tags>
-        <tag>setup</tag>
-        <tag>boost</tag>
+        <tag>coding</tag>
+        <tag>dos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Debugging: errors and fixes</title>
+    <url>/2012/09/06/Debugging-errors-and-fixes/</url>
+    <content><![CDATA[<h2 id="Can-not-find-dxtrans-h-in-DirectX-programming"><a href="#Can-not-find-dxtrans-h-in-DirectX-programming" class="headerlink" title="Can not find dxtrans.h in DirectX programming"></a>Can not find dxtrans.h in DirectX programming</h2><p>cc: <a href="http://blog.csdn.net/clever101/article/details/5617982" target="_blank" rel="noopener">http://blog.csdn.net/clever101/article/details/5617982</a></p>
+<ol>
+<li>Remove <code>#include &quot;dxtrans.h&quot;</code> where causing errors (e.g. <code>qedit.h</code>).</li>
+<li><p>Add the following macro definition to the beginning of code <code>#include &lt;qedit.h&gt;</code></p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtCompositor_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtAlphaSetter_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtJpeg_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtKey_INTERFACE_DEFINED__</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="error-C2143-syntax-error-missing-‘-’-before-‘constant’"><a href="#error-C2143-syntax-error-missing-‘-’-before-‘constant’" class="headerlink" title="error C2143: syntax error : missing ‘)’ before ‘constant’"></a>error C2143: syntax error : missing ‘)’ before ‘constant’</h2><p>E.g. after defining a constant: <code>#define A 1</code>, but in program, we mistaken using <code>int A;</code> and so on.</p>
+<p>Solve: use <code>A</code> directly, not <code>int A</code>.</p>
+<h2 id="error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’"><a href="#error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’" class="headerlink" title="error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’"></a>error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’</h2><p>In <code>winnt.h</code>, add the following line</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> POINTER_64 __ptr64</span></span><br></pre></td></tr></table></figure>
+<p>before</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> *PVOID;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> * POINTER_64 PVOID64;</span><br></pre></td></tr></table></figure>
+<h2 id="error-C2471-cannot-update-program-database-—-vc90-pdb"><a href="#error-C2471-cannot-update-program-database-—-vc90-pdb" class="headerlink" title="error C2471: cannot update program database —-vc90.pdb"></a>error C2471: cannot update program database —-vc90.pdb</h2><p><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Disabled&#39;</code>.</p>
+<h2 id="error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’"><a href="#error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’" class="headerlink" title="error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’"></a>error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’</h2><p>Two ways to fix it:</p>
+<ol>
+<li><code>Project –&gt; Properties –&gt; General –&gt; Character Set –&gt; &quot;Use Multi-Byte Character Set&quot;</code>.</li>
+<li>Indicate that the string literal, in this case <code>&quot;Hello world!&quot;</code> is of a specific encoding. This can be done through either prefixing it with <code>L</code>, such as <code>L&quot;Hello world!&quot;</code>, or surrounding it with the generic <code>_T(&quot;Hello world!&quot;)</code> macro. The latter will expand to the L prefix if you are compiling for unicode, and nothing (indicating multi-byte) otherwise.</li>
+</ol>
+<h2 id="error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility"><a href="#error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility" class="headerlink" title="error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)"></a>error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)</h2><p>Based on: <a href="https://svn.boost.org/trac/boost/ticket/4874" target="_blank" rel="noopener">https://svn.boost.org/trac/boost/ticket/4874</a><br>This is a bug of boost library (before version 1_52_0) when using VC2010 in Debug mode (note: the problem also exists in boost-1_52_0 for VC2012 in Debug mode, but still cannot be solved with this method). It can be solved by modifying <code>BOOST_PATH/boost/multi_array/view.hpp</code> to something like</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">multi_array_view&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> multi_array_view&amp; other) &#123;</span><br><span class="line">    <span class="keyword">if</span> (&amp;other != <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="comment">// make sure the dimensions agree</span></span><br><span class="line">        BOOST_ASSERT(other.num_dimensions() == <span class="keyword">this</span>-&gt;num_dimensions());</span><br><span class="line">        BOOST_ASSERT(<span class="built_in">std</span>::equal(other.shape(),</span><br><span class="line">            other.shape()+<span class="keyword">this</span>-&gt;num_dimensions(),</span><br><span class="line">            <span class="keyword">this</span>-&gt;shape()));</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> _MSC_VER &gt;= 1600</span></span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterThis = begin();</span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterOther = other.begin();</span><br><span class="line">        <span class="keyword">for</span> (; iterThis != end(); ++iterThis, ++iterOther)</span><br><span class="line">            *iterThis = *iterOther;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">        <span class="comment">// iterator-based copy</span></span><br><span class="line">        <span class="built_in">std</span>::copy(other.begin(),other.end(),begin());</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Error-Code-S1023-when-installing-DirectX-SDK-June-2010"><a href="#Error-Code-S1023-when-installing-DirectX-SDK-June-2010" class="headerlink" title="Error Code: S1023 when installing DirectX SDK (June 2010)"></a>Error Code: S1023 when installing DirectX SDK (June 2010)</h2><p>cc: <a href="http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx" target="_blank" rel="noopener">http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx</a></p>
+<ol>
+<li><p>Remove the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong> from the system (both x86 and x64 if applicable). This can be easily done via a command-line with administrator rights:</p>
+ <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">MsiExec.exe /passive /X&#123;F0C3E5D1-<span class="number">1</span>ADE-<span class="number">321</span>E-<span class="number">8167</span>-<span class="number">68</span>EF0DE699A5&#125;</span><br><span class="line">MsiExec.exe /passive /X&#123;<span class="number">1</span>D8E6291-B0D5-<span class="number">35</span>EC-<span class="number">8441</span>-<span class="number">6616</span>F567A0F7&#125;</span><br></pre></td></tr></table></figure></li>
+<li>Install the DirectX SDK (June 2010).</li>
+<li>Reinstall the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong>. On an x64 system, you should install both the x86 and x64 versions of the C++ REDIST. Be sure to install the most <a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;id=26999" target="_blank" rel="noopener">current version available</a>.</li>
+</ol>
+<h2 id="error-LNK1000-Internal-error-during-IncrBuildImage"><a href="#error-LNK1000-Internal-error-during-IncrBuildImage" class="headerlink" title="error LNK1000: Internal error during IncrBuildImage"></a>error LNK1000: Internal error during IncrBuildImage</h2><p>This is common in VS2008, VS2010 fix this. Two ways to fix it:</p>
+<ol>
+<li>Install patch <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
+<li>Two steps:<ol>
+<li><code>Project –&gt; Properties –&gt; Linker –&gt; General –&gt; Enable Incremental Linking –&gt; &#39;No&#39;</code>.</li>
+<li><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Program Database (/Zi)&#39;</code>.</li>
+</ol>
+</li>
+</ol>
+<h2 id="error-LNK1104-cannot-open-file-‘cxcore-lib’"><a href="#error-LNK1104-cannot-open-file-‘cxcore-lib’" class="headerlink" title="error LNK1104: cannot open file ‘cxcore.lib’"></a>error LNK1104: cannot open file ‘cxcore.lib’</h2><p><code>Project –&gt; Properties –&gt; Configuration properties –&gt; Linker – &gt; Input –&gt; Additional Dependence –&gt;</code> Check whether all libs here are consistent with current PC (e.g. after installing OpenCV2.0, should be cxcore200.lib).</p>
+<h2 id="error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW"><a href="#error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW" class="headerlink" title="error LNK2001: unresolved external symbol __imp___CrtDbgReportW"></a>error LNK2001: unresolved external symbol <code>__imp___CrtDbgReportW</code></h2><p>This will happen when compiling code under <strong>vc10 + Debug</strong>.</p>
+<p>Solve: <code>Project –&gt; Properties –&gt; C/C++ –&gt; Code Generation –&gt; Runtime Library –&gt; Multi-threaded Debug DLL (/MDd)&#39;</code>.</p>
+<h2 id="error-LNK2001-unresolved-external-symbol"><a href="#error-LNK2001-unresolved-external-symbol" class="headerlink" title="error LNK2001: unresolved external symbol"></a>error LNK2001: unresolved external symbol</h2><p>Reason: not use <code>class::</code> before the types/names we defined ourselves.</p>
+<p>Solve: try to add these all <code>class::</code> needed.</p>
+<h2 id="This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged"><a href="#This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged" class="headerlink" title="This source file has changed. It no longer matches the version of the file used to build the application being debugged"></a>This source file has changed. It no longer matches the version of the file used to build the application being debugged</h2><ol>
+<li>Check if code contains illegal characters, e.g. copied from QQ.</li>
+<li>Build your project before you debug.</li>
+</ol>
+<h2 id="Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists"><a href="#Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists" class="headerlink" title="Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists"></a>Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists</h2><p>This will happen when you want to create a solution platform for a single project in a big solution, which one of other projects in the solution has already has this solution platform.<br>Solve <a href="http://www.dpvreony.co.uk/blog/post/v/62" target="_blank" rel="noopener">[1]</a>:</p>
+<ol>
+<li>Close Visual Studio</li>
+<li>Find the project’s (the one that you want to create platform) <code>.vcproject</code>  file and open it with e.g. notepad… other than VS.</li>
+<li>Inside the <code>&lt;ItemGroup Label=&quot;ProjectConfigurations&quot;&gt;</code> node you will find a series of Configuration nodes. Copy (and paste underneath) one which has a name attribute beginning with <code>Debug|</code> and replace the text at the end with your desired platform (i.e. Change <code>Debug|Win32</code> to <code>Debug|x64</code>).</li>
+<li>Repeat the above step for a <code>Release</code> configuration.</li>
+</ol>
+<hr>
+<h2 id="Others"><a href="#Others" class="headerlink" title="Others:"></a>Others:</h2><h3 id="Error-code-S1023-when-trying-to-install-DirectX"><a href="#Error-code-S1023-when-trying-to-install-DirectX" class="headerlink" title="Error code: S1023 when trying to install DirectX"></a>Error code: S1023 when trying to install DirectX</h3><p>Solve <a href="http://answers.microsoft.com/en-us/windows/forum/windows_7-windows_programs/error-code-s1023-when-trying-to-install-directx/0aadf7ec-e004-42eb-8a1a-2865ff5b3a37" target="_blank" rel="noopener">[1]</a>:</p>
+<ol>
+<li>Uninstall <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
+<li>Install DirectX again. Should be OK.</li>
+<li>Install back <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>debugging</tag>
       </tags>
   </entry>
   <entry>
@@ -439,41 +508,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Handle Chinese bookmarks in Latex</title>
-    <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
-    <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
-<a id="more"></a>
-<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
-<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
-<p>Correct way to handle is:</p>
-<ol>
-<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
-<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
-<li>Run <code>pdflatex</code> again. Done!</li>
-</ol>
-<hr>
-<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
-<ol>
-<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
-<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
-<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
-<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
-<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
-</ol>
-<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
-<hr>
-<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
-<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
-<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>latex</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Good refs on Stack Overflow</title>
     <url>/2014/04/13/Good-refs-on-Stack-Overflow/</url>
     <content><![CDATA[<h5 id="C"><a href="#C" class="headerlink" title="C"></a>C</h5><ul>
@@ -540,119 +574,38 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Debugging: errors and fixes</title>
-    <url>/2012/09/06/Debugging-errors-and-fixes/</url>
-    <content><![CDATA[<h2 id="Can-not-find-dxtrans-h-in-DirectX-programming"><a href="#Can-not-find-dxtrans-h-in-DirectX-programming" class="headerlink" title="Can not find dxtrans.h in DirectX programming"></a>Can not find dxtrans.h in DirectX programming</h2><p>cc: <a href="http://blog.csdn.net/clever101/article/details/5617982" target="_blank" rel="noopener">http://blog.csdn.net/clever101/article/details/5617982</a></p>
-<ol>
-<li>Remove <code>#include &quot;dxtrans.h&quot;</code> where causing errors (e.g. <code>qedit.h</code>).</li>
-<li><p>Add the following macro definition to the beginning of code <code>#include &lt;qedit.h&gt;</code></p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtCompositor_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtAlphaSetter_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtJpeg_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtKey_INTERFACE_DEFINED__</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="error-C2143-syntax-error-missing-‘-’-before-‘constant’"><a href="#error-C2143-syntax-error-missing-‘-’-before-‘constant’" class="headerlink" title="error C2143: syntax error : missing ‘)’ before ‘constant’"></a>error C2143: syntax error : missing ‘)’ before ‘constant’</h2><p>E.g. after defining a constant: <code>#define A 1</code>, but in program, we mistaken using <code>int A;</code> and so on.</p>
-<p>Solve: use <code>A</code> directly, not <code>int A</code>.</p>
-<h2 id="error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’"><a href="#error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’" class="headerlink" title="error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’"></a>error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’</h2><p>In <code>winnt.h</code>, add the following line</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> POINTER_64 __ptr64</span></span><br></pre></td></tr></table></figure>
-<p>before</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> *PVOID;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> * POINTER_64 PVOID64;</span><br></pre></td></tr></table></figure>
-<h2 id="error-C2471-cannot-update-program-database-—-vc90-pdb"><a href="#error-C2471-cannot-update-program-database-—-vc90-pdb" class="headerlink" title="error C2471: cannot update program database —-vc90.pdb"></a>error C2471: cannot update program database —-vc90.pdb</h2><p><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Disabled&#39;</code>.</p>
-<h2 id="error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’"><a href="#error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’" class="headerlink" title="error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’"></a>error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’</h2><p>Two ways to fix it:</p>
-<ol>
-<li><code>Project –&gt; Properties –&gt; General –&gt; Character Set –&gt; &quot;Use Multi-Byte Character Set&quot;</code>.</li>
-<li>Indicate that the string literal, in this case <code>&quot;Hello world!&quot;</code> is of a specific encoding. This can be done through either prefixing it with <code>L</code>, such as <code>L&quot;Hello world!&quot;</code>, or surrounding it with the generic <code>_T(&quot;Hello world!&quot;)</code> macro. The latter will expand to the L prefix if you are compiling for unicode, and nothing (indicating multi-byte) otherwise.</li>
-</ol>
-<h2 id="error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility"><a href="#error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility" class="headerlink" title="error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)"></a>error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)</h2><p>Based on: <a href="https://svn.boost.org/trac/boost/ticket/4874" target="_blank" rel="noopener">https://svn.boost.org/trac/boost/ticket/4874</a><br>This is a bug of boost library (before version 1_52_0) when using VC2010 in Debug mode (note: the problem also exists in boost-1_52_0 for VC2012 in Debug mode, but still cannot be solved with this method). It can be solved by modifying <code>BOOST_PATH/boost/multi_array/view.hpp</code> to something like</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">multi_array_view&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> multi_array_view&amp; other) &#123;</span><br><span class="line">    <span class="keyword">if</span> (&amp;other != <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="comment">// make sure the dimensions agree</span></span><br><span class="line">        BOOST_ASSERT(other.num_dimensions() == <span class="keyword">this</span>-&gt;num_dimensions());</span><br><span class="line">        BOOST_ASSERT(<span class="built_in">std</span>::equal(other.shape(),</span><br><span class="line">            other.shape()+<span class="keyword">this</span>-&gt;num_dimensions(),</span><br><span class="line">            <span class="keyword">this</span>-&gt;shape()));</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> _MSC_VER &gt;= 1600</span></span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterThis = begin();</span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterOther = other.begin();</span><br><span class="line">        <span class="keyword">for</span> (; iterThis != end(); ++iterThis, ++iterOther)</span><br><span class="line">            *iterThis = *iterOther;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">        <span class="comment">// iterator-based copy</span></span><br><span class="line">        <span class="built_in">std</span>::copy(other.begin(),other.end(),begin());</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Error-Code-S1023-when-installing-DirectX-SDK-June-2010"><a href="#Error-Code-S1023-when-installing-DirectX-SDK-June-2010" class="headerlink" title="Error Code: S1023 when installing DirectX SDK (June 2010)"></a>Error Code: S1023 when installing DirectX SDK (June 2010)</h2><p>cc: <a href="http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx" target="_blank" rel="noopener">http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx</a></p>
-<ol>
-<li><p>Remove the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong> from the system (both x86 and x64 if applicable). This can be easily done via a command-line with administrator rights:</p>
- <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">MsiExec.exe /passive /X&#123;F0C3E5D1-<span class="number">1</span>ADE-<span class="number">321</span>E-<span class="number">8167</span>-<span class="number">68</span>EF0DE699A5&#125;</span><br><span class="line">MsiExec.exe /passive /X&#123;<span class="number">1</span>D8E6291-B0D5-<span class="number">35</span>EC-<span class="number">8441</span>-<span class="number">6616</span>F567A0F7&#125;</span><br></pre></td></tr></table></figure></li>
-<li>Install the DirectX SDK (June 2010).</li>
-<li>Reinstall the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong>. On an x64 system, you should install both the x86 and x64 versions of the C++ REDIST. Be sure to install the most <a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;id=26999" target="_blank" rel="noopener">current version available</a>.</li>
-</ol>
-<h2 id="error-LNK1000-Internal-error-during-IncrBuildImage"><a href="#error-LNK1000-Internal-error-during-IncrBuildImage" class="headerlink" title="error LNK1000: Internal error during IncrBuildImage"></a>error LNK1000: Internal error during IncrBuildImage</h2><p>This is common in VS2008, VS2010 fix this. Two ways to fix it:</p>
-<ol>
-<li>Install patch <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
-<li>Two steps:<ol>
-<li><code>Project –&gt; Properties –&gt; Linker –&gt; General –&gt; Enable Incremental Linking –&gt; &#39;No&#39;</code>.</li>
-<li><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Program Database (/Zi)&#39;</code>.</li>
-</ol>
-</li>
-</ol>
-<h2 id="error-LNK1104-cannot-open-file-‘cxcore-lib’"><a href="#error-LNK1104-cannot-open-file-‘cxcore-lib’" class="headerlink" title="error LNK1104: cannot open file ‘cxcore.lib’"></a>error LNK1104: cannot open file ‘cxcore.lib’</h2><p><code>Project –&gt; Properties –&gt; Configuration properties –&gt; Linker – &gt; Input –&gt; Additional Dependence –&gt;</code> Check whether all libs here are consistent with current PC (e.g. after installing OpenCV2.0, should be cxcore200.lib).</p>
-<h2 id="error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW"><a href="#error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW" class="headerlink" title="error LNK2001: unresolved external symbol __imp___CrtDbgReportW"></a>error LNK2001: unresolved external symbol <code>__imp___CrtDbgReportW</code></h2><p>This will happen when compiling code under <strong>vc10 + Debug</strong>.</p>
-<p>Solve: <code>Project –&gt; Properties –&gt; C/C++ –&gt; Code Generation –&gt; Runtime Library –&gt; Multi-threaded Debug DLL (/MDd)&#39;</code>.</p>
-<h2 id="error-LNK2001-unresolved-external-symbol"><a href="#error-LNK2001-unresolved-external-symbol" class="headerlink" title="error LNK2001: unresolved external symbol"></a>error LNK2001: unresolved external symbol</h2><p>Reason: not use <code>class::</code> before the types/names we defined ourselves.</p>
-<p>Solve: try to add these all <code>class::</code> needed.</p>
-<h2 id="This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged"><a href="#This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged" class="headerlink" title="This source file has changed. It no longer matches the version of the file used to build the application being debugged"></a>This source file has changed. It no longer matches the version of the file used to build the application being debugged</h2><ol>
-<li>Check if code contains illegal characters, e.g. copied from QQ.</li>
-<li>Build your project before you debug.</li>
-</ol>
-<h2 id="Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists"><a href="#Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists" class="headerlink" title="Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists"></a>Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists</h2><p>This will happen when you want to create a solution platform for a single project in a big solution, which one of other projects in the solution has already has this solution platform.<br>Solve <a href="http://www.dpvreony.co.uk/blog/post/v/62" target="_blank" rel="noopener">[1]</a>:</p>
-<ol>
-<li>Close Visual Studio</li>
-<li>Find the project’s (the one that you want to create platform) <code>.vcproject</code>  file and open it with e.g. notepad… other than VS.</li>
-<li>Inside the <code>&lt;ItemGroup Label=&quot;ProjectConfigurations&quot;&gt;</code> node you will find a series of Configuration nodes. Copy (and paste underneath) one which has a name attribute beginning with <code>Debug|</code> and replace the text at the end with your desired platform (i.e. Change <code>Debug|Win32</code> to <code>Debug|x64</code>).</li>
-<li>Repeat the above step for a <code>Release</code> configuration.</li>
-</ol>
-<hr>
-<h2 id="Others"><a href="#Others" class="headerlink" title="Others:"></a>Others:</h2><h3 id="Error-code-S1023-when-trying-to-install-DirectX"><a href="#Error-code-S1023-when-trying-to-install-DirectX" class="headerlink" title="Error code: S1023 when trying to install DirectX"></a>Error code: S1023 when trying to install DirectX</h3><p>Solve <a href="http://answers.microsoft.com/en-us/windows/forum/windows_7-windows_programs/error-code-s1023-when-trying-to-install-directx/0aadf7ec-e004-42eb-8a1a-2865ff5b3a37" target="_blank" rel="noopener">[1]</a>:</p>
-<ol>
-<li>Uninstall <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
-<li>Install DirectX again. Should be OK.</li>
-<li>Install back <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>debugging</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
-    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
-    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
-<ol>
-<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
-</li>
-<li><p>call MATLAB directly in VC++.</p>
-</li>
-</ol>
-<hr>
-<p>This blog will focus on the second approach (also the easier one).</p>
+    <title>Handle Chinese bookmarks in Latex</title>
+    <url>/2014/12/08/Handle-Chinese-bookmarks-in-Latex/</url>
+    <content><![CDATA[<p>We often encounter problems of showing Chinese bookmarks during using Latex, take the following MWE, i.e. <code>main.tex</code> as an example:</p>
 <a id="more"></a>
-<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
-<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
-<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
-<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
-<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
-<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
-<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
-<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
-<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
-<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
-<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
-<ul>
-<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
-<li><code>string</code></li>
-<li>matrix</li>
-<li>gray-scale image</li>
-<li>RGB image</li>
-</ul>
-</li>
+<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">&#123;article&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[english]</span><span class="string">&#123;babel&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;CJK&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">[CJKbookmarks]</span><span class="string">&#123;hyperref&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;CJK*&#125;</span><span class="string">&#123;GBK&#125;</span><span class="string">&#123;song&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">section</span><span class="string">&#123;测试&#125;</span></span> </span><br><span class="line">基于CJK的可以搜索、复制、有书签的中文PDF。</span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;CJK*&#125;</span></span> </span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
+<p>When using <code>pdflatex</code> to compile, the Chinese bookmarks will not show correctly, though there will be no problem showing Chinese in the body text.</p>
+<p>Correct way to handle is:</p>
+<ol>
+<li>Download and extract <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/misc/gbk2uni.zip" target="_blank" rel="noopener"><code>gbk2uni.exe</code></a> to the Latex source folder.</li>
+<li>Before final run of <code>pdflatex</code> command, dos run <code>gdk2uni.exe main.out</code></li>
+<li>Run <code>pdflatex</code> again. Done!</li>
 </ol>
-<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
-<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
-</ul>
+<hr>
+<p>It’s possible to simplify the 2nd step by adding a one-click button to the Latex editor, i.e. WinEdt’s toobar. The steps are:</p>
+<ol>
+<li>Copy <code>gbk2uni.exe</code> to <code>C:\CTEX\MiKTeX\miktex\bin</code>.</li>
+<li>Create file <code>gbk2uni.bat</code> with the following content:<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">gbk2uni %<span class="number">1</span>.out</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure></li>
+<li>Put this file to <code>..\Ctex\WinEdt\Bin\</code> (create <code>Bin</code> folder if not existing).</li>
+<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… –&gt; MainMenu –&gt;</code> double click to open <code>MainMenu.ini</code> file <code>–&gt;</code> add the following content before <code>END=&quot;&amp;Accessories&quot; –&gt;</code> right click <code>MainMenu –&gt; load script (F9)</code>.<figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="attr">ITEM</span>=<span class="string">"GBK to Unicode"</span></span><br><span class="line">    CAPTION="gbk2uni"</span><br><span class="line">    IMAGE="Notepad"</span><br><span class="line">    SAVE_INPUT=1</span><br><span class="line">    MACRO=:Run('%B\Bin\gbk2uni.bat %N');</span><br><span class="line">    REQ_FILTER="%P\%N.out"</span><br></pre></td></tr></table></figure></li>
+<li>In <strong>WinEdt</strong>: <code>Options –&gt; Option Interface… –&gt; Menu and Toolbar… – &gt; Toolbar –&gt;</code> double click to open <code>toolbar.ini</code> file –&gt; add <code>BUTTON=&quot;GBK to Unicode&quot;</code>, e.g. before <code>BUTTON=&quot;MetaFont&quot; –&gt;</code> right click <code>Toolbar –&gt; load script (F9)</code>.</li>
+<li>Done! There will be a <code>gbk2uni</code> button (with a <strong>Notepad</strong> icon, change in step-4 if you want to use other icons) before <code>MetaFont</code> button.</li>
+</ol>
+<p>Up to now, the way to generate the PDF with correct Chinese bookmarks can be, i.e <strong><em>all by simply clicking the coresponding buttons</em></strong>: <code>pdflatex -&gt; pdflatex –&gt; gdk2uni -&gt; pdflatex</code>.</p>
+<hr>
+<h4 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h4><ol>
+<li>Example from: <a href="http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270" target="_blank" rel="noopener">http://bbs.ctex.org/forum.php?mod=viewthread&amp;tid=64270</a></li>
+<li>Adding <code>gbk2uni</code> button to WinEdt is based on: <a href="http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_48f3a1cd0101mon3.html</a></li>
+</ol>
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>mixed_programming</tag>
-        <tag>matlab</tag>
-        <tag>c++</tag>
+        <tag>latex</tag>
       </tags>
   </entry>
   <entry>
@@ -852,6 +805,53 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>i/o</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MATLAB/C++ Mixed Programming: call MATLAB directly in VC++</title>
+    <url>/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/</url>
+    <content><![CDATA[<p>There are two ways in VC++ to call MATLAB:</p>
+<ol>
+<li><p>distribute MATLAB code into MATLAB independent C++ shared library. Refer to the <a href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">previous blog</a> for details.</p>
+</li>
+<li><p>call MATLAB directly in VC++.</p>
+</li>
+</ol>
+<hr>
+<p>This blog will focus on the second approach (also the easier one).</p>
+<a id="more"></a>
+<h5 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h5><ul>
+<li>Install MATLAB: unlike the first method, make sure you have the whole MATLAB application installed in order to call MATLAB directly in VC++ (only MATLAB Compiler Runtime is needed for the first method). We will take <strong>MATLAB-x64-R2013a</strong> as an example (installed under <code>C:\Program Files\MATLAB\R2013a</code>).</li>
+<li><strong>Platform consistence:</strong> <strong><em>the platforms of MATLAB and VC++ compile platform must be the same</em></strong>, i.e. Win32/x86 VC++ compile platform can only use x86 MATLAB and x64 VC++ compile platform can only use x64 MATLAB.</li>
+<li>Example: take the following example <code>myadd2.m</code> (assume under <code>C:\</code>):<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">'Output from MATLAB.'</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="VC-setup"><a href="#VC-setup" class="headerlink" title="VC setup:"></a>VC setup:</h5><ol>
+<li>Add MATLAB include folder to project <code>Include</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\include</code></li>
+<li>Add MATLAB library folder to project <code>Library</code> files: i.e. <code>C:\Program Files\MATLAB\R2013a\extern\lib\win64\microsoft</code></li>
+<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmx.lib libeng.lib</code></li>
+<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;$(ProjectDir)\dlls_x64;C:\Program Files\MATLAB\R2013a\runtime\win64;C:\Program Files\MATLAB\R2013a\bin\win64</code></li>
+<li>Add header to main code: <code>#include &quot;engine.h&quot;</code></li>
+<li><p>Call in VC++: refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB_directly.cpp" target="_blank" rel="noopener">VC_call_MATLAB_directly.cpp</a> for details.</p>
+<p> In this cpp file, there are also ways to handle data passing of different types between VC++ and MATLAB (see the <code>SHOW_EXTEND_INFO</code> part), which includes:</p>
+<ul>
+<li><code>double</code> (or <code>int</code>/<code>float</code>/…)</li>
+<li><code>string</code></li>
+<li>matrix</li>
+<li>gray-scale image</li>
+<li>RGB image</li>
+</ul>
+</li>
+</ol>
+<h5 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h5><ul>
+<li>Try to close the previous MATLAB window first (extra command window) if stuck at <code>engOpen(NULL)</code>.</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>mixed_programming</tag>
+        <tag>matlab</tag>
+        <tag>c++</tag>
       </tags>
   </entry>
   <entry>
@@ -1728,197 +1728,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Running Python in Windows and install external libraries</title>
-    <url>/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/</url>
-    <content><![CDATA[<h5 id="Setup-Python-environment-in-Windows-using-Anaconda"><a href="#Setup-Python-environment-in-Windows-using-Anaconda" class="headerlink" title="Setup Python environment in Windows: (using Anaconda)"></a>Setup Python environment in Windows: (using <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>)</h5><ol>
-<li>Download Window’s version <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>.</li>
-<li>Install (e.g. default to folder <code>C:\Anaconda</code>).</li>
-<li>Setup python system variable: new a system variable with name <code>PYTHONPATH</code> and value <code>C:\Anaconda\Lib\site-packages</code>.</li>
-</ol>
-<a id="more"></a>
-<h5 id="Install-external-libraries-3-different-ways"><a href="#Install-external-libraries-3-different-ways" class="headerlink" title="Install external libraries (3 different ways):"></a>Install external libraries (3 different ways):</h5><ol>
-<li><strong>Install from Anaconda server:</strong><ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>To install <strong>py</strong> library, type <code>conda install py</code> (You can first type <code>conda search xxx</code> to search <strong>xxx</strong> library exist in Anaconda server or not, full list is available by type <code>conda list</code>).</li>
-</ul>
-</li>
-<li><strong>Install from external libraries directly:</strong> (Take <a href="https://code.google.com/p/protobuf/" target="_blank" rel="noopener"><strong>protobuf</strong></a> as an example in <code>C:\Libs\protobuf-2.4.1</code>)<ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>cd to protobuf’s folder: <code>C:\Libs\protobuf-2.4.1\python</code>.</li>
-<li>Build: <code>python setup.py build</code></li>
-<li>Install: <code>python setup.py install</code></li>
-<li>Done. Then you can e.g. <code>from google.protobuf import descriptor</code> and use e.g. <code>descriptor.FileDescriptor()</code> in <strong>.py</strong> source code.</li>
-</ul>
-</li>
-<li><strong>Install by copy files directly:</strong> (Take <strong>OpenCV</strong> as am example in <code>C:\Libs\OpenCV-2.3.1</code>)<ul>
-<li>Copy <strong>cy.py</strong> and <strong>cv2.pyd</strong> from folder <code>C:\Libs\OpenCV-2.3.1\build\python\2.7</code> to <code>C:\Anaconda\Lib\site-packages</code>.</li>
-<li>Done. Then you can <code>import cv/cv2</code> and use e.g. <code>cv2.imwrite()</code> in <strong>.py</strong> source code.</li>
-</ul>
-</li>
-</ol>
-<h5 id="Run-Python"><a href="#Run-Python" class="headerlink" title="Run Python"></a>Run Python</h5><ol>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
-<li>Run: <code>&gt; python xxx.py</code>.</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>python</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Sorting algorithms: implementation and comparison</title>
-    <url>/2013/08/29/Sorting-algorithms-implementation-and-comparison/</url>
-    <content><![CDATA[<h5 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation:"></a>Implementation:</h5><p>Implementation of 10 sorting algorithms can be found <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/Sorting.cpp" target="_blank" rel="noopener">here</a>, including</p>
-<ol>
-<li>SelectionSort</li>
-<li>InsertSort</li>
-<li>ShellSort</li>
-<li>BubbleSort</li>
-<li>HeapSort</li>
-<li>QuickSort</li>
-<li>MergeSort</li>
-<li>CountingSort</li>
-<li>RadixSort</li>
-<li>BucketSort</li>
-</ol>
-<a id="more"></a>
-<p>Animation for above soring algorithms can be found <a href="http://www.cs.usfca.edu/~galles/visualization/Algorithms.html" target="_blank" rel="noopener">here</a>.</p>
-<h5 id="Comparison"><a href="#Comparison" class="headerlink" title="Comparison:"></a>Comparison:</h5><div class="table-container">
-<table>
-<thead>
-<tr>
-<th>Algorithm</th>
-<th>Average Time</th>
-<th>Worst Time</th>
-<th>Best Time</th>
-<th>Stable?</th>
-<th>Auxiliary Space</th>
-<th>Constraints</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>SelectionSort</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$\checkmark$</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>InsertSort</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$O(n)$</td>
-<td>$\checkmark$</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>ShellSort</td>
-<td><em>N/A</em></td>
-<td><em>N/A</em></td>
-<td><em>N/A</em></td>
-<td>x</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>BubbleSort</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$O(n^2)$</td>
-<td>$\checkmark$</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>HeapSort</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>x</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>QuickSort</td>
-<td>$O(nlogn)$</td>
-<td>$O(n^2)$</td>
-<td>$O(nlogn)$</td>
-<td>x</td>
-<td>$C$</td>
-<td></td>
-</tr>
-<tr>
-<td>MergeSort</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>$O(nlogn)$</td>
-<td>$\checkmark$</td>
-<td>$n$</td>
-<td></td>
-</tr>
-<tr>
-<td>CountingSort</td>
-<td>$O(n+k)$</td>
-<td>$O(n+k)$</td>
-<td>$O(n+k)$</td>
-<td>$\checkmark$</td>
-<td>$n+k+C$</td>
-<td>non-negative and within some range</td>
-</tr>
-<tr>
-<td>RadixSort</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$\checkmark$</td>
-<td>$n+k+C$</td>
-<td>non-negative</td>
-</tr>
-<tr>
-<td>BucketSort</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$O(n)$</td>
-<td>$\checkmark$</td>
-<td>$2n+C$</td>
-<td>elements distribute in buckets evenly and independent</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Note: $C$ is a small constant; $k$ is the max element; $n$ is the number of total elements. <em>N/A</em> means it depends on selection of increment value.</p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>algorithm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Track memory leaks in VS</title>
-    <url>/2015/06/23/Track-memory-leaks-in-VS/</url>
-    <content><![CDATA[<p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
-<a id="more"></a>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
-<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
-<p>Note that:</p>
-<ol>
-<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
-<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
-</ol>
-<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Research Topics Related Useful Links</title>
     <url>/2011/11/15/Research-Topics-Related-Useful-Links/</url>
     <content><![CDATA[<h2 id="3D-face-facial-expressions-databases"><a href="#3D-face-facial-expressions-databases" class="headerlink" title="3D face (facial expressions) databases"></a>3D face (facial expressions) databases</h2><ul>
@@ -2056,6 +1865,138 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>Sorting algorithms: implementation and comparison</title>
+    <url>/2013/08/29/Sorting-algorithms-implementation-and-comparison/</url>
+    <content><![CDATA[<h5 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation:"></a>Implementation:</h5><p>Implementation of 10 sorting algorithms can be found <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/Sorting.cpp" target="_blank" rel="noopener">here</a>, including</p>
+<ol>
+<li>SelectionSort</li>
+<li>InsertSort</li>
+<li>ShellSort</li>
+<li>BubbleSort</li>
+<li>HeapSort</li>
+<li>QuickSort</li>
+<li>MergeSort</li>
+<li>CountingSort</li>
+<li>RadixSort</li>
+<li>BucketSort</li>
+</ol>
+<a id="more"></a>
+<p>Animation for above soring algorithms can be found <a href="http://www.cs.usfca.edu/~galles/visualization/Algorithms.html" target="_blank" rel="noopener">here</a>.</p>
+<h5 id="Comparison"><a href="#Comparison" class="headerlink" title="Comparison:"></a>Comparison:</h5><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Average Time</th>
+<th>Worst Time</th>
+<th>Best Time</th>
+<th>Stable?</th>
+<th>Auxiliary Space</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SelectionSort</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$\checkmark$</td>
+<td>$C$</td>
+<td></td>
+</tr>
+<tr>
+<td>InsertSort</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$O(n)$</td>
+<td>$\checkmark$</td>
+<td>$C$</td>
+<td></td>
+</tr>
+<tr>
+<td>ShellSort</td>
+<td><em>N/A</em></td>
+<td><em>N/A</em></td>
+<td><em>N/A</em></td>
+<td>x</td>
+<td>$C$</td>
+<td></td>
+</tr>
+<tr>
+<td>BubbleSort</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$O(n^2)$</td>
+<td>$\checkmark$</td>
+<td>$C$</td>
+<td></td>
+</tr>
+<tr>
+<td>HeapSort</td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>x</td>
+<td>$C$</td>
+<td></td>
+</tr>
+<tr>
+<td>QuickSort</td>
+<td>$O(nlogn)$</td>
+<td>$O(n^2)$</td>
+<td>$O(nlogn)$</td>
+<td>x</td>
+<td>$C$</td>
+<td></td>
+</tr>
+<tr>
+<td>MergeSort</td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>$O(nlogn)$</td>
+<td>$\checkmark$</td>
+<td>$n$</td>
+<td></td>
+</tr>
+<tr>
+<td>CountingSort</td>
+<td>$O(n+k)$</td>
+<td>$O(n+k)$</td>
+<td>$O(n+k)$</td>
+<td>$\checkmark$</td>
+<td>$n+k+C$</td>
+<td>non-negative and within some range</td>
+</tr>
+<tr>
+<td>RadixSort</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$\checkmark$</td>
+<td>$n+k+C$</td>
+<td>non-negative</td>
+</tr>
+<tr>
+<td>BucketSort</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$O(n)$</td>
+<td>$\checkmark$</td>
+<td>$2n+C$</td>
+<td>elements distribute in buckets evenly and independent</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Note: $C$ is a small constant; $k$ is the max element; $n$ is the number of total elements. <em>N/A</em> means it depends on selection of increment value.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>algorithm</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Using Libxml2 library in VC++</title>
     <url>/2012/06/18/Using-Libxml2-library-in-VC/</url>
     <content><![CDATA[<p><a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform), it is free software available under the MIT License. We can use it to read/write data from XML data file.</p>
@@ -2082,26 +2023,22 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Using MSXML to read/write XML files</title>
-    <url>/2012/07/11/Using-MSXML-to-read-write-XML-files/</url>
-    <content><![CDATA[<p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
-<p>In the followings, I will show how to use MSXML to read/write xml files.</p>
-<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
-<li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
-<li>Add <code>#import &lt;msxml3.dll&gt;</code> to the beginning part of your code.</li>
-<li><p>Use the following xml files as an example:</p>
-  <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Appearance_model</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"6"</span> <span class="attr">weight</span>=<span class="string">"0.017783"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"10"</span> <span class="attr">weight</span>=<span class="string">"0.003343"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Appearance_model</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="Read-from-xml-files"><a href="#Read-from-xml-files" class="headerlink" title="Read from xml files:"></a>Read from xml files:</h2><p>For example, we want to load the above xml data to a <code>vector&lt;pair&lt;int, float&gt;&gt;</code> (<code>name</code> to a string), do like the following code, where input parameter gives the path of above xml file.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">vector&lt;pair&lt;int, float&gt;&gt; load_appearance_model_from_xml(string file, string &amp; name)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model;</span><br><span class="line"></span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line">    spXMLDoc-&gt;load(file.c_str());</span><br><span class="line"></span><br><span class="line">    MSXML2::IXMLDOMElementPtr spRoot = spXMLDoc-&gt;documentElement; <span class="comment">//root node</span></span><br><span class="line">    <span class="keyword">if</span> (spRoot-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        MSXML2::IXMLDOMNodeListPtr spNodeList = spRoot-&gt;childNodes;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// traverse child's nodes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i != spNodeList-&gt;length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMNodePtr spNode = spNodeList-&gt;item[i];</span><br><span class="line">            <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                name = (<span class="keyword">char</span> *) spNode-&gt;Gettext();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> index;</span><br><span class="line">                <span class="keyword">float</span> weight;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// traverse node's attributes</span></span><br><span class="line">                MSXML2::IXMLDOMNamedNodeMapPtr spNameNodeMap = spNode-&gt;attributes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">long</span> j = <span class="number">0</span>; j != spNameNodeMap-&gt;length; ++j)</span><br><span class="line">                &#123;</span><br><span class="line">                    MSXML2::IXMLDOMNodePtr spNode2 = spNameNodeMap-&gt;item[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"index"</span>)</span><br><span class="line">                        index = (<span class="keyword">int</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"weight"</span>)</span><br><span class="line">                        weight = (<span class="keyword">float</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                app_model.push_back(make_pair(index, weight));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app_model;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Write-to-xml-files"><a href="#Write-to-xml-files" class="headerlink" title="Write to xml files:"></a>Write to xml files:</h2><p>Do like the following code, where input parameter file gives the file name that you want to save.</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_appearance_model_to_xml</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model, <span class="built_in">string</span> name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    MSXML2::IXMLDOMElementPtr  spRoot;</span><br><span class="line">    HRESULT hr = spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SUCCEEDED(hr))</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Unable to create xml file.\n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>, &amp;spRoot);</span><br><span class="line">        spXMLDoc-&gt;raw_appendChild(spRoot, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        MSXML2::IXMLDOMElementPtr childNode2;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>, &amp;childNode2);</span><br><span class="line">        childNode2-&gt;put_text((<span class="keyword">_bstr_t</span>)xxx);</span><br><span class="line">        spRoot-&gt;appendChild(childNode2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;app_model.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMElementPtr childNode;</span><br><span class="line">            spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>, &amp;childNode);</span><br><span class="line"></span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"index"</span>, app_model[i].first);</span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"weight"</span>, app_model[i].second);</span><br><span class="line"></span><br><span class="line">            spRoot-&gt;appendChild(childNode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        spXMLDoc-&gt;save(file.c_str());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>Note:</strong> Above writing xml with <code>&lt;name&gt;xxx&lt;/name&gt;</code> style is not fully tested.</p>
+    <title>Track memory leaks in VS</title>
+    <url>/2015/06/23/Track-memory-leaks-in-VS/</url>
+    <content><![CDATA[<p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
+<a id="more"></a>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
+<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
+<p>Note that:</p>
+<ol>
+<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
+<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
+</ol>
+<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>xml</tag>
       </tags>
   </entry>
   <entry>
@@ -2151,6 +2088,29 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>debugging</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Using MSXML to read/write XML files</title>
+    <url>/2012/07/11/Using-MSXML-to-read-write-XML-files/</url>
+    <content><![CDATA[<p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
+<p>In the followings, I will show how to use MSXML to read/write xml files.</p>
+<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
+<li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
+<li>Add <code>#import &lt;msxml3.dll&gt;</code> to the beginning part of your code.</li>
+<li><p>Use the following xml files as an example:</p>
+  <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Appearance_model</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"6"</span> <span class="attr">weight</span>=<span class="string">"0.017783"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"10"</span> <span class="attr">weight</span>=<span class="string">"0.003343"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Appearance_model</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Read-from-xml-files"><a href="#Read-from-xml-files" class="headerlink" title="Read from xml files:"></a>Read from xml files:</h2><p>For example, we want to load the above xml data to a <code>vector&lt;pair&lt;int, float&gt;&gt;</code> (<code>name</code> to a string), do like the following code, where input parameter gives the path of above xml file.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">vector&lt;pair&lt;int, float&gt;&gt; load_appearance_model_from_xml(string file, string &amp; name)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model;</span><br><span class="line"></span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line">    spXMLDoc-&gt;load(file.c_str());</span><br><span class="line"></span><br><span class="line">    MSXML2::IXMLDOMElementPtr spRoot = spXMLDoc-&gt;documentElement; <span class="comment">//root node</span></span><br><span class="line">    <span class="keyword">if</span> (spRoot-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        MSXML2::IXMLDOMNodeListPtr spNodeList = spRoot-&gt;childNodes;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// traverse child's nodes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i != spNodeList-&gt;length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMNodePtr spNode = spNodeList-&gt;item[i];</span><br><span class="line">            <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                name = (<span class="keyword">char</span> *) spNode-&gt;Gettext();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> index;</span><br><span class="line">                <span class="keyword">float</span> weight;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// traverse node's attributes</span></span><br><span class="line">                MSXML2::IXMLDOMNamedNodeMapPtr spNameNodeMap = spNode-&gt;attributes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">long</span> j = <span class="number">0</span>; j != spNameNodeMap-&gt;length; ++j)</span><br><span class="line">                &#123;</span><br><span class="line">                    MSXML2::IXMLDOMNodePtr spNode2 = spNameNodeMap-&gt;item[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"index"</span>)</span><br><span class="line">                        index = (<span class="keyword">int</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"weight"</span>)</span><br><span class="line">                        weight = (<span class="keyword">float</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                app_model.push_back(make_pair(index, weight));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app_model;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Write-to-xml-files"><a href="#Write-to-xml-files" class="headerlink" title="Write to xml files:"></a>Write to xml files:</h2><p>Do like the following code, where input parameter file gives the file name that you want to save.</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_appearance_model_to_xml</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model, <span class="built_in">string</span> name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    MSXML2::IXMLDOMElementPtr  spRoot;</span><br><span class="line">    HRESULT hr = spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SUCCEEDED(hr))</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Unable to create xml file.\n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>, &amp;spRoot);</span><br><span class="line">        spXMLDoc-&gt;raw_appendChild(spRoot, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        MSXML2::IXMLDOMElementPtr childNode2;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>, &amp;childNode2);</span><br><span class="line">        childNode2-&gt;put_text((<span class="keyword">_bstr_t</span>)xxx);</span><br><span class="line">        spRoot-&gt;appendChild(childNode2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;app_model.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMElementPtr childNode;</span><br><span class="line">            spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>, &amp;childNode);</span><br><span class="line"></span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"index"</span>, app_model[i].first);</span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"weight"</span>, app_model[i].second);</span><br><span class="line"></span><br><span class="line">            spRoot-&gt;appendChild(childNode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        spXMLDoc-&gt;save(file.c_str());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Note:</strong> Above writing xml with <code>&lt;name&gt;xxx&lt;/name&gt;</code> style is not fully tested.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>xml</tag>
       </tags>
   </entry>
   <entry>
@@ -2210,6 +2170,71 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>i/o</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Running Python via Anaconda</title>
+    <url>/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/</url>
+    <content><![CDATA[<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
+<li>Install <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>. (e.g. by default in <code>C:\Users\Yongtao\Anaconda3</code>)</li>
+<li>Add the following paths to <strong>Path</strong>:<ul>
+<li><code>C:\Users\Yongtao\Anaconda3</code><ul>
+<li><code>C:\Users\Yongtao\Anaconda3\Scripts</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<a id="more"></a>
+<h1 id="Add-libs"><a href="#Add-libs" class="headerlink" title="Add libs"></a>Add libs</h1><h2 id="Online-install"><a href="#Online-install" class="headerlink" title="Online install"></a>Online install</h2><h3 id="Install-directly"><a href="#Install-directly" class="headerlink" title="Install directly"></a>Install directly</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install xxx</span><br></pre></td></tr></table></figure>
+<h3 id="Via-Anaconda-cloud"><a href="#Via-Anaconda-cloud" class="headerlink" title="Via Anaconda cloud"></a>Via Anaconda cloud</h3><ol>
+<li>Search the lib on <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a></li>
+<li>Use the command listed on the lib page<blockquote>
+<p>Take OpenCV as an example, run </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install -c conda-forge opencv</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ol>
+<h2 id="Offline-install"><a href="#Offline-install" class="headerlink" title="Offline install"></a>Offline install</h2><h3 id="tar-bz2-type1"><a href="#tar-bz2-type1" class="headerlink" title="tar.bz2 type1"></a><code>tar.bz2</code> type<sup><a href="#fn_1" id="reffn_1">1</a></sup></h3><ol>
+<li>Download lib of type <code>tar.bz2</code> (e.g. search <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a>)<blockquote>
+<p>Note: download the lib with correct PC versions, including</p>
+<ul>
+<li><strong>Python</strong> (e.g. lib name contains like <code>py37</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python</span><br></pre></td></tr></table></figure></li>
+<li><strong>CUDA</strong> (e.g. lib name contains like <code>cuda92</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nvcc --version</span><br></pre></td></tr></table></figure></li>
+</ul>
+</blockquote>
+</li>
+<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda install --use-local xxx.tar.bz2</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="whl-type"><a href="#whl-type" class="headerlink" title="whl type"></a><code>whl</code> type</h3><blockquote>
+<p>Some <code>whl</code> libs are available at <a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/" target="_blank" rel="noopener">Unofficial Windows Binaries for Python Extension Packages</a> | <a href="https://pypi.org/simple/dlib/" target="_blank" rel="noopener">dlib</a>.</p>
+</blockquote>
+<ol>
+<li>Download lib of type <code>whl</code> (must match local Python and CUDA versions as above)</li>
+<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pip install xx.whl</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="From-source"><a href="#From-source" class="headerlink" title="From source"></a>From source</h3><p>Take <strong>dlib</strong> as an example</p>
+<ol>
+<li>Download its source <a href="https://pypi.org/project/dlib/" target="_blank" rel="noopener">here</a> (e.g. <strong>dlib-19.19.0.tar.gz</strong>).</li>
+<li>Extract it and run cmd (may need to run twice) in the folder   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><ol>
+<li>Run <strong>Anaconda Command Prompt</strong> or <strong>cmd</strong> (with <code>activate</code> command).</li>
+<li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
+<li>Run   <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">python xxx.py</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote id="fn_1">
+<sup>1</sup>. <a href="https://blog.csdn.net/qq_33039859/article/details/80785535" target="_blank" rel="noopener">Conda install 本地压缩包文件tar.bz2</a><a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>setup</tag>
+        <tag>coding</tag>
+        <tag>python</tag>
       </tags>
   </entry>
 </search>

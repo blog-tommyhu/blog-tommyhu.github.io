@@ -20,16 +20,17 @@
     var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Setup Python environment in Windows: (using Anaconda) Download Window’s version Anaconda. Install (e.g. default to folder C:\Anaconda). Setup python system variable: new a system variable with name PY">
+  <meta name="description" content="Install Install Anaconda. (e.g. by default in C:\Users\Yongtao\Anaconda3) Add the following paths to Path: C:\Users\Yongtao\Anaconda3 C:\Users\Yongtao\Anaconda3\Scripts">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Running Python in Windows and install external libraries">
+<meta property="og:title" content="Running Python via Anaconda">
 <meta property="og:url" content="https://blog-tommyhu.github.io/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/index.html">
 <meta property="og:site_name" content="Yongtao Hu&#39;s blog">
-<meta property="og:description" content="Setup Python environment in Windows: (using Anaconda) Download Window’s version Anaconda. Install (e.g. default to folder C:\Anaconda). Setup python system variable: new a system variable with name PY">
+<meta property="og:description" content="Install Install Anaconda. (e.g. by default in C:\Users\Yongtao\Anaconda3) Add the following paths to Path: C:\Users\Yongtao\Anaconda3 C:\Users\Yongtao\Anaconda3\Scripts">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2013-10-05T05:07:14.000Z">
-<meta property="article:modified_time" content="2020-04-29T13:18:32.878Z">
+<meta property="article:modified_time" content="2020-04-30T04:18:16.111Z">
 <meta property="article:author" content="Yongtao Hu">
+<meta property="article:tag" content="setup">
 <meta property="article:tag" content="coding">
 <meta property="article:tag" content="python">
 <meta name="twitter:card" content="summary">
@@ -47,7 +48,7 @@
   };
 </script>
 
-  <title>Running Python in Windows and install external libraries | Yongtao Hu's blog</title>
+  <title>Running Python via Anaconda | Yongtao Hu's blog</title>
   
 
 
@@ -200,7 +201,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Running Python in Windows and install external libraries
+          Running Python via Anaconda
         </h1>
 
         <div class="post-meta">
@@ -217,7 +218,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-04-29 21:18:32" itemprop="dateModified" datetime="2020-04-29T21:18:32+08:00">2020-04-29</time>
+                <time title="Modified: 2020-04-30 12:18:16" itemprop="dateModified" datetime="2020-04-30T12:18:16+08:00">2020-04-30</time>
               </span>
 
           
@@ -252,37 +253,61 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h5 id="Setup-Python-environment-in-Windows-using-Anaconda"><a href="#Setup-Python-environment-in-Windows-using-Anaconda" class="headerlink" title="Setup Python environment in Windows: (using Anaconda)"></a>Setup Python environment in Windows: (using <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>)</h5><ol>
-<li>Download Window’s version <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>.</li>
-<li>Install (e.g. default to folder <code>C:\Anaconda</code>).</li>
-<li>Setup python system variable: new a system variable with name <code>PYTHONPATH</code> and value <code>C:\Anaconda\Lib\site-packages</code>.</li>
+        <h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
+<li>Install <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>. (e.g. by default in <code>C:\Users\Yongtao\Anaconda3</code>)</li>
+<li>Add the following paths to <strong>Path</strong>:<ul>
+<li><code>C:\Users\Yongtao\Anaconda3</code><ul>
+<li><code>C:\Users\Yongtao\Anaconda3\Scripts</code></li>
+</ul>
+</li>
+</ul>
+</li>
 </ol>
 <a id="more"></a>
-<h5 id="Install-external-libraries-3-different-ways"><a href="#Install-external-libraries-3-different-ways" class="headerlink" title="Install external libraries (3 different ways):"></a>Install external libraries (3 different ways):</h5><ol>
-<li><strong>Install from Anaconda server:</strong><ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>To install <strong>py</strong> library, type <code>conda install py</code> (You can first type <code>conda search xxx</code> to search <strong>xxx</strong> library exist in Anaconda server or not, full list is available by type <code>conda list</code>).</li>
-</ul>
-</li>
-<li><strong>Install from external libraries directly:</strong> (Take <a href="https://code.google.com/p/protobuf/" target="_blank" rel="noopener"><strong>protobuf</strong></a> as an example in <code>C:\Libs\protobuf-2.4.1</code>)<ul>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
-<li>cd to protobuf’s folder: <code>C:\Libs\protobuf-2.4.1\python</code>.</li>
-<li>Build: <code>python setup.py build</code></li>
-<li>Install: <code>python setup.py install</code></li>
-<li>Done. Then you can e.g. <code>from google.protobuf import descriptor</code> and use e.g. <code>descriptor.FileDescriptor()</code> in <strong>.py</strong> source code.</li>
-</ul>
-</li>
-<li><strong>Install by copy files directly:</strong> (Take <strong>OpenCV</strong> as am example in <code>C:\Libs\OpenCV-2.3.1</code>)<ul>
-<li>Copy <strong>cy.py</strong> and <strong>cv2.pyd</strong> from folder <code>C:\Libs\OpenCV-2.3.1\build\python\2.7</code> to <code>C:\Anaconda\Lib\site-packages</code>.</li>
-<li>Done. Then you can <code>import cv/cv2</code> and use e.g. <code>cv2.imwrite()</code> in <strong>.py</strong> source code.</li>
-</ul>
+<h1 id="Add-libs"><a href="#Add-libs" class="headerlink" title="Add libs"></a>Add libs</h1><h2 id="Online-install"><a href="#Online-install" class="headerlink" title="Online install"></a>Online install</h2><h3 id="Install-directly"><a href="#Install-directly" class="headerlink" title="Install directly"></a>Install directly</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install xxx</span><br></pre></td></tr></table></figure>
+<h3 id="Via-Anaconda-cloud"><a href="#Via-Anaconda-cloud" class="headerlink" title="Via Anaconda cloud"></a>Via Anaconda cloud</h3><ol>
+<li>Search the lib on <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a></li>
+<li>Use the command listed on the lib page<blockquote>
+<p>Take OpenCV as an example, run </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install -c conda-forge opencv</span><br></pre></td></tr></table></figure>
+</blockquote>
 </li>
 </ol>
-<h5 id="Run-Python"><a href="#Run-Python" class="headerlink" title="Run Python"></a>Run Python</h5><ol>
-<li>Run <strong>Anaconda Command Prompt</strong> under Anaconda’s start menu.</li>
+<h2 id="Offline-install"><a href="#Offline-install" class="headerlink" title="Offline install"></a>Offline install</h2><h3 id="tar-bz2-type1"><a href="#tar-bz2-type1" class="headerlink" title="tar.bz2 type1"></a><code>tar.bz2</code> type<sup><a href="#fn_1" id="reffn_1">1</a></sup></h3><ol>
+<li>Download lib of type <code>tar.bz2</code> (e.g. search <a href="https://anaconda.org/" target="_blank" rel="noopener">Anaconda Cloud</a>)<blockquote>
+<p>Note: download the lib with correct PC versions, including</p>
+<ul>
+<li><strong>Python</strong> (e.g. lib name contains like <code>py37</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python</span><br></pre></td></tr></table></figure></li>
+<li><strong>CUDA</strong> (e.g. lib name contains like <code>cuda92</code>), which can be checked on PC via cmd  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvcc --version</span><br></pre></td></tr></table></figure></li>
+</ul>
+</blockquote>
+</li>
+<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install --use-local xxx.tar.bz2</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="whl-type"><a href="#whl-type" class="headerlink" title="whl type"></a><code>whl</code> type</h3><blockquote>
+<p>Some <code>whl</code> libs are available at <a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/" target="_blank" rel="noopener">Unofficial Windows Binaries for Python Extension Packages</a> | <a href="https://pypi.org/simple/dlib/" target="_blank" rel="noopener">dlib</a>.</p>
+</blockquote>
+<ol>
+<li>Download lib of type <code>whl</code> (must match local Python and CUDA versions as above)</li>
+<li>Install in cmd   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install xx.whl</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="From-source"><a href="#From-source" class="headerlink" title="From source"></a>From source</h3><p>Take <strong>dlib</strong> as an example</p>
+<ol>
+<li>Download its source <a href="https://pypi.org/project/dlib/" target="_blank" rel="noopener">here</a> (e.g. <strong>dlib-19.19.0.tar.gz</strong>).</li>
+<li>Extract it and run cmd (may need to run twice) in the folder   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><ol>
+<li>Run <strong>Anaconda Command Prompt</strong> or <strong>cmd</strong> (with <code>activate</code> command).</li>
 <li>Change to the folder that contains the Python file that you want (assume <strong>xxx.py</strong>) to run.</li>
-<li>Run: <code>&gt; python xxx.py</code>.</li>
+<li>Run   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python xxx.py</span><br></pre></td></tr></table></figure>
+</li>
 </ol>
+<blockquote id="fn_1">
+<sup>1</sup>. <a href="https://blog.csdn.net/qq_33039859/article/details/80785535" target="_blank" rel="noopener">Conda install 本地压缩包文件tar.bz2</a><a href="#reffn_1" title="Jump back to footnote [1] in the text."> &#8617;</a>
+</blockquote>
 
     </div>
 
@@ -293,6 +318,7 @@
       <footer class="post-footer">
           
           <div class="post-tags">
+              <a href="/tags/setup/" rel="tag"><i class="fa fa-tag"></i> setup</a>
               <a href="/tags/coding/" rel="tag"><i class="fa fa-tag"></i> coding</a>
               <a href="/tags/python/" rel="tag"><i class="fa fa-tag"></i> python</a>
           </div>
@@ -375,7 +401,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Setup-Python-environment-in-Windows-using-Anaconda"><span class="nav-number">1.</span> <span class="nav-text">Setup Python environment in Windows: (using Anaconda)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Install-external-libraries-3-different-ways"><span class="nav-number">2.</span> <span class="nav-text">Install external libraries (3 different ways):</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Run-Python"><span class="nav-number">3.</span> <span class="nav-text">Run Python</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Install"><span class="nav-number">1.</span> <span class="nav-text">Install</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Add-libs"><span class="nav-number">2.</span> <span class="nav-text">Add libs</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Online-install"><span class="nav-number">2.1.</span> <span class="nav-text">Online install</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Install-directly"><span class="nav-number">2.1.1.</span> <span class="nav-text">Install directly</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Via-Anaconda-cloud"><span class="nav-number">2.1.2.</span> <span class="nav-text">Via Anaconda cloud</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Offline-install"><span class="nav-number">2.2.</span> <span class="nav-text">Offline install</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tar-bz2-type1"><span class="nav-number">2.2.1.</span> <span class="nav-text">tar.bz2 type1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#whl-type"><span class="nav-number">2.2.2.</span> <span class="nav-text">whl type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#From-source"><span class="nav-number">2.2.3.</span> <span class="nav-text">From source</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Run"><span class="nav-number">3.</span> <span class="nav-text">Run</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -527,7 +553,7 @@
   var disqus_config = function() {
     this.page.url = "https://blog-tommyhu.github.io/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/";
     this.page.identifier = "2013/10/05/Running-Python-in-Windows-and-install-external-libraries/";
-    this.page.title = "Running Python in Windows and install external libraries";
+    this.page.title = "Running Python via Anaconda";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
