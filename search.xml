@@ -1,77 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Build Boost for x32/x64 VC++ compilers on Windows</title>
-    <url>/2013/01/02/Build-Boost-for-x32-x64-VC-compilers-on-Windows/</url>
-    <content><![CDATA[<p><a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> is a set of libraries for the C++ programming language that provide support for tasks and structures such as linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions, and unit testing. Steps to build Boost for x32/x64 VC++ compilers on Windows are as follows:</p>
-<ol>
-<li>Download <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> and extract it to PC (assume <code>C:\Libs\boost_1_47_0</code>).</li>
-<li>Double click to run <code>bootstrap.bat</code> in Boost’s root folder, which will generate <code>bjam.exe</code> (and <code>b2.exe</code>…) in the same folder.</li>
-<li>Run <strong>VC++</strong>.</li>
-<li><code>VC++ &gt; Tools &gt; Visual Studio Command Prompt</code>.</li>
-<li><p>In the command window, first change working folder to <code>C:\Libs\boost_1_47_0</code> and type the following command (Note: it will take a long time to finish, which is depended on your system, 20min for me.):</p>
- <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">bjam --build-<span class="built_in">type</span>=complete toolset=msvc-<span class="number">10</span>.<span class="number">0</span> threading=multi link=static address-model=<span class="number">64</span></span><br></pre></td></tr></table></figure></li>
-<li>Setup VC++. Two steps need to be done.<ul>
-<li>Add <code>C:\Libs\boost_1_47_0</code> to project Include files.</li>
-<li>Add <code>C:\Libs\boost_1_47_0\stage\lib</code> to project Library files.</li>
-</ul>
-</li>
-</ol>
-<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><p>The above step will build <strong>static Boost libraries for x64 VC++</strong>. Options can be modified in step 5 to build it for other versions’ VC++, see the following table for details.</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Command</th>
-<th style="text-align:center">Options</th>
-<th style="text-align:center">Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">toolset</td>
-<td style="text-align:center"><span style="color:red">msvc-6.5</span> <br> <span style="color:red">msvc-8.0</span> <br> <span style="color:red">msvc-9.0</span> <br> <span style="color:red">msvc-10.0</span> <br> <span style="color:red">msvc-11.0</span> <br> <span style="color:red">msvc-12.0</span></td>
-<td style="text-align:center">Visual Studio 6.0, Service Pack 5 <br> Visual Studio 2005 <br> Visual Studio 2008 <br> Visual Studio 2010 <br> Visual Studio 2012 <br> Visual Studio 2013</td>
-</tr>
-<tr>
-<td style="text-align:center">link</td>
-<td style="text-align:center"><span style="color:red">static</span> <br> <span style="color:red">shared</span></td>
-<td style="text-align:center">static libraries <br> shared libraries</td>
-</tr>
-<tr>
-<td style="text-align:center">address-model</td>
-<td style="text-align:center"><span style="color:red">32</span> <br> <span style="color:red">64</span></td>
-<td style="text-align:center">x32 VC++ compilers <br> x64 VC++ compilers</td>
-</tr>
-</tbody>
-</table>
-</div>
-]]></content>
-      <tags>
-        <tag>setup</tag>
-        <tag>boost</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Character encodings of text files</title>
-    <url>/2013/01/21/Character-encodings-of-text-files/</url>
-    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
-<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
-<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
-<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
-</ol>
-]]></content>
-      <tags>
-        <tag>encoding</tag>
-        <tag>text</tag>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Blogging via Hexo</title>
     <url>/2020/04/29/Blogging-via-Hexo/</url>
     <content><![CDATA[<p>I recently moved my blog here using <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> instead of previous <a href="http://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a>, though the old version is still <a href="http://blog-ythu.github.io/" target="_blank" rel="noopener">available</a>. Hexo is a fast, simple &amp; powerful blog framework. Compared with Jekyll, Hexo is more flexible in terms of setup, post writing via Markdown, tags, themes, content searching, 3rd-part plugin support, etc.</p>
@@ -170,8 +99,8 @@
 </blockquote>
 ]]></content>
       <tags>
-        <tag>setup</tag>
         <tag>hexo</tag>
+        <tag>setup</tag>
       </tags>
   </entry>
   <entry>
@@ -200,8 +129,97 @@ The difference is that: the first method <strong>only copy the listed files</str
 </ol>
 ]]></content>
       <tags>
-        <tag>coding</tag>
         <tag>cmake</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>DOS sumup</title>
+    <url>/2012/04/06/DOS-sumup/</url>
+    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
+<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
+<li><p>Get all file names</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Get all file full paths</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>dos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Character encodings of text files</title>
+    <url>/2013/01/21/Character-encodings-of-text-files/</url>
+    <content><![CDATA[<p>A text file can be encoded in many different <a href="http://en.wikipedia.org/wiki/Character_encoding" target="_blank" rel="noopener">character encodings</a>. There are many <a href="http://en.wikipedia.org/wiki/Windows_code_page" target="_blank" rel="noopener">encoding variations</a> even just for Windows system. Special attention has to be given when handling text files with different character encodings, e.g. if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF-8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>.</p>
+<p>In this post, given a text file, I will show how to get its character encoding and how to convert it from one character encoding to another.</p>
+<h2 id="Get-the-character-encoding-of-a-text-file"><a href="#Get-the-character-encoding-of-a-text-file" class="headerlink" title="Get the character encoding of a text file"></a>Get the character encoding of a text file</h2><p>Actually, <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">in many cases</a>, we cannot be sure about which character encoding a file is encoded. In the following, I will only give the method to get a text file’s character encoding if its character encoding can only be 4 basic ones, namely <code>ANSI</code>, <code>Unicode</code>, <code>Unicode big endian</code> and <code>UTF-8 (with BOM)</code>. These 4 encodings are all Notepad supports.  It cannot guarantee to give the correct answer if not satisfy this, e.g. it will be considered as a ANSI file if it’s UTF-8 (without BOM). See the following code (based on <a href="http://hi.baidu.com/whmtorrent/item/932d270a1dc4787abee97e4f" target="_blank" rel="noopener">[1]</a> <a href="http://stackoverflow.com/questions/9103294/c-how-to-inspect-file-byte-order-mark-in-order-to-get-if-it-is-utf-8" target="_blank" rel="noopener">[2]</a>).</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 0 - ANSI</span></span><br><span class="line"><span class="comment">// 1 - Unicode</span></span><br><span class="line"><span class="comment">// 2 - Unicode big endian</span></span><br><span class="line"><span class="comment">// 3 - UTF-8</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> only correct for handling normal encodings (i.e. see NOTEPAD's 4 types)</span></span><br><span class="line"><span class="comment">//        , eg. UTF-8 with BOM, if UTF-8 without BOM, will considered as ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_text_file_encoding</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> nReturn = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> uniTxt[] = &#123;<span class="number">0xFF</span>, <span class="number">0xFE</span>&#125;;<span class="comment">// Unicode file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> endianTxt[] = &#123;<span class="number">0xFE</span>, <span class="number">0xFF</span>&#125;;<span class="comment">// Unicode big endian file header</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> utf8Txt[] = &#123;<span class="number">0xEF</span>, <span class="number">0xBB</span>&#125;;<span class="comment">// UTF_8 file header</span></span><br><span class="line"></span><br><span class="line">    DWORD dwBytesRead = <span class="number">0</span>;</span><br><span class="line">    HANDLE hFile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, <span class="literal">NULL</span>, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (hFile == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        hFile = <span class="literal">NULL</span>;</span><br><span class="line">        CloseHandle(hFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    BYTE *lpHeader = <span class="keyword">new</span> BYTE[<span class="number">2</span>];</span><br><span class="line">    ReadFile(hFile, lpHeader, <span class="number">2</span>, &amp;dwBytesRead, <span class="literal">NULL</span>);</span><br><span class="line">    CloseHandle(hFile);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == uniTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == uniTxt[<span class="number">1</span>])<span class="comment">// Unicode file</span></span><br><span class="line">        nReturn = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == endianTxt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == endianTxt[<span class="number">1</span>])<span class="comment">//  Unicode big endian file</span></span><br><span class="line">        nReturn = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lpHeader[<span class="number">0</span>] == utf8Txt[<span class="number">0</span>] &amp;&amp; lpHeader[<span class="number">1</span>] == utf8Txt[<span class="number">1</span>])<span class="comment">// UTF-8 file</span></span><br><span class="line">        nReturn = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nReturn = <span class="number">0</span>;   <span class="comment">//Ascii</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> []lpHeader;</span><br><span class="line">    <span class="keyword">return</span> nReturn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Convert-from-one-character-encoding-to-another"><a href="#Convert-from-one-character-encoding-to-another" class="headerlink" title="Convert from one character encoding to another"></a>Convert from one character encoding to another</h2><p>As the example goes in the beginning that if we use <code>fstream</code>‘s <code>getline()</code> to read from a text file (contains Chinese) in <code>UTF8</code>, we will get gibberish characters, while will be correct if the text file is in <code>ANSI</code>, in the following, only 2 converting methods will be given, namely <code>UTF-8 (with BOM)</code> to <code>ANSI</code> and <code>UTF-8 (without BOM)</code> to <code>ANSI</code>. See the following code (based on <a href="http://m.oschina.net/blog/17457" target="_blank" rel="noopener">[3]</a> <a href="http://blog.csdn.net/afjafjafj2008/article/details/6620617" target="_blank" rel="noopener">[4]</a>). Conversions between <code>UTF-8</code>, <code>UTF-16</code> and <code>UTF-32</code> can be seen from <a href="http://my.oschina.net/zhangzhihao/blog/70462" target="_blank" rel="noopener">[5]</a>.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// change a char's encoding from UTF8 to ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">char</span>* <span class="title">change_encoding_from_UTF8_to_ANSI</span><span class="params">(<span class="keyword">char</span>* szU8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> wcsLen = ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">wchar_t</span>* wszString = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[wcsLen + <span class="number">1</span>];</span><br><span class="line">    ::MultiByteToWideChar(CP_UTF8, <span class="literal">NULL</span>, szU8, <span class="built_in">strlen</span>(szU8), wszString, wcsLen);</span><br><span class="line">    wszString[wcsLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ansiLen = ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">char</span>* szAnsi = <span class="keyword">new</span> <span class="keyword">char</span>[ansiLen + <span class="number">1</span>];</span><br><span class="line">    ::WideCharToMultiByte(CP_ACP, <span class="literal">NULL</span>, wszString, wcslen(wszString), szAnsi, ansiLen, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    szAnsi[ansiLen] = <span class="string">'\0'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> szAnsi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (with BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_with_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// the first 3 bytes (ef bb bf) is UTF-8 header flags</span></span><br><span class="line">        <span class="comment">// all the others are single byte ASCII code.</span></span><br><span class="line">        <span class="comment">// should delete these 3 when output</span></span><br><span class="line">        getline(infile, strLine);</span><br><span class="line">        strResult += strLine.substr(<span class="number">3</span>)+<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// read UTF-8 (without BOM) file and convert it to be in ANSI</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">change_text_file_encoding_from_UTF8_without_BOM_to_ANSI</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ifstream infile;</span><br><span class="line">    <span class="built_in">string</span> strLine=<span class="string">""</span>;</span><br><span class="line">    <span class="built_in">string</span> strResult=<span class="string">""</span>;</span><br><span class="line">    infile.open(filename);</span><br><span class="line">    <span class="keyword">if</span> (infile)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(!infile.eof())</span><br><span class="line">        &#123;</span><br><span class="line">            getline(infile, strLine);</span><br><span class="line">            strResult += strLine+<span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    infile.close();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* changeTemp=<span class="keyword">new</span> <span class="keyword">char</span>[strResult.length()];</span><br><span class="line">    <span class="built_in">strcpy</span>(changeTemp, strResult.c_str());</span><br><span class="line">    <span class="keyword">char</span>* changeResult = change_encoding_from_UTF8_to_ANSI(changeTemp);</span><br><span class="line">    strResult=changeResult;</span><br><span class="line"></span><br><span class="line">    ofstream outfile;</span><br><span class="line">    outfile.open(filename);</span><br><span class="line">    outfile.write(strResult.c_str(),strResult.length());</span><br><span class="line">    outfile.flush();</span><br><span class="line">    outfile.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li>What Every Programmer Absolutely, Positively Needs To Know About Encodings And Character Sets To Work With Text: <a href="http://kunststube.net/encoding/" target="_blank" rel="noopener">http://kunststube.net/encoding/</a></li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>encoding</tag>
+        <tag>text</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Build Boost for x32/x64 VC++ compilers on Windows</title>
+    <url>/2013/01/02/Build-Boost-for-x32-x64-VC-compilers-on-Windows/</url>
+    <content><![CDATA[<p><a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> is a set of libraries for the C++ programming language that provide support for tasks and structures such as linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions, and unit testing. Steps to build Boost for x32/x64 VC++ compilers on Windows are as follows:</p>
+<ol>
+<li>Download <a href="http://www.boost.org/" target="_blank" rel="noopener">Boost</a> and extract it to PC (assume <code>C:\Libs\boost_1_47_0</code>).</li>
+<li>Double click to run <code>bootstrap.bat</code> in Boost’s root folder, which will generate <code>bjam.exe</code> (and <code>b2.exe</code>…) in the same folder.</li>
+<li>Run <strong>VC++</strong>.</li>
+<li><code>VC++ &gt; Tools &gt; Visual Studio Command Prompt</code>.</li>
+<li><p>In the command window, first change working folder to <code>C:\Libs\boost_1_47_0</code> and type the following command (Note: it will take a long time to finish, which is depended on your system, 20min for me.):</p>
+ <figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">bjam --build-<span class="built_in">type</span>=complete toolset=msvc-<span class="number">10</span>.<span class="number">0</span> threading=multi link=static address-model=<span class="number">64</span></span><br></pre></td></tr></table></figure></li>
+<li>Setup VC++. Two steps need to be done.<ul>
+<li>Add <code>C:\Libs\boost_1_47_0</code> to project Include files.</li>
+<li>Add <code>C:\Libs\boost_1_47_0\stage\lib</code> to project Library files.</li>
+</ul>
+</li>
+</ol>
+<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><p>The above step will build <strong>static Boost libraries for x64 VC++</strong>. Options can be modified in step 5 to build it for other versions’ VC++, see the following table for details.</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Command</th>
+<th style="text-align:center">Options</th>
+<th style="text-align:center">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">toolset</td>
+<td style="text-align:center"><span style="color:red">msvc-6.5</span> <br> <span style="color:red">msvc-8.0</span> <br> <span style="color:red">msvc-9.0</span> <br> <span style="color:red">msvc-10.0</span> <br> <span style="color:red">msvc-11.0</span> <br> <span style="color:red">msvc-12.0</span></td>
+<td style="text-align:center">Visual Studio 6.0, Service Pack 5 <br> Visual Studio 2005 <br> Visual Studio 2008 <br> Visual Studio 2010 <br> Visual Studio 2012 <br> Visual Studio 2013</td>
+</tr>
+<tr>
+<td style="text-align:center">link</td>
+<td style="text-align:center"><span style="color:red">static</span> <br> <span style="color:red">shared</span></td>
+<td style="text-align:center">static libraries <br> shared libraries</td>
+</tr>
+<tr>
+<td style="text-align:center">address-model</td>
+<td style="text-align:center"><span style="color:red">32</span> <br> <span style="color:red">64</span></td>
+<td style="text-align:center">x32 VC++ compilers <br> x64 VC++ compilers</td>
+</tr>
+</tbody>
+</table>
+</div>
+]]></content>
+      <tags>
+        <tag>setup</tag>
+        <tag>boost</tag>
       </tags>
   </entry>
   <entry>
@@ -331,24 +349,6 @@ The difference is that: the first method <strong>only copy the listed files</str
 ]]></content>
       <tags>
         <tag>conversion</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>DOS sumup</title>
-    <url>/2012/04/06/DOS-sumup/</url>
-    <content><![CDATA[<h2 id="Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level"><a href="#Upgrade-the-structure-of-all-files-in-current-folder-including-sub-folders-and-sub-sub-folders…-by-one-level" class="headerlink" title="Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level"></a>Upgrade the structure of all files in current folder (including sub-folders and sub-sub-folders…) by one level</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> /r %x <span class="keyword">in</span> (*.*) <span class="keyword">do</span> move <span class="string">"%x"</span> <span class="string">"%x"</span>/../..</span><br></pre></td></tr></table></figure>
-<h2 id="Get-all-file-names-absolute-paths-in-current-folder-to-txt"><a href="#Get-all-file-names-absolute-paths-in-current-folder-to-txt" class="headerlink" title="Get all file names (absolute paths) in current folder to txt"></a>Get all file names (absolute paths) in current folder to txt</h2><ul>
-<li><p>Get all file names</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Get all file full paths</p>
-  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Dir /s /b *.* &gt; list.txt</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>dos</tag>
       </tags>
   </entry>
   <entry>
@@ -609,6 +609,46 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>IO sumup</title>
+    <url>/2012/01/01/IO-sumup/</url>
+    <content><![CDATA[<h2 id="using-C-FILE-stdio-h"><a href="#using-C-FILE-stdio-h" class="headerlink" title="using C - FILE (stdio.h)"></a>using C - FILE (stdio.h)</h2><ul>
+<li><p>文件的类型: 二进制文件/一般文件, 只是读取和写入的方式不一样罢了</p>
+<ul>
+<li><p>读取一般文件: (写类似)</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FILE *fi;</span><br><span class="line">fi=fopen(<span class="string">"15.dat"</span>,<span class="string">"r"</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>读取二进制文件: (写类似)</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FILE *fi;</span><br><span class="line">fi=fopen(<span class="string">"15.dat"</span>,<span class="string">"rb"</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>读数据: (写类似)</p>
+<ul>
+<li><p>数据规整的话 (均为同一类型) 可以全部读出, Like:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FILE * fi2;</span><br><span class="line"><span class="keyword">float</span> * data2 =<span class="keyword">new</span> <span class="keyword">float</span>[length*width*heigth];</span><br><span class="line">fi2=fopen(<span class="string">"1.bin"</span>,<span class="string">"rb"</span>);</span><br><span class="line">fread(data2, <span class="keyword">sizeof</span>(<span class="keyword">float</span>), length*width*heigth, fi2);</span><br></pre></td></tr></table></figure></li>
+<li><p>不规整的话: Like:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">float</span> x,y,z,t,f;</span><br><span class="line"><span class="comment">//get to the real data point, start reading</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">&#123;</span><br><span class="line">    res = <span class="built_in">fscanf</span>(fi, <span class="string">"%f %f %f %f %f"</span>, &amp;x, &amp;y, &amp;z, &amp;t, &amp;f);</span><br><span class="line">&#125; <span class="keyword">while</span> (res != EOF &amp;&amp; res == <span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+<p>NOTE: 写用</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">fprintf</span>(fo, <span class="string">"%f\t%f\t0.0\n"</span>, a, b);</span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">fwrite (x, <span class="number">1</span>, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) , fo );</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p><em>特别注意</em>: fprintf 对应fscanf, fwrite对应fread, 别搞混了!!!</p>
+<ul>
+<li><p>忽略前面的说明信息, 找到真正的开始点再读取:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//look for a starting point</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">&#123;</span><br><span class="line">    res=<span class="built_in">fscanf</span>(fi,<span class="string">"%100s"</span>, stub);</span><br><span class="line">&#125; <span class="keyword">while</span> (res != EOF &amp;&amp; stricmp(stub, <span class="string">"aaaaa"</span>)!=<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>  注: aaaaa为你真正数据的上一个信息, 下一个就为真实数据</p>
+</li>
+</ul>
+<h2 id="using-C-fstream-fstream-h"><a href="#using-C-fstream-fstream-h" class="headerlink" title="using C++ - fstream (fstream.h)"></a>using C++ - fstream (fstream.h)</h2><p>cc: <a href="http://www.newxing.com/Tech/Program/Cpp/577.html" target="_blank" rel="noopener">http://www.newxing.com/Tech/Program/Cpp/577.html</a></p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>i/o</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Host code via Bitbucket</title>
     <url>/2013/01/22/Host-code-via-Bitbucket/</url>
     <content><![CDATA[<p>Similar to <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>, <a href="https://bitbucket.org/" target="_blank" rel="noopener">Bitbucket</a> makes it very easy to host your code. We all know that GitHub works great for open-source. However, you have to pay if you want to create private repositories. On the other hand, Bitbucket enables you to create unlimited free private repositories. This is an important reason why more and more people are using Bitbucket nowadays. In this post, I will show how to use Bitbucket to easily host your code (over <a href="http://tortoisehg.bitbucket.org/" target="_blank" rel="noopener">TortoiseHg</a> specifically).</p>
@@ -768,43 +808,43 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>IO sumup</title>
-    <url>/2012/01/01/IO-sumup/</url>
-    <content><![CDATA[<h2 id="using-C-FILE-stdio-h"><a href="#using-C-FILE-stdio-h" class="headerlink" title="using C - FILE (stdio.h)"></a>using C - FILE (stdio.h)</h2><ul>
-<li><p>文件的类型: 二进制文件/一般文件, 只是读取和写入的方式不一样罢了</p>
-<ul>
-<li><p>读取一般文件: (写类似)</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FILE *fi;</span><br><span class="line">fi=fopen(<span class="string">"15.dat"</span>,<span class="string">"r"</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>读取二进制文件: (写类似)</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FILE *fi;</span><br><span class="line">fi=fopen(<span class="string">"15.dat"</span>,<span class="string">"rb"</span>);</span><br></pre></td></tr></table></figure></li>
-</ul>
+    <title>MATLAB sumup</title>
+    <url>/2012/08/30/MATLAB-sumup/</url>
+    <content><![CDATA[<h2 id="Get-rect-from-mouse"><a href="#Get-rect-from-mouse" class="headerlink" title="Get rect from mouse"></a>Get rect from mouse</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imshow(<span class="string">'test.jpg'</span>);</span><br><span class="line">rect = getrect;</span><br></pre></td></tr></table></figure>
+<h2 id="对话框-dialog-box"><a href="#对话框-dialog-box" class="headerlink" title="对话框 dialog box"></a>对话框 dialog box</h2><p>cc: <a href="http://hi.baidu.com/7777777_shu/item/ccb713f20ce99e18d7ff8cda" target="_blank" rel="noopener">matlab GUI之对话框</a></p>
+<h2 id="多个string连接"><a href="#多个string连接" class="headerlink" title="多个string连接"></a>多个string连接</h2><ol>
+<li><p><code>sprintf</code></p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br></pre></td></tr></table></figure></li>
+<li><p>strcat</p>
+ <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>读数据: (写类似)</p>
-<ul>
-<li><p>数据规整的话 (均为同一类型) 可以全部读出, Like:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FILE * fi2;</span><br><span class="line"><span class="keyword">float</span> * data2 =<span class="keyword">new</span> <span class="keyword">float</span>[length*width*heigth];</span><br><span class="line">fi2=fopen(<span class="string">"1.bin"</span>,<span class="string">"rb"</span>);</span><br><span class="line">fread(data2, <span class="keyword">sizeof</span>(<span class="keyword">float</span>), length*width*heigth, fi2);</span><br></pre></td></tr></table></figure></li>
-<li><p>不规整的话: Like:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">float</span> x,y,z,t,f;</span><br><span class="line"><span class="comment">//get to the real data point, start reading</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">&#123;</span><br><span class="line">    res = <span class="built_in">fscanf</span>(fi, <span class="string">"%f %f %f %f %f"</span>, &amp;x, &amp;y, &amp;z, &amp;t, &amp;f);</span><br><span class="line">&#125; <span class="keyword">while</span> (res != EOF &amp;&amp; res == <span class="number">5</span>);</span><br></pre></td></tr></table></figure>
-<p>NOTE: 写用</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">fprintf</span>(fo, <span class="string">"%f\t%f\t0.0\n"</span>, a, b);</span><br></pre></td></tr></table></figure>
-<p>或</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">fwrite (x, <span class="number">1</span>, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) , fo );</span><br></pre></td></tr></table></figure>
+</ol>
+<h2 id="获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名"><a href="#获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名" class="headerlink" title="获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)"></a>获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[pathstr,realname,ext] = fileparts(<span class="string">'C:\\images\\test.bmp'</span>);</span><br></pre></td></tr></table></figure>
+<p>=&gt;</p>
+<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">pathstr = <span class="string">'C:\images\'</span></span><br><span class="line"><span class="string">realname = '</span>test'</span><br><span class="line">ext = <span class="string">'.bmp'</span></span><br></pre></td></tr></table></figure>
+<h2 id="UI获取文件名和文件夹"><a href="#UI获取文件名和文件夹" class="headerlink" title="UI获取文件名和文件夹"></a>UI获取文件名和文件夹</h2><ul>
+<li><p>文件</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[filename, pathname] = uigetfile(&#123;<span class="string">'*.*'</span>;<span class="string">'*.avi'</span>;<span class="string">'*.mpg'</span>;<span class="string">'*.wmv'</span>;<span class="string">'*.asf'</span>;<span class="string">'*.asx'</span>;<span class="string">'*.mj2'</span>&#125;, <span class="string">'Select a VIDEO file...'</span>);</span><br><span class="line">video_file_name = fullfile(pathname, filename); <span class="comment">% use fullfile for OS independent</span></span><br></pre></td></tr></table></figure></li>
+<li><p>文件夹</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">output_images_folder = uigetdir(pwd, <span class="string">'Select the FOLDER where to save images...'</span>)</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
+<h2 id="遍历文件夹内所有-指定类型-文件"><a href="#遍历文件夹内所有-指定类型-文件" class="headerlink" title="遍历文件夹内所有(指定类型)文件"></a>遍历文件夹内所有(指定类型)文件</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">data_pwd = uigetdir;</span><br><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br><span class="line">filearray = dir(file_temp);</span><br><span class="line">s=<span class="built_in">max</span>(<span class="built_in">size</span>(filearray));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:s</span><br><span class="line">    imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="获取image的长-宽和channel数"><a href="#获取image的长-宽和channel数" class="headerlink" title="获取image的长, 宽和channel数"></a>获取image的长, 宽和channel数</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">img = imread(<span class="string">'C:\Users\tommyhu\Desktop\test\frame_0000.bmp'</span>);</span><br><span class="line">[h, w, c] = <span class="built_in">size</span>(img);</span><br></pre></td></tr></table></figure>
+<h2 id="遍历video的每一帧"><a href="#遍历video的每一帧" class="headerlink" title="遍历video的每一帧"></a>遍历video的每一帧</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">mov = VideoReader(video_file_name);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:mov.numberofframes</span><br><span class="line">    b=read(mov,<span class="built_in">i</span>);</span><br><span class="line">	... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="获取用户输入"><a href="#获取用户输入" class="headerlink" title="获取用户输入"></a>获取用户输入</h2><ul>
+<li><p>命令行方式</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">strResponse = input(<span class="string">'Do you want more? Y/N [Y]: '</span>, <span class="string">'s'</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>UI方式</p>
+  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">prompt = &#123; <span class="string">'from:'</span>,<span class="string">'to:'</span>,<span class="string">'step'</span>&#125;;</span><br><span class="line">dlg_title = <span class="string">'choose images'</span>;</span><br><span class="line">num_lines = [<span class="number">4</span> <span class="number">1</span> <span class="number">3</span>]; <span class="comment">% can be a scaler number that applies to all</span></span><br><span class="line">defAns = &#123;<span class="string">'0'</span>, <span class="string">''</span>, <span class="string">'1'</span>&#125;;</span><br><span class="line">options = <span class="string">'on'</span>; <span class="comment">% enable to resize window</span></span><br><span class="line">answer = inputdlg(prompt,dlg_title,num_lines,defAns);</span><br><span class="line"></span><br><span class="line">from=str2num(cell2mat(answer(<span class="number">1</span>)));</span><br><span class="line">to=str2num(cell2mat(answer(<span class="number">2</span>)));</span><br><span class="line">stepsize=str2num(cell2mat(answer(<span class="number">3</span>)));</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<p><em>特别注意</em>: fprintf 对应fscanf, fwrite对应fread, 别搞混了!!!</p>
-<ul>
-<li><p>忽略前面的说明信息, 找到真正的开始点再读取:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//look for a starting point</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">&#123;</span><br><span class="line">    res=<span class="built_in">fscanf</span>(fi,<span class="string">"%100s"</span>, stub);</span><br><span class="line">&#125; <span class="keyword">while</span> (res != EOF &amp;&amp; stricmp(stub, <span class="string">"aaaaa"</span>)!=<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
-<p>  注: aaaaa为你真正数据的上一个信息, 下一个就为真实数据</p>
-</li>
-</ul>
-<h2 id="using-C-fstream-fstream-h"><a href="#using-C-fstream-fstream-h" class="headerlink" title="using C++ - fstream (fstream.h)"></a>using C++ - fstream (fstream.h)</h2><p>cc: <a href="http://www.newxing.com/Tech/Program/Cpp/577.html" target="_blank" rel="noopener">http://www.newxing.com/Tech/Program/Cpp/577.html</a></p>
+<h2 id="输出到txt"><a href="#输出到txt" class="headerlink" title="输出到txt"></a>输出到txt</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">fileID = fopen(<span class="string">'faces.txt'</span>, <span class="string">'w'</span>);</span><br><span class="line">fprintf(fileID,<span class="string">'[%4.2f,%d,%d,%d]\n'</span>, x, y, z, t);</span><br><span class="line">fclose(fileID);</span><br></pre></td></tr></table></figure>
+<h2 id="Functions-with-required-and-optional-inputs"><a href="#Functions-with-required-and-optional-inputs" class="headerlink" title="Functions with required and optional inputs"></a>Functions with required and optional inputs</h2><p>Refer to <a href="http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html" target="_blank" rel="noopener">http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html</a>.</p>
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>i/o</tag>
+        <tag>matlab</tag>
       </tags>
   </entry>
   <entry>
@@ -849,8 +889,8 @@ The difference is that: the first method <strong>only copy the listed files</str
 ]]></content>
       <tags>
         <tag>coding</tag>
-        <tag>mixed_programming</tag>
         <tag>matlab</tag>
+        <tag>mixed_programming</tag>
         <tag>c++</tag>
       </tags>
   </entry>
@@ -973,49 +1013,9 @@ The difference is that: the first method <strong>only copy the listed files</str
 ]]></content>
       <tags>
         <tag>coding</tag>
+        <tag>matlab</tag>
         <tag>mixed_programming</tag>
-        <tag>matlab</tag>
         <tag>c++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MATLAB sumup</title>
-    <url>/2012/08/30/MATLAB-sumup/</url>
-    <content><![CDATA[<h2 id="Get-rect-from-mouse"><a href="#Get-rect-from-mouse" class="headerlink" title="Get rect from mouse"></a>Get rect from mouse</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imshow(<span class="string">'test.jpg'</span>);</span><br><span class="line">rect = getrect;</span><br></pre></td></tr></table></figure>
-<h2 id="对话框-dialog-box"><a href="#对话框-dialog-box" class="headerlink" title="对话框 dialog box"></a>对话框 dialog box</h2><p>cc: <a href="http://hi.baidu.com/7777777_shu/item/ccb713f20ce99e18d7ff8cda" target="_blank" rel="noopener">matlab GUI之对话框</a></p>
-<h2 id="多个string连接"><a href="#多个string连接" class="headerlink" title="多个string连接"></a>多个string连接</h2><ol>
-<li><p><code>sprintf</code></p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br></pre></td></tr></table></figure></li>
-<li><p>strcat</p>
- <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名"><a href="#获取文件绝对路径的各个部分-e-g-目录path-文件名-扩展名" class="headerlink" title="获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)"></a>获取文件绝对路径的各个部分 (e.g. 目录path, 文件名, 扩展名)</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[pathstr,realname,ext] = fileparts(<span class="string">'C:\\images\\test.bmp'</span>);</span><br></pre></td></tr></table></figure>
-<p>=&gt;</p>
-<figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">pathstr = <span class="string">'C:\images\'</span></span><br><span class="line"><span class="string">realname = '</span>test'</span><br><span class="line">ext = <span class="string">'.bmp'</span></span><br></pre></td></tr></table></figure>
-<h2 id="UI获取文件名和文件夹"><a href="#UI获取文件名和文件夹" class="headerlink" title="UI获取文件名和文件夹"></a>UI获取文件名和文件夹</h2><ul>
-<li><p>文件</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">[filename, pathname] = uigetfile(&#123;<span class="string">'*.*'</span>;<span class="string">'*.avi'</span>;<span class="string">'*.mpg'</span>;<span class="string">'*.wmv'</span>;<span class="string">'*.asf'</span>;<span class="string">'*.asx'</span>;<span class="string">'*.mj2'</span>&#125;, <span class="string">'Select a VIDEO file...'</span>);</span><br><span class="line">video_file_name = fullfile(pathname, filename); <span class="comment">% use fullfile for OS independent</span></span><br></pre></td></tr></table></figure></li>
-<li><p>文件夹</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">output_images_folder = uigetdir(pwd, <span class="string">'Select the FOLDER where to save images...'</span>)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="遍历文件夹内所有-指定类型-文件"><a href="#遍历文件夹内所有-指定类型-文件" class="headerlink" title="遍历文件夹内所有(指定类型)文件"></a>遍历文件夹内所有(指定类型)文件</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">data_pwd = uigetdir;</span><br><span class="line">file_temp = sprintf(<span class="string">'%s\\*.%s'</span>, data_pwd, input_type);</span><br><span class="line">filearray = dir(file_temp);</span><br><span class="line">s=<span class="built_in">max</span>(<span class="built_in">size</span>(filearray));</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:s</span><br><span class="line">    imgname=strcat(data_pwd,<span class="string">'\\'</span>,filearray(<span class="built_in">i</span>).name);</span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="获取image的长-宽和channel数"><a href="#获取image的长-宽和channel数" class="headerlink" title="获取image的长, 宽和channel数"></a>获取image的长, 宽和channel数</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">img = imread(<span class="string">'C:\Users\tommyhu\Desktop\test\frame_0000.bmp'</span>);</span><br><span class="line">[h, w, c] = <span class="built_in">size</span>(img);</span><br></pre></td></tr></table></figure>
-<h2 id="遍历video的每一帧"><a href="#遍历video的每一帧" class="headerlink" title="遍历video的每一帧"></a>遍历video的每一帧</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">mov = VideoReader(video_file_name);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:<span class="number">1</span>:mov.numberofframes</span><br><span class="line">    b=read(mov,<span class="built_in">i</span>);</span><br><span class="line">	... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="获取用户输入"><a href="#获取用户输入" class="headerlink" title="获取用户输入"></a>获取用户输入</h2><ul>
-<li><p>命令行方式</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">strResponse = input(<span class="string">'Do you want more? Y/N [Y]: '</span>, <span class="string">'s'</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>UI方式</p>
-  <figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">prompt = &#123; <span class="string">'from:'</span>,<span class="string">'to:'</span>,<span class="string">'step'</span>&#125;;</span><br><span class="line">dlg_title = <span class="string">'choose images'</span>;</span><br><span class="line">num_lines = [<span class="number">4</span> <span class="number">1</span> <span class="number">3</span>]; <span class="comment">% can be a scaler number that applies to all</span></span><br><span class="line">defAns = &#123;<span class="string">'0'</span>, <span class="string">''</span>, <span class="string">'1'</span>&#125;;</span><br><span class="line">options = <span class="string">'on'</span>; <span class="comment">% enable to resize window</span></span><br><span class="line">answer = inputdlg(prompt,dlg_title,num_lines,defAns);</span><br><span class="line"></span><br><span class="line">from=str2num(cell2mat(answer(<span class="number">1</span>)));</span><br><span class="line">to=str2num(cell2mat(answer(<span class="number">2</span>)));</span><br><span class="line">stepsize=str2num(cell2mat(answer(<span class="number">3</span>)));</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="输出到txt"><a href="#输出到txt" class="headerlink" title="输出到txt"></a>输出到txt</h2><figure class="highlight matlab"><table><tr><td class="code"><pre><span class="line">fileID = fopen(<span class="string">'faces.txt'</span>, <span class="string">'w'</span>);</span><br><span class="line">fprintf(fileID,<span class="string">'[%4.2f,%d,%d,%d]\n'</span>, x, y, z, t);</span><br><span class="line">fclose(fileID);</span><br></pre></td></tr></table></figure>
-<h2 id="Functions-with-required-and-optional-inputs"><a href="#Functions-with-required-and-optional-inputs" class="headerlink" title="Functions with required and optional inputs"></a>Functions with required and optional inputs</h2><p>Refer to <a href="http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html" target="_blank" rel="noopener">http://www.mathworks.com/help/matlab/matlab_prog/parse-function-inputs.html</a>.</p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>matlab</tag>
       </tags>
   </entry>
   <entry>
@@ -1059,156 +1059,6 @@ The difference is that: the first method <strong>only copy the listed files</str
       <tags>
         <tag>coding</tag>
         <tag>mfc</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OpenCV sumup</title>
-    <url>/2012/09/04/OpenCV-sumup/</url>
-    <content><![CDATA[<h2 id="Data-types-of-Mat"><a href="#Data-types-of-Mat" class="headerlink" title="Data types of Mat"></a>Data types of Mat</h2><div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Name</th>
-<th style="text-align:center">Data Type</th>
-<th style="text-align:center">Bit Size</th>
-<th style="text-align:center">Range</th>
-<th style="text-align:center">Other</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>CV_8U</code></td>
-<td style="text-align:center">uchar / unsigned char</td>
-<td style="text-align:center">8</td>
-<td style="text-align:center">0 ~ 255</td>
-<td style="text-align:center">Default for image data</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_8S</code></td>
-<td style="text-align:center">char</td>
-<td style="text-align:center">8</td>
-<td style="text-align:center">-128 ~ 127</td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_16U</code></td>
-<td style="text-align:center">ushort / unsigned short int</td>
-<td style="text-align:center">16</td>
-<td style="text-align:center">0 ~ 65535</td>
-<td style="text-align:center">unsigned short</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_16S</code></td>
-<td style="text-align:center">short int</td>
-<td style="text-align:center">16</td>
-<td style="text-align:center">-32768 ~ 32767</td>
-<td style="text-align:center">short</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_32S</code></td>
-<td style="text-align:center">int</td>
-<td style="text-align:center">32</td>
-<td style="text-align:center">-2147483648 ~ 2147483647</td>
-<td style="text-align:center">long</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_32F</code></td>
-<td style="text-align:center">float</td>
-<td style="text-align:center">32</td>
-<td style="text-align:center">\(1.18\times10^{-38}\) ~ \(3.40\times10^{38}\)</td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>CV_64F</code></td>
-<td style="text-align:center">double</td>
-<td style="text-align:center">64</td>
-<td style="text-align:center">\(2.23\times10^{-308}\) ~ \(1.79\times10^{308}\)</td>
-<td style="text-align:center"></td>
-</tr>
-</tbody>
-</table>
-</div>
-<h2 id="Conversion-between-Mat-and-IplImage"><a href="#Conversion-between-Mat-and-IplImage" class="headerlink" title="Conversion between Mat and IplImage"></a>Conversion between Mat and IplImage</h2><ol>
-<li><p><strong><code>IplImage *</code> to <code>Mat</code></strong>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *ipl_img;</span><br><span class="line"><span class="function">Mat <span class="title">mat_img</span><span class="params">(ipl_img)</span></span>;</span><br></pre></td></tr></table></figure></li>
-<li><p><strong><code>IplImage</code> to <code>Mat</code></strong>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage ipl_img;</span><br><span class="line">Mat mat_img = cv::cvarrToMat(&amp;ipl_img, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong><code>Mat</code> to <code>IplImage</code></strong>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat mat_img;</span><br><span class="line">IplImage ipl_img = mat_img;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="Access-pixel-intensity-values-of-images"><a href="#Access-pixel-intensity-values-of-images" class="headerlink" title="Access pixel intensity values of images"></a>Access pixel intensity values of images</h2><ol>
-<li><p><strong><code>Mat</code></strong> (e.g. <code>Mat img</code>)</p>
-<ul>
-<li><p><strong>Grayscale</strong> (<code>8UC1</code>)</p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = img.at&lt;uchar&gt;(y, x);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong>Color image</strong> (<strong>BGR</strong> color ordering, the default format returned by <code>imread</code>)</p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Vec3b intensity = img.at&lt;Vec3b&gt;(y, x);</span><br><span class="line">uchar blue = intensity.val[<span class="number">0</span>];</span><br><span class="line">uchar green = intensity.val[<span class="number">1</span>];</span><br><span class="line">uchar red = intensity.val[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
-<p>Note: the same method can be used to change pixel intensities.</p>
-</li>
-</ul>
-</li>
-<li><p><strong><code>IplImage</code></strong> (e.g. <code>IplImage* img</code>)</p>
-<ul>
-<li><p><strong>Grayscale</strong></p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = CV_IMAGE_ELEM(img, uchar, h, w);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong>Color image</strong></p>
-   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar blue = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>);</span><br><span class="line">uchar green = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">1</span>);</span><br><span class="line">uchar red = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="Content-transform-between-Mat-row-col-and-vector"><a href="#Content-transform-between-Mat-row-col-and-vector" class="headerlink" title="Content transform between Mat row/col and vector"></a>Content transform between Mat row/col and vector</h2><ol>
-<li><p><strong><code>Mat</code> row/col to <code>Mat</code> row/col</strong><br>cc: <a href="http://opencv.willowgarage.com/documentation/cpp/basic_structures.html" target="_blank" rel="noopener">http://opencv.willowgarage.com/documentation/cpp/basic_structures.html</a></p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// add 5-th row, multiplied by 3 to the 3rd row</span></span><br><span class="line">M.row(<span class="number">3</span>) = M.row(<span class="number">3</span>) + M.row(<span class="number">5</span>)*<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// now copy 7-th column to the 1-st column</span></span><br><span class="line"><span class="comment">// M.col(1) = M.col(7); // this will not work</span></span><br><span class="line">Mat M1 = M.col(<span class="number">1</span>);</span><br><span class="line">M.col(<span class="number">7</span>).copyTo(M1);</span><br></pre></td></tr></table></figure></li>
-<li><p><strong><code>Mat</code> row/col to <code>vector</code></strong></p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">data</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, CV_32F)</span></span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">0</span>) = <span class="number">1</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">1</span>) = <span class="number">2</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">0</span>) = <span class="number">3</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">1</span>) = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second row data to p</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p;  </span><br><span class="line">data.row(<span class="number">1</span>).copyTo(p);</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second col data to p2</span></span><br><span class="line">Mat data_transpose;</span><br><span class="line">transpose(data, data_transpose);</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p2;  </span><br><span class="line">data_transpose.row(<span class="number">1</span>).copyTo(p2);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="About-cv-Rect"><a href="#About-cv-Rect" class="headerlink" title="About cv::Rect"></a>About cv::Rect</h2><p>Note that, the top and left boundary of the rectangle are inclusive, while the right and bottom boundaries are not.</p>
-<ul>
-<li>For <code>cv::Rect rect(x,y,w,h)</code>, its right bottom corner is <code>rect.br() = cv::Point(x+w, y+h)</code>, not <del><code>cv::Point(x+w-1, y+h-1)</code></del>.</li>
-<li><p>To loop over an image ROI in OpenCV (where ROI is specified by <code>rect</code> ) is implemented as:</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = roi.y; y &lt; roi.y + roi.height; y++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = roi.x; x &lt; roi.x + roi.width; x++) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="About-CvBox2D"><a href="#About-CvBox2D" class="headerlink" title="About CvBox2D"></a>About CvBox2D</h2><p>The definition of <code>CvBox2D</code> in OpenCV 2.1 is as follows:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">CvBox2D</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    CvPoint2D32f center; <span class="comment">/* center of the box */</span></span><br><span class="line">    CvSize2D32f size; <span class="comment">/* box width and length */</span></span><br><span class="line">    <span class="keyword">float</span> angle; <span class="comment">/* angle between the horizontal axis and the first side (i.e. length) in radians */</span></span><br><span class="line">&#125;</span><br><span class="line">CvBox2D;</span><br></pre></td></tr></table></figure>
-<p>However, there are several inconsistencies when using in practice (i.e. angle), where I found that:</p>
-<ol>
-<li><code>center</code>: no problem.</li>
-<li><code>size</code>, take care of two things:<ul>
-<li><code>size</code> is for the <strong>full size</strong>, not <del><strong>the half size</strong></del>. (Extremtly useful for ellipses respresented by <code>CvBox2D</code>).</li>
-<li><code>size</code> is consisted of <code>width</code> and <code>height</code>. Note that no perticular garantee for the size relationship amont the two (who is larger), on the other hand, it seems <code>height</code> will be always larger than <code>width</code> obtained by default (need to verify!!!)</li>
-</ul>
-</li>
-<li><p><code>angle</code>, several issues:</p>
-<ul>
-<li>Type: not <del><strong>radians</strong></del>, <strong>degrees</strong> instead.</li>
-<li>Meaning: not <del><strong>angle between the horizontal axis and the first side (i.e. length)</strong></del>, <strong>the angle anticlockwisely from -y($\uparrow$) direction ( see the image plane in the following figure) to the first length edge instead</strong>.</li>
-<li><p>Range: can be any size, but with cycle period of <strong>180 (\(\pi\))</strong>, so better to first <strong>normalize to [0, 180)</strong> in practise.</p>
-<p> <img src="/2012/09/04/OpenCV-sumup/image_plane.png" alt="Image for showing image plane" title="Image plane"></p>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="About-Sobel-operator"><a href="#About-Sobel-operator" class="headerlink" title="About Sobel operator"></a>About Sobel operator</h2><p>When using the following old version:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CVAPI(<span class="keyword">void</span>) cvSobel( <span class="keyword">const</span> CvArr* src, CvArr* dst, <span class="keyword">int</span> xorder, <span class="keyword">int</span> yorder, <span class="keyword">int</span> aperture_size CV_DEFAULT(<span class="number">3</span>));</span><br></pre></td></tr></table></figure>
-<p>, remember that, for <code>dst</code> (need to be created by using <code>cvCreateImage</code>), only <code>IPL_DEPTH_32F</code> can be used, which is different from OpenCV’s documentation.</p>
-<p>For new version (together with the old version):</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CV_EXPORTS_W <span class="keyword">void</span> <span class="title">Sobel</span><span class="params">( InputArray src, OutputArray dst, <span class="keyword">int</span> ddepth, <span class="keyword">int</span> dx, <span class="keyword">int</span> dy, <span class="keyword">int</span> ksize=<span class="number">3</span>, <span class="keyword">double</span> scale=<span class="number">1</span>, <span class="keyword">double</span> delta=<span class="number">0</span>, <span class="keyword">int</span> borderType=BORDER_DEFAULT)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>, remember that the following two versions will give the same result</p>
-<ul>
-<li><p>Old version</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *xsobel, *ysobel;</span><br><span class="line">xsobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">ysobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">cvSobel(img_gray, xsobel, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>);</span><br><span class="line">cvSobel(img_gray, ysobel, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>New version</p>
-  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat xsobel, ysobel;</span><br><span class="line">Sobel(img_gray, xsobel, CV_32F, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br><span class="line">Sobel(img_gray, ysobel, CV_32F, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>opencv</tag>
       </tags>
   </entry>
   <entry>
@@ -1728,6 +1578,156 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
+    <title>OpenCV sumup</title>
+    <url>/2012/09/04/OpenCV-sumup/</url>
+    <content><![CDATA[<h2 id="Data-types-of-Mat"><a href="#Data-types-of-Mat" class="headerlink" title="Data types of Mat"></a>Data types of Mat</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Name</th>
+<th style="text-align:center">Data Type</th>
+<th style="text-align:center">Bit Size</th>
+<th style="text-align:center">Range</th>
+<th style="text-align:center">Other</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>CV_8U</code></td>
+<td style="text-align:center">uchar / unsigned char</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">0 ~ 255</td>
+<td style="text-align:center">Default for image data</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_8S</code></td>
+<td style="text-align:center">char</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">-128 ~ 127</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_16U</code></td>
+<td style="text-align:center">ushort / unsigned short int</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">0 ~ 65535</td>
+<td style="text-align:center">unsigned short</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_16S</code></td>
+<td style="text-align:center">short int</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">-32768 ~ 32767</td>
+<td style="text-align:center">short</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_32S</code></td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">-2147483648 ~ 2147483647</td>
+<td style="text-align:center">long</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_32F</code></td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">\(1.18\times10^{-38}\) ~ \(3.40\times10^{38}\)</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>CV_64F</code></td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">64</td>
+<td style="text-align:center">\(2.23\times10^{-308}\) ~ \(1.79\times10^{308}\)</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="Conversion-between-Mat-and-IplImage"><a href="#Conversion-between-Mat-and-IplImage" class="headerlink" title="Conversion between Mat and IplImage"></a>Conversion between Mat and IplImage</h2><ol>
+<li><p><strong><code>IplImage *</code> to <code>Mat</code></strong>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *ipl_img;</span><br><span class="line"><span class="function">Mat <span class="title">mat_img</span><span class="params">(ipl_img)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li><p><strong><code>IplImage</code> to <code>Mat</code></strong>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage ipl_img;</span><br><span class="line">Mat mat_img = cv::cvarrToMat(&amp;ipl_img, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong><code>Mat</code> to <code>IplImage</code></strong>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat mat_img;</span><br><span class="line">IplImage ipl_img = mat_img;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="Access-pixel-intensity-values-of-images"><a href="#Access-pixel-intensity-values-of-images" class="headerlink" title="Access pixel intensity values of images"></a>Access pixel intensity values of images</h2><ol>
+<li><p><strong><code>Mat</code></strong> (e.g. <code>Mat img</code>)</p>
+<ul>
+<li><p><strong>Grayscale</strong> (<code>8UC1</code>)</p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = img.at&lt;uchar&gt;(y, x);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Color image</strong> (<strong>BGR</strong> color ordering, the default format returned by <code>imread</code>)</p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Vec3b intensity = img.at&lt;Vec3b&gt;(y, x);</span><br><span class="line">uchar blue = intensity.val[<span class="number">0</span>];</span><br><span class="line">uchar green = intensity.val[<span class="number">1</span>];</span><br><span class="line">uchar red = intensity.val[<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+<p>Note: the same method can be used to change pixel intensities.</p>
+</li>
+</ul>
+</li>
+<li><p><strong><code>IplImage</code></strong> (e.g. <code>IplImage* img</code>)</p>
+<ul>
+<li><p><strong>Grayscale</strong></p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar intensity = CV_IMAGE_ELEM(img, uchar, h, w);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Color image</strong></p>
+   <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">uchar blue = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>);</span><br><span class="line">uchar green = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">1</span>);</span><br><span class="line">uchar red = CV_IMAGE_ELEM(img, uchar, y, x*<span class="number">3</span>+<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="Content-transform-between-Mat-row-col-and-vector"><a href="#Content-transform-between-Mat-row-col-and-vector" class="headerlink" title="Content transform between Mat row/col and vector"></a>Content transform between Mat row/col and vector</h2><ol>
+<li><p><strong><code>Mat</code> row/col to <code>Mat</code> row/col</strong><br>cc: <a href="http://opencv.willowgarage.com/documentation/cpp/basic_structures.html" target="_blank" rel="noopener">http://opencv.willowgarage.com/documentation/cpp/basic_structures.html</a></p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// add 5-th row, multiplied by 3 to the 3rd row</span></span><br><span class="line">M.row(<span class="number">3</span>) = M.row(<span class="number">3</span>) + M.row(<span class="number">5</span>)*<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// now copy 7-th column to the 1-st column</span></span><br><span class="line"><span class="comment">// M.col(1) = M.col(7); // this will not work</span></span><br><span class="line">Mat M1 = M.col(<span class="number">1</span>);</span><br><span class="line">M.col(<span class="number">7</span>).copyTo(M1);</span><br></pre></td></tr></table></figure></li>
+<li><p><strong><code>Mat</code> row/col to <code>vector</code></strong></p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">data</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, CV_32F)</span></span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">0</span>) = <span class="number">1</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>, <span class="number">1</span>) = <span class="number">2</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">0</span>) = <span class="number">3</span>;</span><br><span class="line">data.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>, <span class="number">1</span>) = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second row data to p</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p;  </span><br><span class="line">data.row(<span class="number">1</span>).copyTo(p);</span><br><span class="line"></span><br><span class="line"><span class="comment">// copy second col data to p2</span></span><br><span class="line">Mat data_transpose;</span><br><span class="line">transpose(data, data_transpose);</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; p2;  </span><br><span class="line">data_transpose.row(<span class="number">1</span>).copyTo(p2);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="About-cv-Rect"><a href="#About-cv-Rect" class="headerlink" title="About cv::Rect"></a>About cv::Rect</h2><p>Note that, the top and left boundary of the rectangle are inclusive, while the right and bottom boundaries are not.</p>
+<ul>
+<li>For <code>cv::Rect rect(x,y,w,h)</code>, its right bottom corner is <code>rect.br() = cv::Point(x+w, y+h)</code>, not <del><code>cv::Point(x+w-1, y+h-1)</code></del>.</li>
+<li><p>To loop over an image ROI in OpenCV (where ROI is specified by <code>rect</code> ) is implemented as:</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> y = roi.y; y &lt; roi.y + roi.height; y++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> x = roi.x; x &lt; roi.x + roi.width; x++) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="About-CvBox2D"><a href="#About-CvBox2D" class="headerlink" title="About CvBox2D"></a>About CvBox2D</h2><p>The definition of <code>CvBox2D</code> in OpenCV 2.1 is as follows:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">CvBox2D</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    CvPoint2D32f center; <span class="comment">/* center of the box */</span></span><br><span class="line">    CvSize2D32f size; <span class="comment">/* box width and length */</span></span><br><span class="line">    <span class="keyword">float</span> angle; <span class="comment">/* angle between the horizontal axis and the first side (i.e. length) in radians */</span></span><br><span class="line">&#125;</span><br><span class="line">CvBox2D;</span><br></pre></td></tr></table></figure>
+<p>However, there are several inconsistencies when using in practice (i.e. angle), where I found that:</p>
+<ol>
+<li><code>center</code>: no problem.</li>
+<li><code>size</code>, take care of two things:<ul>
+<li><code>size</code> is for the <strong>full size</strong>, not <del><strong>the half size</strong></del>. (Extremtly useful for ellipses respresented by <code>CvBox2D</code>).</li>
+<li><code>size</code> is consisted of <code>width</code> and <code>height</code>. Note that no perticular garantee for the size relationship amont the two (who is larger), on the other hand, it seems <code>height</code> will be always larger than <code>width</code> obtained by default (need to verify!!!)</li>
+</ul>
+</li>
+<li><p><code>angle</code>, several issues:</p>
+<ul>
+<li>Type: not <del><strong>radians</strong></del>, <strong>degrees</strong> instead.</li>
+<li>Meaning: not <del><strong>angle between the horizontal axis and the first side (i.e. length)</strong></del>, <strong>the angle anticlockwisely from -y($\uparrow$) direction ( see the image plane in the following figure) to the first length edge instead</strong>.</li>
+<li><p>Range: can be any size, but with cycle period of <strong>180 (\(\pi\))</strong>, so better to first <strong>normalize to [0, 180)</strong> in practise.</p>
+<p> <img src="/2012/09/04/OpenCV-sumup/image_plane.png" alt="Image for showing image plane" title="Image plane"></p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="About-Sobel-operator"><a href="#About-Sobel-operator" class="headerlink" title="About Sobel operator"></a>About Sobel operator</h2><p>When using the following old version:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">CVAPI(<span class="keyword">void</span>) cvSobel( <span class="keyword">const</span> CvArr* src, CvArr* dst, <span class="keyword">int</span> xorder, <span class="keyword">int</span> yorder, <span class="keyword">int</span> aperture_size CV_DEFAULT(<span class="number">3</span>));</span><br></pre></td></tr></table></figure>
+<p>, remember that, for <code>dst</code> (need to be created by using <code>cvCreateImage</code>), only <code>IPL_DEPTH_32F</code> can be used, which is different from OpenCV’s documentation.</p>
+<p>For new version (together with the old version):</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">CV_EXPORTS_W <span class="keyword">void</span> <span class="title">Sobel</span><span class="params">( InputArray src, OutputArray dst, <span class="keyword">int</span> ddepth, <span class="keyword">int</span> dx, <span class="keyword">int</span> dy, <span class="keyword">int</span> ksize=<span class="number">3</span>, <span class="keyword">double</span> scale=<span class="number">1</span>, <span class="keyword">double</span> delta=<span class="number">0</span>, <span class="keyword">int</span> borderType=BORDER_DEFAULT)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>, remember that the following two versions will give the same result</p>
+<ul>
+<li><p>Old version</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">IplImage *xsobel, *ysobel;</span><br><span class="line">xsobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">ysobel = cvCreateImage(cvSize(in-&gt;width, in-&gt;height), IPL_DEPTH_32F, <span class="number">1</span> );</span><br><span class="line">cvSobel(img_gray, xsobel, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>);</span><br><span class="line">cvSobel(img_gray, ysobel, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>New version</p>
+  <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat xsobel, ysobel;</span><br><span class="line">Sobel(img_gray, xsobel, CV_32F, <span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br><span class="line">Sobel(img_gray, ysobel, CV_32F, <span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, BORDER_REFLECT);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>opencv</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Research Topics Related Useful Links</title>
     <url>/2011/11/15/Research-Topics-Related-Useful-Links/</url>
     <content><![CDATA[<h2 id="3D-face-facial-expressions-databases"><a href="#3D-face-facial-expressions-databases" class="headerlink" title="3D face (facial expressions) databases"></a>3D face (facial expressions) databases</h2><ul>
@@ -1997,184 +1997,8 @@ The difference is that: the first method <strong>only copy the listed files</str
       </tags>
   </entry>
   <entry>
-    <title>Using Libxml2 library in VC++</title>
-    <url>/2012/06/18/Using-Libxml2-library-in-VC/</url>
-    <content><![CDATA[<p><a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform), it is free software available under the MIT License. We can use it to read/write data from XML data file.</p>
-<p>Steps to use Libxml2 library is as follows:</p>
-<ol>
-<li>Download <a href="http://gnuwin32.sourceforge.net/" target="_blank" rel="noopener">GnuWin</a> (note that currently GnuWin is only for win32, for win64, we can simply copy installed files in win32 to win64 system, it did work :)) and intall it to anywhere on your PC.</li>
-<li>Download Libxml2 and extract it to anywhere on your PC.</li>
-<li>In VC++ project:<ul>
-<li>Add path <code>&lt;Libxml2 root&gt;/include</code> to VC++ Include Directories.</li>
-<li>Add path <code>&lt;GnuWin root&gt;/include</code> to VC++ Include Directories.</li>
-<li>Add path <code>&lt;Libxml2 root&gt;/lib</code> to VC++ Library Directories.</li>
-<li>Add path <code>&lt;GnuWin root&gt;/lib</code> to VC++ Library Directories.</li>
-<li>Add <code>libiconv.lib</code> and <code>libxml2.lib</code> to Project Linker Input Additional Dependencies.</li>
-<li>Copy <code>libxml2.dll</code> under path <code>&lt;Libxml2 root&gt;/bin</code> to project folder.</li>
-<li>Copy <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs/-/blob/master/src/Opencv2.3.1/iconv.dll" target="_blank" rel="noopener"><code>iconv.dll</code></a> and <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs/-/blob/master/src/Opencv2.3.1/zlib1.dll" target="_blank" rel="noopener"><code>zlib1.dll</code></a> to project folder.</li>
-</ul>
-</li>
-<li>Do like <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs" target="_blank" rel="noopener">project</a> to read/write data from/to XML files.</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>xml</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Track memory leaks in VS</title>
-    <url>/2015/06/23/Track-memory-leaks-in-VS/</url>
-    <content><![CDATA[<p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
-<a id="more"></a>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
-<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
-<p>Note that:</p>
-<ol>
-<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
-<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
-</ol>
-<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Weird things in programming</title>
-    <url>/2012/12/19/Weird-things-in-programming/</url>
-    <content><![CDATA[<p>Weird things often occur in programming. We can tell so-called reasons to some of them. For others, the only thing we can do is, how the hell could these be? We have to pay extra attention to avoid these in order not to fall into debugging nightmares.</p>
-<h2 id="10000000000000000-10000000000000000"><a href="#10000000000000000-10000000000000000" class="headerlink" title="10000000000000000 != 10000000000000000 ???"></a>10000000000000000 != 10000000000000000 ???</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">float</span> a = <span class="number">10000000000000000.0</span>;</span><br><span class="line"><span class="keyword">float</span> b = a - <span class="number">10000000000000000.0</span>;</span><br></pre></td></tr></table></figure>
-<p>When printing them, it turns out:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">a = <span class="number">10000000272564224.000000</span></span><br><span class="line">b = <span class="number">272564224.000000</span></span><br></pre></td></tr></table></figure>
-<p>When viewing them in Watch under Debug, it turns out:</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">Name</th>
-<th style="text-align:center">Value</th>
-<th style="text-align:center">Type</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">1.0000000e+016</td>
-<td style="text-align:center">float</td>
-</tr>
-<tr>
-<td style="text-align:center">b</td>
-<td style="text-align:center"><span style="color:red">2.7256422e+008</span></td>
-<td style="text-align:center">float</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Reason: discussed in <a href="http://stackoverflow.com/questions/18877902/why-is-10000000000000000-10000000000000000" target="_blank" rel="noopener">here</a>.</p>
-<h2 id="215510-10000-2155100000"><a href="#215510-10000-2155100000" class="headerlink" title="215510*10000 != 2155100000 ???"></a>215510*10000 != 2155100000 ???</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">UINT64 time1 = <span class="number">215510</span>*<span class="number">10000</span>;</span><br><span class="line">UINT64 time2 = (UINT64)(<span class="number">215510</span> * <span class="number">10000</span>);</span><br></pre></td></tr></table></figure>
-<p>When printing them or in Watch, it turns out:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">time1 = <span class="number">18446744071569684320</span></span><br><span class="line">time2 = <span class="number">18446744071569684320</span></span><br></pre></td></tr></table></figure>
-<p>We have to use one of the following codes in order to get correct answer:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">UINT64 time3 = (UINT64)<span class="number">215510</span> * <span class="number">10000</span>;</span><br><span class="line">UINT64 time4 = <span class="number">215510</span> * (UINT64)<span class="number">10000</span>;</span><br><span class="line">UINT64 time5 = (UINT64)<span class="number">215510</span> * (UINT64)<span class="number">10000</span>;</span><br></pre></td></tr></table></figure>
-<p>Reason: discussed in <a href="http://stackoverflow.com/questions/20727531/why-is-21551010000-2155100000" target="_blank" rel="noopener">here</a>.</p>
-<h2 id="3-lt-–1"><a href="#3-lt-–1" class="headerlink" title="3 &lt; –1 ???"></a>3 &lt; –1 ???</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> start = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; data;</span><br><span class="line">data.push_back(<span class="number">0</span>);</span><br><span class="line">data.push_back(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=start; i&lt;data.size()-start; i++)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"In...\n"</span>);</span><br></pre></td></tr></table></figure>
-<p>When running the above code, it will run <code>printf(&quot;In...\n&quot;);</code> infinitely. Although based on the condition (<code>3&lt;-1</code>) of the <code>for</code> loop, it should never do this. Weird, huh?</p>
-<p>To avoid this, you have to compute the long condition equation first, like:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">... ...</span><br><span class="line"><span class="keyword">int</span> end = data.size()-start;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=start; i&lt;end; i++)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"In...\n"</span>);</span><br></pre></td></tr></table></figure>
-<p><strong>Reason</strong>: discussed in <a href="http://stackoverflow.com/questions/20728649/why-is-31-in-code" target="_blank" rel="noopener">here</a>.</p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>debugging</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Using MSXML to read/write XML files</title>
-    <url>/2012/07/11/Using-MSXML-to-read-write-XML-files/</url>
-    <content><![CDATA[<p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
-<p>In the followings, I will show how to use MSXML to read/write xml files.</p>
-<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
-<li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
-<li>Add <code>#import &lt;msxml3.dll&gt;</code> to the beginning part of your code.</li>
-<li><p>Use the following xml files as an example:</p>
-  <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Appearance_model</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"6"</span> <span class="attr">weight</span>=<span class="string">"0.017783"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"10"</span> <span class="attr">weight</span>=<span class="string">"0.003343"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Appearance_model</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="Read-from-xml-files"><a href="#Read-from-xml-files" class="headerlink" title="Read from xml files:"></a>Read from xml files:</h2><p>For example, we want to load the above xml data to a <code>vector&lt;pair&lt;int, float&gt;&gt;</code> (<code>name</code> to a string), do like the following code, where input parameter gives the path of above xml file.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">vector&lt;pair&lt;int, float&gt;&gt; load_appearance_model_from_xml(string file, string &amp; name)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model;</span><br><span class="line"></span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line">    spXMLDoc-&gt;load(file.c_str());</span><br><span class="line"></span><br><span class="line">    MSXML2::IXMLDOMElementPtr spRoot = spXMLDoc-&gt;documentElement; <span class="comment">//root node</span></span><br><span class="line">    <span class="keyword">if</span> (spRoot-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        MSXML2::IXMLDOMNodeListPtr spNodeList = spRoot-&gt;childNodes;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// traverse child's nodes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i != spNodeList-&gt;length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMNodePtr spNode = spNodeList-&gt;item[i];</span><br><span class="line">            <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                name = (<span class="keyword">char</span> *) spNode-&gt;Gettext();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> index;</span><br><span class="line">                <span class="keyword">float</span> weight;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// traverse node's attributes</span></span><br><span class="line">                MSXML2::IXMLDOMNamedNodeMapPtr spNameNodeMap = spNode-&gt;attributes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">long</span> j = <span class="number">0</span>; j != spNameNodeMap-&gt;length; ++j)</span><br><span class="line">                &#123;</span><br><span class="line">                    MSXML2::IXMLDOMNodePtr spNode2 = spNameNodeMap-&gt;item[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"index"</span>)</span><br><span class="line">                        index = (<span class="keyword">int</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"weight"</span>)</span><br><span class="line">                        weight = (<span class="keyword">float</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                app_model.push_back(make_pair(index, weight));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app_model;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Write-to-xml-files"><a href="#Write-to-xml-files" class="headerlink" title="Write to xml files:"></a>Write to xml files:</h2><p>Do like the following code, where input parameter file gives the file name that you want to save.</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_appearance_model_to_xml</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model, <span class="built_in">string</span> name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    MSXML2::IXMLDOMElementPtr  spRoot;</span><br><span class="line">    HRESULT hr = spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SUCCEEDED(hr))</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Unable to create xml file.\n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>, &amp;spRoot);</span><br><span class="line">        spXMLDoc-&gt;raw_appendChild(spRoot, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        MSXML2::IXMLDOMElementPtr childNode2;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>, &amp;childNode2);</span><br><span class="line">        childNode2-&gt;put_text((<span class="keyword">_bstr_t</span>)xxx);</span><br><span class="line">        spRoot-&gt;appendChild(childNode2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;app_model.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMElementPtr childNode;</span><br><span class="line">            spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>, &amp;childNode);</span><br><span class="line"></span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"index"</span>, app_model[i].first);</span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"weight"</span>, app_model[i].second);</span><br><span class="line"></span><br><span class="line">            spRoot-&gt;appendChild(childNode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        spXMLDoc-&gt;save(file.c_str());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>Note:</strong> Above writing xml with <code>&lt;name&gt;xxx&lt;/name&gt;</code> style is not fully tested.</p>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>xml</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>fwrite/fread for different data types</title>
-    <url>/2012/06/13/fwrite-fread-for-different-data-types/</url>
-    <content><![CDATA[<p>We use <code>fwrite</code> to write formated data to disk and use <code>fread</code> to later read them back from disk. Different data types are very different in using <code>fwrite/fread</code>. The following shows how to do for <code>vector</code> (simple), <code>Mat</code>, <code>vector&lt;Mat&gt;</code>, <code>struct</code> (simple), <code>struct</code> (complex).</p>
-<h2 id="for-vector-simple"><a href="#for-vector-simple" class="headerlink" title="for vector (simple):"></a>for <code>vector</code> (simple):</h2><ol>
-<li><p><code>fwrite</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_vector</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    <span class="comment">//size_element = result[0].elemSize()*result[0].total();</span></span><br><span class="line">    fwrite(&amp;a[<span class="number">0</span>], a.size(), <span class="keyword">sizeof</span>(<span class="keyword">int</span>), fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p><code>fread</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">load_vector</span><span class="params">(<span class="built_in">string</span> file, <span class="keyword">int</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; result;</span><br><span class="line">    result.resize(size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line"></span><br><span class="line">    fread( &amp;result[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">int</span>), result.size(), fi );</span><br><span class="line">    fclose(fi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>Usage:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; a;</span><br><span class="line">a.push_back(<span class="number">0</span>);</span><br><span class="line">a.push_back(<span class="number">1</span>);</span><br><span class="line">a.push_back(<span class="number">2</span>);</span><br><span class="line">write_vector(<span class="string">"vector.dat"</span>, a);</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; b = load_vector(<span class="string">"vector.dat"</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="for-Mat"><a href="#for-Mat" class="headerlink" title="for Mat:"></a>for <code>Mat</code>:</h2><ol>
-<li><p><code>fwrite</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_mat</span><span class="params">(<span class="built_in">string</span> file, Mat a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    <span class="comment">//size_element = result[0].elemSize()*result[0].total();</span></span><br><span class="line">    fwrite(a.ptr(), <span class="number">1</span>, (<span class="keyword">size_t</span>)(a.elemSize()*a.total()), fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p><code>fread</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">load_mat</span><span class="params">(<span class="built_in">string</span> file, <span class="keyword">int</span> rows, <span class="keyword">int</span> cols, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Mat <span class="title">result</span><span class="params">(rows, cols, type)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    fread(result.ptr(), (<span class="keyword">size_t</span>)(result.elemSize()*result.total()), <span class="number">1</span>, fi);</span><br><span class="line">    fclose(fi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>Usage:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat a = Mat::eye(<span class="number">3</span>, <span class="number">3</span>, CV_32FC1);</span><br><span class="line">write_mat(<span class="string">"mat.dat"</span>, a);</span><br><span class="line">Mat b = load_mat(<span class="string">"mat.dat"</span>, <span class="number">3</span>, <span class="number">3</span>, CV_32FC1);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="for-vector-lt-Mat-gt-every-Mat-have-similar-data"><a href="#for-vector-lt-Mat-gt-every-Mat-have-similar-data" class="headerlink" title="for vector&lt;Mat&gt; (every Mat have similar data):"></a>for <code>vector&lt;Mat&gt;</code> (every <code>Mat</code> have similar data):</h2><ol>
-<li><p><code>fwrite</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_all_images_content_to_disk</span><span class="params">(<span class="built_in">vector</span>&lt;Mat&gt; result, <span class="built_in">string</span> file, <span class="keyword">size_t</span> &amp; size_mat)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;result.size(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        Mat stub = result[i];</span><br><span class="line"></span><br><span class="line">        size_mat = (<span class="keyword">size_t</span>)(stub.elemSize()*stub.total());</span><br><span class="line">        fwrite(stub.ptr(), size_mat, <span class="number">1</span>, fo);</span><br><span class="line">    &#125;</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p><code>fread</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;Mat&gt; <span class="title">load_images_content_from_disk</span><span class="params">(<span class="built_in">string</span> file, <span class="keyword">size_t</span> size_mat, <span class="keyword">int</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;Mat&gt; result;</span><br><span class="line">    result.resize(size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;size; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">Mat <span class="title">stub</span><span class="params">(WIDTH_IMAGE, HEIGHT_IMAGE, CV_8UC3)</span></span>;</span><br><span class="line"></span><br><span class="line">        fread(stub.ptr(), size_mat, <span class="number">1</span>, fi);</span><br><span class="line"></span><br><span class="line">        result.push_back(stub);</span><br><span class="line">    &#125;</span><br><span class="line">    fclose(fi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>Usage:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// for vector&lt;Mat&gt; IMAGES_CONTENT;</span></span><br><span class="line"><span class="keyword">size_t</span> size_mat;</span><br><span class="line">write_all_images_content_to_disk(IMAGES_CONTENT, <span class="string">"images.dat"</span>, size_mat);</span><br><span class="line"><span class="built_in">vector</span>&lt;Mat&gt; stub = load_images_content_from_disk(<span class="string">"images.dat"</span>, size_mat, IMAGES_CONTENT.size());</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="for-struct-simple"><a href="#for-struct-simple" class="headerlink" title="for struct (simple):"></a>for <code>struct</code> (simple):</h2><p>Take the following struct as an example:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PERSON</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">char</span> name[<span class="number">30</span>];</span><br><span class="line">    <span class="keyword">int</span> age;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ol>
-<li><p><code>fwrite</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_struct</span><span class="params">(<span class="built_in">string</span> file, PERSON a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    fwrite(&amp;a, <span class="keyword">sizeof</span>(struct PERSON), <span class="number">1</span>, fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p><code>fread</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">load_struct</span><span class="params">(<span class="built_in">string</span> file, PERSON &amp; result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    fread(&amp;result, <span class="keyword">sizeof</span>(struct PERSON), <span class="number">1</span>, fi);</span><br><span class="line">    fclose(fi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>Usage:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">PERSON a;</span><br><span class="line"><span class="built_in">strcpy</span>(a.name, <span class="string">"Tommy"</span>);</span><br><span class="line">a.age = <span class="number">25</span>;</span><br><span class="line"></span><br><span class="line">write_struct(<span class="string">"person.dat"</span>, a);</span><br><span class="line">PERSON b;</span><br><span class="line">load_struct(<span class="string">"person.dat"</span>, b);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="for-struct-contains-vector-and-Mat"><a href="#for-struct-contains-vector-and-Mat" class="headerlink" title="for struct (contains vector and Mat):"></a>for <code>struct</code> (contains <code>vector</code> and <code>Mat</code>):</h2><p>Take the following struct as an example:</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">FEATURE_RECT</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Rect rect;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; color_hist;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; hog;</span><br><span class="line">    Mat region_mat;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ol>
-<li><p><code>fwrite</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_struct</span><span class="params">(<span class="built_in">string</span> file, FEATURE_RECT a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    fwrite(&amp;a, <span class="keyword">sizeof</span>(struct FEATURE_RECT), <span class="number">1</span>, fo);</span><br><span class="line">    fwrite(&amp;a.color_hist[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), a.color_hist.size(), fo);</span><br><span class="line">    fwrite(&amp;a.hog[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), a.hog.size(), fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p><code>fread</code>:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">load_struct</span><span class="params">(<span class="built_in">string</span> file, FEATURE_RECT &amp; result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    fread(&amp;result, <span class="keyword">sizeof</span>(struct FEATURE_RECT ), <span class="number">1</span>, fi);</span><br><span class="line">    fread(&amp;result.color_hist[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), result.color_hist.size(), fi);</span><br><span class="line">    fread(&amp;result.hog[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), result.hog.size(), fi);</span><br><span class="line">    fclose(fi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>Usage:</p>
- <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FEATURE_RECT test;</span><br><span class="line">test.rect = Rect(<span class="number">1</span>,<span class="number">2</span>,<span class="number">100</span>,<span class="number">200</span>);</span><br><span class="line">test.color_hist.push_back(<span class="number">0</span>);</span><br><span class="line">test.hog.push_back(<span class="number">1</span>);</span><br><span class="line">test.region_mat = Mat::eye(<span class="number">3</span>,<span class="number">3</span>,CV_32FC1);</span><br><span class="line"></span><br><span class="line">write_struct(<span class="string">"struct.dat"</span>, test);</span><br><span class="line">FEATURE_RECT test2;</span><br><span class="line">load_struct(<span class="string">"struct.dat"</span>, test2);</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>coding</tag>
-        <tag>i/o</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Running Python via Anaconda</title>
-    <url>/2013/10/05/Running-Python-in-Windows-and-install-external-libraries/</url>
+    <url>/2013/10/05/Running-Python-via-Anaconda/</url>
     <content><![CDATA[<h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><ol>
 <li>Install <a href="http://continuum.io/downloads" target="_blank" rel="noopener">Anaconda</a>. (e.g. by default in <code>C:\Users\Yongtao\Anaconda3</code>)</li>
 <li>Add the following paths to <strong>Path</strong>:<ul>
@@ -2235,6 +2059,182 @@ The difference is that: the first method <strong>only copy the listed files</str
         <tag>setup</tag>
         <tag>coding</tag>
         <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Track memory leaks in VS</title>
+    <url>/2015/06/23/Track-memory-leaks-in-VS/</url>
+    <content><![CDATA[<p>In VS, memory leaks can be detected by using C Run-Time (CRT) libraries [1]. A typical example of enabling this feature can be like:</p>
+<a id="more"></a>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* the #include statements must follow the order shown here */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRTDBG_MAP_ALLOC <span class="comment">// show file name and line number when detecting leaked memory</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;crtdbg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* make it work also for c++ new operator, together with malloc */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> _DEBUG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> new DBG_NEW</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>  <span class="comment">// _DEBUG</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">/* these two lines will report all memory leaks after application exits */</span></span><br><span class="line">	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	<span class="comment">// turn on leak checking flag</span></span><br><span class="line">	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);				<span class="comment">// set report to the Output window</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set startint point that want to check memory leak */</span></span><br><span class="line">	_CrtMemState s1, s2, s3;</span><br><span class="line">	_CrtMemCheckpoint(&amp;s1);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* ---your real code goes here--- */</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">int</span> *test = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];					<span class="comment">// line 26</span></span><br><span class="line">		<span class="keyword">int</span> *test2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">20</span>];					<span class="comment">// line 27</span></span><br><span class="line">		<span class="keyword">int</span> *test3;</span><br><span class="line">		test3 = (<span class="keyword">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">int</span>) * <span class="number">30</span>);	<span class="comment">// line 29</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* set ending point that want to check memory leak */</span></span><br><span class="line">	_CrtMemCheckpoint(&amp;s2);</span><br><span class="line">	<span class="keyword">if</span> (_CrtMemDifference(&amp;s3, &amp;s1, &amp;s2))&#123; <span class="comment">// only report memory leak if happens indeed</span></span><br><span class="line">		_CrtMemDumpStatistics(&amp;s3);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This will report the memory leaks in the <strong>Output Window</strong> as follows:<br><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Free Blocks.</span><br><span class="line"><span class="number">240</span> bytes in <span class="number">3</span> Normal Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> CRT Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Ignore Blocks.</span><br><span class="line"><span class="number">0</span> bytes in <span class="number">0</span> Client Blocks.</span><br><span class="line">Largest number used: <span class="number">240</span> bytes.</span><br><span class="line">Total allocations: <span class="number">240</span> bytes.</span><br><span class="line">-----------------------------------</span><br><span class="line">Detected memory leaks!</span><br><span class="line">Dumping objects -&gt;</span><br><span class="line">..\test\main.cpp(<span class="number">29</span>) : &#123;<span class="number">415</span>&#125; normal block at <span class="number">0x00A8FB60</span>, <span class="number">120</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">27</span>) : &#123;<span class="number">414</span>&#125; normal block at <span class="number">0x00A8FAD0</span>, <span class="number">80</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">..\test\main.cpp(<span class="number">26</span>) : &#123;<span class="number">413</span>&#125; normal block at <span class="number">0x00A8FA68</span>, <span class="number">40</span> bytes <span class="keyword">long</span>.</span><br><span class="line"> Data: &lt;                &gt; CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD </span><br><span class="line">Object dump complete.</span><br></pre></td></tr></table></figure></p>
+<p>Based on the memory leak report, we can easily identify where memory leaks happens (in this case, <strong>line 26/27/29</strong>) and how bad they are (e.g. <strong>leaking 120 bytes in line 29</strong>). </p>
+<p>Note that:</p>
+<ol>
+<li><strong>The second part of the memory leak report that contains file names and line numbers is only available after the whole application exits</strong>.</li>
+<li>To track memory leaks before application exit, we have to set starting and ending points in code, as we did in the above example. By moving the starting and ending points around, it is flexible for us to track the exact code that we’re focused on. Sample memory leak report can be seen from the first part of above report.</li>
+</ol>
+<h4 id="References"><a href="#References" class="headerlink" title="References"></a>References</h4><p>[1] Finding Memory Leaks Using the CRT Library: <a href="https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx" target="_blank" rel="noopener">https://msdn.microsoft.com/en-us/library/x98tx3cf.aspx</a></p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Using Libxml2 library in VC++</title>
+    <url>/2012/06/18/Using-Libxml2-library-in-VC/</url>
+    <content><![CDATA[<p><a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> is the XML C parser and toolkit developed for the Gnome project (but usable outside of the Gnome platform), it is free software available under the MIT License. We can use it to read/write data from XML data file.</p>
+<p>Steps to use Libxml2 library is as follows:</p>
+<ol>
+<li>Download <a href="http://gnuwin32.sourceforge.net/" target="_blank" rel="noopener">GnuWin</a> (note that currently GnuWin is only for win32, for win64, we can simply copy installed files in win32 to win64 system, it did work :)) and intall it to anywhere on your PC.</li>
+<li>Download Libxml2 and extract it to anywhere on your PC.</li>
+<li>In VC++ project:<ul>
+<li>Add path <code>&lt;Libxml2 root&gt;/include</code> to VC++ Include Directories.</li>
+<li>Add path <code>&lt;GnuWin root&gt;/include</code> to VC++ Include Directories.</li>
+<li>Add path <code>&lt;Libxml2 root&gt;/lib</code> to VC++ Library Directories.</li>
+<li>Add path <code>&lt;GnuWin root&gt;/lib</code> to VC++ Library Directories.</li>
+<li>Add <code>libiconv.lib</code> and <code>libxml2.lib</code> to Project Linker Input Additional Dependencies.</li>
+<li>Copy <code>libxml2.dll</code> under path <code>&lt;Libxml2 root&gt;/bin</code> to project folder.</li>
+<li>Copy <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs/-/blob/master/src/Opencv2.3.1/iconv.dll" target="_blank" rel="noopener"><code>iconv.dll</code></a> and <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs/-/blob/master/src/Opencv2.3.1/zlib1.dll" target="_blank" rel="noopener"><code>zlib1.dll</code></a> to project folder.</li>
+</ul>
+</li>
+<li>Do like <a href="https://gitlab.com/herohuyongtao/using-libxml2-library-in-vs" target="_blank" rel="noopener">project</a> to read/write data from/to XML files.</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>xml</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Using MSXML to read/write XML files</title>
+    <url>/2012/07/11/Using-MSXML-to-read-write-XML-files/</url>
+    <content><![CDATA[<p>In <a href="https://blog-tommyhu.github.io/2012/06/18/Using-Libxml2-library-in-VC/">previous post</a>, I talked about how to use <a href="http://www.xmlsoft.org/" target="_blank" rel="noopener">Libxml2</a> library to read/write xml files. Actually, there are many <a href="http://lars.ruoff.free.fr/xmlcpp/" target="_blank" rel="noopener">Free C or C++ XML Parser Libraries</a>. From now no, I will turn to <a href="http://msdn.microsoft.com/en-us/library/ms763742.aspx" target="_blank" rel="noopener">MSXML</a> instead because of Libxml2’s poor support for Windows-x64 systems.</p>
+<p>In the followings, I will show how to use MSXML to read/write xml files.</p>
+<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><ul>
+<li>To install MSXML is quite easy, you just need to install Windows SDK, where it is integrated.</li>
+<li>Add <code>#import &lt;msxml3.dll&gt;</code> to the beginning part of your code.</li>
+<li><p>Use the following xml files as an example:</p>
+  <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Appearance_model</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"6"</span> <span class="attr">weight</span>=<span class="string">"0.017783"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Feature</span> <span class="attr">index</span>=<span class="string">"10"</span> <span class="attr">weight</span>=<span class="string">"0.003343"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Appearance_model</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Read-from-xml-files"><a href="#Read-from-xml-files" class="headerlink" title="Read from xml files:"></a>Read from xml files:</h2><p>For example, we want to load the above xml data to a <code>vector&lt;pair&lt;int, float&gt;&gt;</code> (<code>name</code> to a string), do like the following code, where input parameter gives the path of above xml file.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">vector&lt;pair&lt;int, float&gt;&gt; load_appearance_model_from_xml(string file, string &amp; name)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model;</span><br><span class="line"></span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line">    spXMLDoc-&gt;load(file.c_str());</span><br><span class="line"></span><br><span class="line">    MSXML2::IXMLDOMElementPtr spRoot = spXMLDoc-&gt;documentElement; <span class="comment">//root node</span></span><br><span class="line">    <span class="keyword">if</span> (spRoot-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        MSXML2::IXMLDOMNodeListPtr spNodeList = spRoot-&gt;childNodes;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// traverse child's nodes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i != spNodeList-&gt;length; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMNodePtr spNode = spNodeList-&gt;item[i];</span><br><span class="line">            <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                name = (<span class="keyword">char</span> *) spNode-&gt;Gettext();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (spNode-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">int</span> index;</span><br><span class="line">                <span class="keyword">float</span> weight;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// traverse node's attributes</span></span><br><span class="line">                MSXML2::IXMLDOMNamedNodeMapPtr spNameNodeMap = spNode-&gt;attributes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">long</span> j = <span class="number">0</span>; j != spNameNodeMap-&gt;length; ++j)</span><br><span class="line">                &#123;</span><br><span class="line">                    MSXML2::IXMLDOMNodePtr spNode2 = spNameNodeMap-&gt;item[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"index"</span>)</span><br><span class="line">                        index = (<span class="keyword">int</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (spNode2-&gt;nodeName == (<span class="keyword">_bstr_t</span>)<span class="string">"weight"</span>)</span><br><span class="line">                        weight = (<span class="keyword">float</span>)spNode2-&gt;nodeValue;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                app_model.push_back(make_pair(index, weight));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app_model;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Write-to-xml-files"><a href="#Write-to-xml-files" class="headerlink" title="Write to xml files:"></a>Write to xml files:</h2><p>Do like the following code, where input parameter file gives the file name that you want to save.</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_appearance_model_to_xml</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>, <span class="keyword">float</span>&gt;&gt; app_model, <span class="built_in">string</span> name)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CoInitialize(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//read XML</span></span><br><span class="line">    MSXML2::IXMLDOMDocumentPtr spXMLDoc;</span><br><span class="line">    MSXML2::IXMLDOMElementPtr  spRoot;</span><br><span class="line">    HRESULT hr = spXMLDoc.CreateInstance(__uuidof(MSXML2::DOMDocument30));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!SUCCEEDED(hr))</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Unable to create xml file.\n"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Appearance_model"</span>, &amp;spRoot);</span><br><span class="line">        spXMLDoc-&gt;raw_appendChild(spRoot, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        MSXML2::IXMLDOMElementPtr childNode2;</span><br><span class="line">        spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"name"</span>, &amp;childNode2);</span><br><span class="line">        childNode2-&gt;put_text((<span class="keyword">_bstr_t</span>)xxx);</span><br><span class="line">        spRoot-&gt;appendChild(childNode2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;app_model.<span class="built_in">size</span>(); i++)</span><br><span class="line">        &#123;</span><br><span class="line">            MSXML2::IXMLDOMElementPtr childNode;</span><br><span class="line">            spXMLDoc-&gt;raw_createElement((<span class="keyword">_bstr_t</span>)<span class="string">"Feature"</span>, &amp;childNode);</span><br><span class="line"></span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"index"</span>, app_model[i].first);</span><br><span class="line">            childNode-&gt;setAttribute(<span class="string">"weight"</span>, app_model[i].second);</span><br><span class="line"></span><br><span class="line">            spRoot-&gt;appendChild(childNode);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        spXMLDoc-&gt;save(file.c_str());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    spRoot.Release();</span><br><span class="line">    spXMLDoc.Release();</span><br><span class="line">    CoUninitialize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Note:</strong> Above writing xml with <code>&lt;name&gt;xxx&lt;/name&gt;</code> style is not fully tested.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>xml</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Weird things in programming</title>
+    <url>/2012/12/19/Weird-things-in-programming/</url>
+    <content><![CDATA[<p>Weird things often occur in programming. We can tell so-called reasons to some of them. For others, the only thing we can do is, how the hell could these be? We have to pay extra attention to avoid these in order not to fall into debugging nightmares.</p>
+<h2 id="10000000000000000-10000000000000000"><a href="#10000000000000000-10000000000000000" class="headerlink" title="10000000000000000 != 10000000000000000 ???"></a>10000000000000000 != 10000000000000000 ???</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">float</span> a = <span class="number">10000000000000000.0</span>;</span><br><span class="line"><span class="keyword">float</span> b = a - <span class="number">10000000000000000.0</span>;</span><br></pre></td></tr></table></figure>
+<p>When printing them, it turns out:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">a = <span class="number">10000000272564224.000000</span></span><br><span class="line">b = <span class="number">272564224.000000</span></span><br></pre></td></tr></table></figure>
+<p>When viewing them in Watch under Debug, it turns out:</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Name</th>
+<th style="text-align:center">Value</th>
+<th style="text-align:center">Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">a</td>
+<td style="text-align:center">1.0000000e+016</td>
+<td style="text-align:center">float</td>
+</tr>
+<tr>
+<td style="text-align:center">b</td>
+<td style="text-align:center"><span style="color:red">2.7256422e+008</span></td>
+<td style="text-align:center">float</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Reason: discussed in <a href="http://stackoverflow.com/questions/18877902/why-is-10000000000000000-10000000000000000" target="_blank" rel="noopener">here</a>.</p>
+<h2 id="215510-10000-2155100000"><a href="#215510-10000-2155100000" class="headerlink" title="215510*10000 != 2155100000 ???"></a>215510*10000 != 2155100000 ???</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">UINT64 time1 = <span class="number">215510</span>*<span class="number">10000</span>;</span><br><span class="line">UINT64 time2 = (UINT64)(<span class="number">215510</span> * <span class="number">10000</span>);</span><br></pre></td></tr></table></figure>
+<p>When printing them or in Watch, it turns out:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">time1 = <span class="number">18446744071569684320</span></span><br><span class="line">time2 = <span class="number">18446744071569684320</span></span><br></pre></td></tr></table></figure>
+<p>We have to use one of the following codes in order to get correct answer:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">UINT64 time3 = (UINT64)<span class="number">215510</span> * <span class="number">10000</span>;</span><br><span class="line">UINT64 time4 = <span class="number">215510</span> * (UINT64)<span class="number">10000</span>;</span><br><span class="line">UINT64 time5 = (UINT64)<span class="number">215510</span> * (UINT64)<span class="number">10000</span>;</span><br></pre></td></tr></table></figure>
+<p>Reason: discussed in <a href="http://stackoverflow.com/questions/20727531/why-is-21551010000-2155100000" target="_blank" rel="noopener">here</a>.</p>
+<h2 id="3-lt-–1"><a href="#3-lt-–1" class="headerlink" title="3 &lt; –1 ???"></a>3 &lt; –1 ???</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> start = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; data;</span><br><span class="line">data.push_back(<span class="number">0</span>);</span><br><span class="line">data.push_back(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=start; i&lt;data.size()-start; i++)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"In...\n"</span>);</span><br></pre></td></tr></table></figure>
+<p>When running the above code, it will run <code>printf(&quot;In...\n&quot;);</code> infinitely. Although based on the condition (<code>3&lt;-1</code>) of the <code>for</code> loop, it should never do this. Weird, huh?</p>
+<p>To avoid this, you have to compute the long condition equation first, like:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">... ...</span><br><span class="line"><span class="keyword">int</span> end = data.size()-start;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=start; i&lt;end; i++)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"In...\n"</span>);</span><br></pre></td></tr></table></figure>
+<p><strong>Reason</strong>: discussed in <a href="http://stackoverflow.com/questions/20728649/why-is-31-in-code" target="_blank" rel="noopener">here</a>.</p>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>debugging</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>fwrite/fread for different data types</title>
+    <url>/2012/06/13/fwrite-fread-for-different-data-types/</url>
+    <content><![CDATA[<p>We use <code>fwrite</code> to write formated data to disk and use <code>fread</code> to later read them back from disk. Different data types are very different in using <code>fwrite/fread</code>. The following shows how to do for <code>vector</code> (simple), <code>Mat</code>, <code>vector&lt;Mat&gt;</code>, <code>struct</code> (simple), <code>struct</code> (complex).</p>
+<h2 id="for-vector-simple"><a href="#for-vector-simple" class="headerlink" title="for vector (simple):"></a>for <code>vector</code> (simple):</h2><ol>
+<li><p><code>fwrite</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_vector</span><span class="params">(<span class="built_in">string</span> file, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    <span class="comment">//size_element = result[0].elemSize()*result[0].total();</span></span><br><span class="line">    fwrite(&amp;a[<span class="number">0</span>], a.size(), <span class="keyword">sizeof</span>(<span class="keyword">int</span>), fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>fread</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; <span class="title">load_vector</span><span class="params">(<span class="built_in">string</span> file, <span class="keyword">int</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; result;</span><br><span class="line">    result.resize(size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line"></span><br><span class="line">    fread( &amp;result[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">int</span>), result.size(), fi );</span><br><span class="line">    fclose(fi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>Usage:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; a;</span><br><span class="line">a.push_back(<span class="number">0</span>);</span><br><span class="line">a.push_back(<span class="number">1</span>);</span><br><span class="line">a.push_back(<span class="number">2</span>);</span><br><span class="line">write_vector(<span class="string">"vector.dat"</span>, a);</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; b = load_vector(<span class="string">"vector.dat"</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="for-Mat"><a href="#for-Mat" class="headerlink" title="for Mat:"></a>for <code>Mat</code>:</h2><ol>
+<li><p><code>fwrite</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_mat</span><span class="params">(<span class="built_in">string</span> file, Mat a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    <span class="comment">//size_element = result[0].elemSize()*result[0].total();</span></span><br><span class="line">    fwrite(a.ptr(), <span class="number">1</span>, (<span class="keyword">size_t</span>)(a.elemSize()*a.total()), fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>fread</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">Mat <span class="title">load_mat</span><span class="params">(<span class="built_in">string</span> file, <span class="keyword">int</span> rows, <span class="keyword">int</span> cols, <span class="keyword">int</span> type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Mat <span class="title">result</span><span class="params">(rows, cols, type)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    fread(result.ptr(), (<span class="keyword">size_t</span>)(result.elemSize()*result.total()), <span class="number">1</span>, fi);</span><br><span class="line">    fclose(fi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>Usage:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Mat a = Mat::eye(<span class="number">3</span>, <span class="number">3</span>, CV_32FC1);</span><br><span class="line">write_mat(<span class="string">"mat.dat"</span>, a);</span><br><span class="line">Mat b = load_mat(<span class="string">"mat.dat"</span>, <span class="number">3</span>, <span class="number">3</span>, CV_32FC1);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="for-vector-lt-Mat-gt-every-Mat-have-similar-data"><a href="#for-vector-lt-Mat-gt-every-Mat-have-similar-data" class="headerlink" title="for vector&lt;Mat&gt; (every Mat have similar data):"></a>for <code>vector&lt;Mat&gt;</code> (every <code>Mat</code> have similar data):</h2><ol>
+<li><p><code>fwrite</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_all_images_content_to_disk</span><span class="params">(<span class="built_in">vector</span>&lt;Mat&gt; result, <span class="built_in">string</span> file, <span class="keyword">size_t</span> &amp; size_mat)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;result.size(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        Mat stub = result[i];</span><br><span class="line"></span><br><span class="line">        size_mat = (<span class="keyword">size_t</span>)(stub.elemSize()*stub.total());</span><br><span class="line">        fwrite(stub.ptr(), size_mat, <span class="number">1</span>, fo);</span><br><span class="line">    &#125;</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>fread</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="built_in">vector</span>&lt;Mat&gt; <span class="title">load_images_content_from_disk</span><span class="params">(<span class="built_in">string</span> file, <span class="keyword">size_t</span> size_mat, <span class="keyword">int</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;Mat&gt; result;</span><br><span class="line">    result.resize(size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;size; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">Mat <span class="title">stub</span><span class="params">(WIDTH_IMAGE, HEIGHT_IMAGE, CV_8UC3)</span></span>;</span><br><span class="line"></span><br><span class="line">        fread(stub.ptr(), size_mat, <span class="number">1</span>, fi);</span><br><span class="line"></span><br><span class="line">        result.push_back(stub);</span><br><span class="line">    &#125;</span><br><span class="line">    fclose(fi);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>Usage:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// for vector&lt;Mat&gt; IMAGES_CONTENT;</span></span><br><span class="line"><span class="keyword">size_t</span> size_mat;</span><br><span class="line">write_all_images_content_to_disk(IMAGES_CONTENT, <span class="string">"images.dat"</span>, size_mat);</span><br><span class="line"><span class="built_in">vector</span>&lt;Mat&gt; stub = load_images_content_from_disk(<span class="string">"images.dat"</span>, size_mat, IMAGES_CONTENT.size());</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="for-struct-simple"><a href="#for-struct-simple" class="headerlink" title="for struct (simple):"></a>for <code>struct</code> (simple):</h2><p>Take the following struct as an example:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PERSON</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">char</span> name[<span class="number">30</span>];</span><br><span class="line">    <span class="keyword">int</span> age;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p><code>fwrite</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_struct</span><span class="params">(<span class="built_in">string</span> file, PERSON a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    fwrite(&amp;a, <span class="keyword">sizeof</span>(struct PERSON), <span class="number">1</span>, fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>fread</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">load_struct</span><span class="params">(<span class="built_in">string</span> file, PERSON &amp; result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    fread(&amp;result, <span class="keyword">sizeof</span>(struct PERSON), <span class="number">1</span>, fi);</span><br><span class="line">    fclose(fi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>Usage:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">PERSON a;</span><br><span class="line"><span class="built_in">strcpy</span>(a.name, <span class="string">"Tommy"</span>);</span><br><span class="line">a.age = <span class="number">25</span>;</span><br><span class="line"></span><br><span class="line">write_struct(<span class="string">"person.dat"</span>, a);</span><br><span class="line">PERSON b;</span><br><span class="line">load_struct(<span class="string">"person.dat"</span>, b);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="for-struct-contains-vector-and-Mat"><a href="#for-struct-contains-vector-and-Mat" class="headerlink" title="for struct (contains vector and Mat):"></a>for <code>struct</code> (contains <code>vector</code> and <code>Mat</code>):</h2><p>Take the following struct as an example:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">FEATURE_RECT</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Rect rect;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; color_hist;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; hog;</span><br><span class="line">    Mat region_mat;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p><code>fwrite</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_struct</span><span class="params">(<span class="built_in">string</span> file, FEATURE_RECT a)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// write data to file</span></span><br><span class="line">    FILE *fo;</span><br><span class="line">    fo = fopen(file.c_str(), <span class="string">"wb"</span>);</span><br><span class="line">    fwrite(&amp;a, <span class="keyword">sizeof</span>(struct FEATURE_RECT), <span class="number">1</span>, fo);</span><br><span class="line">    fwrite(&amp;a.color_hist[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), a.color_hist.size(), fo);</span><br><span class="line">    fwrite(&amp;a.hog[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), a.hog.size(), fo);</span><br><span class="line">    fclose(fo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>fread</code>:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">load_struct</span><span class="params">(<span class="built_in">string</span> file, FEATURE_RECT &amp; result)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// read data from file</span></span><br><span class="line">    FILE *fi;</span><br><span class="line">    fi = fopen(file.c_str(), <span class="string">"rb"</span>);</span><br><span class="line">    fread(&amp;result, <span class="keyword">sizeof</span>(struct FEATURE_RECT ), <span class="number">1</span>, fi);</span><br><span class="line">    fread(&amp;result.color_hist[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), result.color_hist.size(), fi);</span><br><span class="line">    fread(&amp;result.hog[<span class="number">0</span>], <span class="keyword">sizeof</span>(<span class="keyword">float</span>), result.hog.size(), fi);</span><br><span class="line">    fclose(fi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>Usage:</p>
+ <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">FEATURE_RECT test;</span><br><span class="line">test.rect = Rect(<span class="number">1</span>,<span class="number">2</span>,<span class="number">100</span>,<span class="number">200</span>);</span><br><span class="line">test.color_hist.push_back(<span class="number">0</span>);</span><br><span class="line">test.hog.push_back(<span class="number">1</span>);</span><br><span class="line">test.region_mat = Mat::eye(<span class="number">3</span>,<span class="number">3</span>,CV_32FC1);</span><br><span class="line"></span><br><span class="line">write_struct(<span class="string">"struct.dat"</span>, test);</span><br><span class="line">FEATURE_RECT test2;</span><br><span class="line">load_struct(<span class="string">"struct.dat"</span>, test2);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>coding</tag>
+        <tag>i/o</tag>
       </tags>
   </entry>
 </search>
