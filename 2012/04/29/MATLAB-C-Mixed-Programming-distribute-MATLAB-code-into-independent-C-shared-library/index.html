@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/icon.png">
+  <link rel="mask-icon" href="/images/icon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. call MATLAB directly in VC++. Refer to the this blog for details.  This blog will focus o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MATLAB&#x2F;C++ Mixed Programming: distribute MATLAB code into independent C++ shared library">
+<meta property="og:url" content="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/index.html">
+<meta property="og:site_name" content="Yongtao Hu&#39;s blog">
+<meta property="og:description" content="There are two ways in VC++ to call MATLAB:  distribute MATLAB code into MATLAB independent C++ shared library. call MATLAB directly in VC++. Refer to the this blog for details.  This blog will focus o">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2012-04-29T07:47:39.000Z">
+<meta property="article:modified_time" content="2021-08-12T10:23:13.152Z">
+<meta property="article:author" content="Yongtao Hu">
+<meta property="article:tag" content="coding">
+<meta property="article:tag" content="mixed_programming">
+<meta property="article:tag" content="matlab">
+<meta property="article:tag" content="c++">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>MATLAB/C++ Mixed Programming: distribute MATLAB code into independent C++ shared library | Yongtao Hu's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yongtao Hu's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon.png">
+      <meta itemprop="name" content="Yongtao Hu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yongtao Hu's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MATLAB/C++ Mixed Programming: distribute MATLAB code into independent C++ shared library
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2012-04-29 15:47:39" itemprop="dateCreated datePublished" datetime="2012-04-29T15:47:39+08:00">2012-04-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-12 18:23:13" itemprop="dateModified" datetime="2021-08-12T18:23:13+08:00">2021-08-12</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>There are two ways in VC++ to call MATLAB:</p>
+<ol>
+<li>distribute MATLAB code into MATLAB independent C++ shared library.</li>
+<li>call MATLAB directly in VC++. Refer to the <a href="https://blog-tommyhu.github.io/2013/12/27/MATLAB-C-Mixed-Programming-call-MATLAB-directly-in-VC/">this blog</a> for details.</li>
+</ol>
+<p>This blog will focus on the first approach.</p>
+<a id="more"></a>
+<hr>
+<p>Distributing MATLAB code into C++ libraries will enable us to call MATLAB in C++. This is further can be done to be MATLAB independent, which means we can call these libraries on any PC without MATLAB pre-installed. Also, good news is that, according to <a href="http://www.mathworks.com/support/solutions/en/data/1-GQC9MB/index.html" target="_blank" rel="noopener">MATLAB Support</a>, all deployed components and applications can be distributed free of charge. So, in this way, we can integrate MATLAB codes into our own product without concerning the license problem.</p>
+<hr>
+<p>In the following, I will show you how you can do this step by step.</p>
+<!-- add TOC here -->
+<div id="genTocHere"></div>
+
+<h2 id="Pre-work"><a href="#Pre-work" class="headerlink" title="Pre-work:"></a>Pre-work:</h2><p>Take the following MATLAB function <code>myadd2.m</code> as an example, from which we want to generate MATLAB independent C++ shared library.</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[y, z]</span> = <span class="title">myadd2</span><span class="params">(a, b)</span></span></span><br><span class="line"><span class="comment">% dummy function, just to demonstrate the idea</span></span><br><span class="line">y = a+b;</span><br><span class="line">z = a+<span class="number">2</span>*b;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h2 id="Deploy-in-MATLAB"><a href="#Deploy-in-MATLAB" class="headerlink" title="Deploy in MATLAB:"></a>Deploy in MATLAB:</h2><ol>
+<li>Setup mex in MATLAB if needed, see <a href="http://herohuyongtao.blogspot.hk/2012/04/matlabc-mex.html" target="_blank" rel="noopener">MATLAB/C++ Mixed Programming: setup mex in MATLAB</a>.</li>
+<li>>&gt; <code>mcc -C -W cpplib:libmyadd2 -T link:lib myadd2.m</code> (<code>-C</code> option is needed to generate <code>.ctf</code> file).</li>
+<li><p>Done. We can find the following files generated in the file folder.</p>
+<ul>
+<li><strong>libmyadd2.h</strong></li>
+<li><strong>libmyadd2.ctf</strong></li>
+<li><strong>libmyadd2.dll</strong></li>
+<li><strong>libmyadd2.lib</strong></li>
+<li>libmyadd2_mcc_component_data.c</li>
+<li>libmyadd2.cpp</li>
+<li>libmyadd2.exports</li>
+<li>libmyadd2.exp</li>
+<li><p>libmyadd2.prj</p>
+<p>Among these, only the first 4 will be needed to be called in VC.</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>NOTE: alternately, we can use MATLAB <strong>deploytool</strong> to do this:</p>
+<ol>
+<li>>&gt; <code>deploytool</code></li>
+<li>Pre-setup: In the <strong>Deployment Project</strong> window, edit project <code>Name</code> (also the name for the generated .h/.lib/.dll files, <code>libmyadd2</code> here), <code>Location</code> and most importantly choose the deployment <code>Type</code> to be <code>C++ shared library</code> (4 types in total to choose from including <code>Windows Standalone Application</code>, <code>Console Application</code>, <code>C Shared Library and C++ Shared Library</code>; the other 3 are not fully tested).</li>
+<li>Add files: In the <strong>C++ Shared Library</strong> window, under <code>Build</code> menu, click <code>[Add files]</code> to add <code>myadd2.m</code> as our exported functions.</li>
+<li>Setup: Click <code>Actions</code> Button in the <code>C++ Shared Library</code> window <code>&gt; Settings… &gt; General &gt;</code> uncheck the <code>&#39;Embed CTF archive into the Application&#39;</code>. Note that if we leave this option checked by default, it will not generate <code>.ctf</code> file. Their differences are:<ul>
+<li>Without <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in system Temp folder, i.e. <code>C:\Users\tommyhu\AppData\Local\Temp\tommyhu\mcrCache7.17\myadd20</code>.</li>
+<li>With <code>.ctf</code>: when called in VC++, the runtime temp files needed will be generated in VC++ solution folder, i.e. <code>C:\Users\tommyhu\Documents\visual studio 2010\Projects\test\libmyadd2_mcr</code>.</li>
+</ul>
+</li>
+<li>Build: Click <strong>Build</strong> Button in the <strong>C++ Shared Library window</strong> to do real building.</li>
+<li>Done. Under <code>..\folderWeSet\libmyadd2\distrib</code>, we will find all files we need including:<ul>
+<li><strong>libmyadd2.h</strong></li>
+<li><strong>libmyadd2.ctf</strong></li>
+<li><strong>libmyadd2.dll</strong></li>
+<li><strong>libmyadd2.lib</strong></li>
+</ul>
+</li>
+</ol>
+<h2 id="Setup-client-PC"><a href="#Setup-client-PC" class="headerlink" title="Setup client PC:"></a>Setup client PC:</h2><p>Note: skip this step if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version.</p>
+<ul>
+<li>Copy <strong>MCRInstaller.exe</strong> to client PC and install. Note that <strong>MCRInstaller.exe</strong> should be consistent with the MATLAB version. Usually you can find it under path like<code>…\MATLAB\R2012a\toolbox\compiler\deploy\win64</code>.</li>
+</ul>
+<p>Note: although we have generated MATLAB independent C++ shared libraries, we still need to slightly setup client PC in order to make it work. Actually we still need to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) of it, but at least not full of it, make it portable enough. In reality, we can package it together with our product (and install automatically).</p>
+<h2 id="Call-in-VC"><a href="#Call-in-VC" class="headerlink" title="Call in VC++:"></a>Call in VC++:</h2><ol>
+<li>Libraries preparation: copy the above 4 files into VC project.</li>
+<li>VC setup:<ul>
+<li>Add MATLAB Compiler Runtime include folder to project <code>Include files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\include</code>.</li>
+<li>Add MATLAB Compiler Runtime library folder to project <code>Library files</code>: i.e. <code>C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\extern\lib\win64\microsoft</code>.</li>
+<li>Add MATLAB Compiler Runtime binary folder to project <code>Debugging&gt;Environment</code>: i.e. <code>PATH=%PATH%;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\runtime\win64;C:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\bin\win64</code>.</li>
+<li>Add relevant libraries to <code>Linker&gt;Input&gt;Additional Dependencies</code>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code>. (Note also to add <code>libmx.lib</code> and <code>libmat.lib</code> if you plan to use <code>mxArray</code> in your code.)</li>
+<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code>.</li>
+</ul>
+</li>
+<li>Calling: please refer to <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/cplusplus/VC_call_MATLAB.cpp" target="_blank" rel="noopener"><code>VC_call_MATLAB.cpp</code></a>.</li>
+</ol>
+<p>Note that, if you just want to call them in the same PC or another PC which has already installed MATLAB of the same version, you don’t need step 2 to install MATLAB Compiler Runtime (<strong>MCRInstaller.exe</strong>) because these have been included when you install MATLAB. Under this condition, instead, you can setup VC as follows:</p>
+<ul>
+<li>VC setup:<ul>
+<li>Add MATLAB include folder to project <strong>Include files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\include</code></li>
+<li>Add MATLAB library folder to project <strong>Library files</strong>: i.e. <code>C:\Program Files\MATLAB\R2012a\extern\lib\win64\microsoft</code></li>
+<li>Add relevant libraries to <strong>Linker&gt;Input&gt;Additional Dependencies</strong>: <code>libmyadd2.lib mclmcrrt.lib mclmcr.lib</code></li>
+<li>Add header to main code: <code>#include &quot;libmyadd2.h&quot;</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="Other-Remarks"><a href="#Other-Remarks" class="headerlink" title="Other Remarks:"></a>Other Remarks:</h2><ol>
+<li>When .m file that we want to distribute also calls several other .m files, we don’t need to particularly to indicate. The steps are the same: only the final .m file is need to be distributed.</li>
+<li>Different distributed shared libraries perform independently, i.e., they cannot share variables to work together. For example, it is impossible for one library to use the data created by another library, which will be released when its library ends.</li>
+<li><p><strong>Thread-safety</strong>: According to <a href="http://www.mathworks.com/help/matlab/matlab_external/using-matlab-engine.html" target="_blank" rel="noopener">MATLAB documentation</a>, MATLAB libraries are not thread-safe. If you create multithreaded applications, make sure only one thread accesses the engine application. For example, if you want to use the above <code>libmyadd2.lib</code>, use <code>ThreadLock.h/.cpp</code> as follows:</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ThreadLock.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> ThreadLock Lock;</span><br><span class="line">Lock.Lock();</span><br><span class="line">myadd2(<span class="number">2</span>, y, z, a, b);</span><br><span class="line">Lock.Unlock();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>Type passing</strong>: Passing C++ native types to <code>mwArray</code> in order to call MATLAB</p>
+<ul>
+<li><p>When passing a grayscale <code>Mat</code> image, can use <code>mxINT8_CLASS</code> as follows.</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// assume we want to passing Mat img(rows, cols, CV_8UC1)</span></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">imgP</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(mat, mat);</span><br><span class="line">imgP.SetData(mat.ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>When passing a color <code>Mat</code> image (assume in format <code>CV_RGB</code>), currently no way is found to pass it directly. Possible way is to pass the r, g, b channels independently and then combine them to be a color image in MATLAB as follows.</p>
+<ul>
+<li><p>In VC++:</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// suppose we want to pass Mat img</span></span><br><span class="line"><span class="built_in">vector</span>&lt;Mat&gt; channels; <span class="comment">// R, G, B channels</span></span><br><span class="line">split(img, channels);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> rows = img.rows;</span><br><span class="line"><span class="keyword">int</span> cols = img.cols;</span><br><span class="line"><span class="function">mwArray <span class="title">image_R</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_G</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"><span class="function">mwArray <span class="title">image_B</span><span class="params">(rows, cols, mxUINT8_CLASS)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// remember to tranpose first because MATLAB is col-major</span></span><br><span class="line">transpose(channels[<span class="number">0</span>], channels[<span class="number">0</span>]);</span><br><span class="line">transpose(channels[<span class="number">1</span>], channels[<span class="number">1</span>]);</span><br><span class="line">transpose(channels[<span class="number">2</span>], channels[<span class="number">2</span>]);</span><br><span class="line">image_R.SetData(channels[<span class="number">0</span>].ptr(), rows*cols);</span><br><span class="line">image_G.SetData(channels[<span class="number">1</span>].ptr(), rows*cols);</span><br><span class="line">image_B.SetData(channels[<span class="number">2</span>].ptr(), rows*cols);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>In MATLAB:</p>
+ <figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">image(:,:,<span class="number">1</span>) = image_R;</span><br><span class="line">image(:,:,<span class="number">2</span>) = image_G;</span><br><span class="line">image(:,:,<span class="number">3</span>) = image_B;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>The way to define the input parameter based on a <code>string</code> or <code>char []</code> is as follows:</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ini input parameter: im_path based on string aString or char aString[]</span></span><br><span class="line"><span class="function">mwArray <span class="title">im_path</span><span class="params">(aString.c_str())</span></span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>For passing other types, we had better to use double (<code>mxDOUBLE_CLASS</code>) instead of int (<code>mxINT8_CLASS</code>) even though it actually is a int.</p>
+</li>
+<li><p>For passing complex values:</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// passing to MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rdata[<span class="number">4</span>] = &#123;<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>&#125;;</span><br><span class="line"><span class="keyword">double</span> idata[<span class="number">4</span>] = &#123;<span class="number">10.0</span>, <span class="number">20.0</span>, <span class="number">30.0</span>, <span class="number">40.0</span>&#125;;</span><br><span class="line"><span class="function">mwArray <span class="title">a</span><span class="params">(<span class="number">2</span>, <span class="number">2</span>, mxDOUBLE_CLASS, mxCOMPLEX)</span></span>;</span><br><span class="line">a.Real().SetData(rdata, <span class="number">4</span>);</span><br><span class="line">a.Imag().SetData(idata, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// get back from MATLAB</span></span><br><span class="line"><span class="keyword">double</span> rbuffer[<span class="number">4</span>];</span><br><span class="line"><span class="keyword">double</span> ibuffer[<span class="number">4</span>];</span><br><span class="line">a.Real().GetData(rbuffer,<span class="number">4</span>);</span><br><span class="line">a.Imag().GetData(ibuffer,<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/coding/" rel="tag"><i class="fa fa-tag"></i> coding</a>
+              <a href="/tags/mixed-programming/" rel="tag"><i class="fa fa-tag"></i> mixed_programming</a>
+              <a href="/tags/matlab/" rel="tag"><i class="fa fa-tag"></i> matlab</a>
+              <a href="/tags/c/" rel="tag"><i class="fa fa-tag"></i> c++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2012/04/06/DOS-sumup/" rel="prev" title="DOS sumup">
+      <i class="fa fa-chevron-left"></i> DOS sumup
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2012/06/13/fwrite-fread-for-different-data-types/" rel="next" title="fwrite/fread for different data types">
+      fwrite/fread for different data types <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pre-work"><span class="nav-number">1.</span> <span class="nav-text">Pre-work:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deploy-in-MATLAB"><span class="nav-number">2.</span> <span class="nav-text">Deploy in MATLAB:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-client-PC"><span class="nav-number">3.</span> <span class="nav-text">Setup client PC:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Call-in-VC"><span class="nav-number">4.</span> <span class="nav-text">Call in VC++:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Other-Remarks"><span class="nav-number">5.</span> <span class="nav-text">Other Remarks:</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yongtao Hu"
+      src="/images/icon.png">
+  <p class="site-author-name" itemprop="name">Yongtao Hu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yongtao Hu</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-tommyhu.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog-tommyhu.github.io/2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/";
+    this.page.identifier = "2012/04/29/MATLAB-C-Mixed-Programming-distribute-MATLAB-code-into-independent-C-shared-library/";
+    this.page.title = "MATLAB/C++ Mixed Programming: distribute MATLAB code into independent C++ shared library";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-tommyhu.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

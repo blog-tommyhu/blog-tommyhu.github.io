@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/icon.png">
+  <link rel="mask-icon" href="/images/icon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Conversion between Image Coordinates and World Coordinates are fundamental to all image formation problems. Always confused to me. Sumup here for further references.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Conversion between image and world coordinates">
+<meta property="og:url" content="https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/index.html">
+<meta property="og:site_name" content="Yongtao Hu&#39;s blog">
+<meta property="og:description" content="Conversion between Image Coordinates and World Coordinates are fundamental to all image formation problems. Always confused to me. Sumup here for further references.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/image2.png">
+<meta property="og:image" content="https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/image55.png">
+<meta property="article:published_time" content="2012-04-06T07:50:15.000Z">
+<meta property="article:modified_time" content="2021-08-12T10:23:13.132Z">
+<meta property="article:author" content="Yongtao Hu">
+<meta property="article:tag" content="conversion">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/image2.png">
+
+<link rel="canonical" href="https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Conversion between image and world coordinates | Yongtao Hu's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yongtao Hu's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon.png">
+      <meta itemprop="name" content="Yongtao Hu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yongtao Hu's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Conversion between image and world coordinates
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2012-04-06 15:50:15" itemprop="dateCreated datePublished" datetime="2012-04-06T15:50:15+08:00">2012-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-12 18:23:13" itemprop="dateModified" datetime="2021-08-12T18:23:13+08:00">2021-08-12</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2012/04/06/Conversion-between-image-and-world-coordinates/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/04/06/Conversion-between-image-and-world-coordinates/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Conversion between Image Coordinates and World Coordinates are fundamental to all image formation problems. Always confused to me. Sumup here for further references.</p>
+<p><img src="/2012/04/06/Conversion-between-image-and-world-coordinates/image2.png" alt=""></p>
+<a id="more"></a>
+<h2 id="Preknowledge-Camera-calibration-information"><a href="#Preknowledge-Camera-calibration-information" class="headerlink" title="Preknowledge: Camera calibration information"></a>Preknowledge: Camera calibration information</h2><p>First we have to know camera calibration information, which is essential for these conversions. These parameters contains (see PETS 2009’s calibration data as an example):</p>
+<p><strong>1. Geometry parameters</strong></p>
+<ul>
+<li>\(w\), \(h\) (image’s width and height)</li>
+<li>\(dpx\), \(dpy\)</li>
+<li>\(dx\), \(dy\)</li>
+<li>\(ncx\)</li>
+<li>\(nfx\)</li>
+</ul>
+<p><strong>2. Intrinsic parameters</strong></p>
+<ul>
+<li>\(f\) (focal length)</li>
+<li>\(sx\)</li>
+<li>\(cx\), \(cy\)</li>
+<li>\(kappa1\)</li>
+</ul>
+<p><strong>3. Extrinsic parameters</strong></p>
+<ul>
+<li>\(rx\), \(ry\), \(rz\)</li>
+<li>\(tx\), \(ty\), \(tz\)</li>
+</ul>
+<p>Based on above parameters, we can get:</p>
+<ol>
+<li><p><strong>Camera transform matrix \(Pc\) (3×4)</strong> that multiplies a scene point expressed as a homogeneous coordinate in \(R^4\) (\(w1(x,y,z,1)\)) to produce an image point expressed as a homogeneous coordinate in \(R^3\) (\(w2(u,v,1)\)).</p>
+<p> NOTE: Traditionally, we can obtain (u,v) by the following formula that is projected from 3D scene point (x,y,z). But we have to concern image distortion problem, thus, in practice, we often do this by 4 steps as shown in following <strong>PART: World coordinates to image coordinates</strong>.</p>
+<script type="math/tex; mode=display">
+     w \begin{pmatrix} u \\\ v \\\ 1 \end{pmatrix}
+     = Pc \cdot \lambda \begin{pmatrix} x \\\ y \\\ z \\\ 1 \end{pmatrix}
+     = \begin{pmatrix} R11 & R12 & R13 & R14 \\\  R21 & R22 & R23 & R24 \\\  R31 & R32 & R33 & R34 \end{pmatrix} \cdot \lambda \begin{pmatrix} x \\\ y \\\ z \\\ 1 \end{pmatrix}</script><p> , where</p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         R11 &= cb \cdot cg \\\
+         R12 &= cg \cdot sa \cdot sb - ca \cdot sg \\\
+         R13 &= sa \cdot sg + ca \cdot cg \cdot sb \\\
+         R14 &= tx \\\
+         R21 &= cb \cdot sg \\\
+         R22 &= sa \cdot sb \cdot sg + ca \cdot cg \\\
+         R23 &= ca \cdot sb \cdot sg - cg \cdot sa \\\
+         R24 &= ty \\\
+         R31 &= -sb \\\
+         R32 &= cb \cdot sa \\\
+         R33 &= ca \cdot cb \\\
+         R34 &= tz \\\
+         sa &= \sin(rx) \\\
+         ca &= \cos(rx) \\\
+         sb &= \sin(ry) \\\
+         cb &= \cos(ry) \\\
+         sg &= \sin(rz) \\\
+         cg &= \cos(rz)
+     \end{array} \end{cases}</script></li>
+<li><p><strong>Camera position (\(C<em>{posx}\), \(C</em>{posy}\), \(C_{posz}\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         Cposx &= -( tx \cdot R11 + ty \cdot R21 + tz \cdot R31 ) \\\
+         Cposy &= -( tx \cdot R12 + ty \cdot R22 + tz \cdot R32 ) \\\
+         Cposz &= -( tx \cdot R13 + ty \cdot R23 + tz \cdot R33 )
+     \end{array} \end{cases}</script></li>
+</ol>
+<h2 id="World-coordinates-to-image-coordinates-3D-gt-2D-i-e-x-y-z-gt-u-v"><a href="#World-coordinates-to-image-coordinates-3D-gt-2D-i-e-x-y-z-gt-u-v" class="headerlink" title="World coordinates to image coordinates (\(3D=&gt;2D\), i.e., \((x,y,z)=&gt;(u,v)\))"></a>World coordinates to image coordinates (\(3D=&gt;2D\), i.e., \((x,y,z)=&gt;(u,v)\))</h2><p>Meaning: 3D scene point \((x,y,z) =&gt;\) 2D image pixel \((u,v)\). There need to be 4 steps to do this:</p>
+<ol>
+<li><p><strong>Convert from world coordinates to camera coordinates (\(3D =&gt; 3D\), i.e., \((x,y,z)=&gt;(xc,yc,zc)\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{pmatrix} xc \\\ yc \\\ zc \end{pmatrix}
+     = Pc \cdot \begin{pmatrix} x \\\ y \\\ z \\\ 1 \end{pmatrix}</script></li>
+<li><p><strong>Convert from camera coordinates to undistorted sensor plane coordinates (\(3D=&gt;2D\), i.e., \((xc,yc,zc)=&gt;(xu,yu)\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         xu &= \frac{f \cdot xc}{zc} \\\
+         yu &= \frac{f \cdot yc}{zc}
+     \end{array} \end{cases}</script></li>
+<li><p><strong>Convert from undistorted to distorted sensor plane coordinates (\(2D=&gt;2D\), i.e., \((xu,yu)=&gt;(xd,yd)\))</strong>, reference to the following function in PETS 2009’s calibration pragram:</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">CameraModel::undistortedToDistortedSensorCoord</span> <span class="params">(<span class="keyword">double</span> Xu, <span class="keyword">double</span> Yu, <span class="keyword">double</span>&amp; Xd, <span class="keyword">double</span>&amp; Yd)</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Convert from distorted sensor plane coordinates to image coordinates (\(2D=&gt;2D\), i.e., \((xd,yd)=&gt;(u,v)\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         u &= \frac{xd \cdot sx}{dpx} + cx \\\
+         v &= \frac{yd}{dpy} + cy
+     \end{array} \end{cases}</script></li>
+</ol>
+<h2 id="Image-coordinates-to-world-coordinates-2D-gt-3D-i-e-u-v-gt-x-y-z"><a href="#Image-coordinates-to-world-coordinates-2D-gt-3D-i-e-u-v-gt-x-y-z" class="headerlink" title="Image coordinates to world coordinates (\(2D=&gt;3D\), i.e., \((u,v)=&gt;(x,y,z)\))"></a>Image coordinates to world coordinates (\(2D=&gt;3D\), i.e., \((u,v)=&gt;(x,y,z)\))</h2><p><em>NOTE: If we only have one view, we actually can not get this done unless we also know its z-axis. In this case, please refer to the following function in PETS 2009’s calibration pragram:</em><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">CameraModel::imageToWorld</span><span class="params">(<span class="keyword">double</span> Xi, <span class="keyword">double</span> Yi, <span class="keyword">double</span> Zw, <span class="keyword">double</span>&amp; Xw, <span class="keyword">double</span>&amp; Yw)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>Or we can use multi-views to make this done. The following are the steps given two image coordinates from two different views \((u1,v1)(u2,v2)\), both of them are projected from the same 3D scene point \((x,y,z)\). <strong>In this case, the problem has changed to be 2 \(2D\) pair points (corresponding points) \(=&gt; 3D\), i.e., \((u1,v1)(u2,v2)=&gt;(x,y,z)\).</strong></p>
+<p>The idea is that we anti-project to the \(3D\) space (See following figure, \(C1,C2\) are the camera positions and \(p1=(u1,v1)\), \(p2=(u2,v2))\). We based on line \(R1=C1p1\) and line \(R2=C2p2\). Perfectly, the intersection of \(R1\) and \(R2\) is what we want \(P(x,y,z)\). Unfortunately, \(R1\) and \(R2\) do not in practice intersect, then the idea changes to find midpoint of shortest perpendicular. The following are the steps:<br><img src="/2012/04/06/Conversion-between-image-and-world-coordinates/image55.png" style="width: 400px;"/></p>
+<ol>
+<li><p><strong>Convert from image coordinates to distorted sensor coordinates (\(2D=&gt;2D\), i.e., \((u1,v1)=&gt;(xd1,yd1), (u2,v2)=&gt;(xd2,yd2)\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         xd1 &= dpx \cdot \frac{u1 - cx1}{sx1} \\\
+         yd1 &= dpy \cdot (v1 - cy1) \\\
+         xd2 &= dpx \cdot \frac{u2 - cx2}{sx2} \\\
+         yd2 &= dpy \cdot (v2 - cy2)
+     \end{array} \end{cases}</script></li>
+<li><p><strong>Convert from distorted sensor to undistorted sensor plane coordinates (\(2D=&gt;2D\), i.e., \((xd1,yd1)=&gt;(xu1,yu1), (xd2,yd2)=&gt;(xu2,yu2)\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         xu1 &= xd1 \cdot (1 + kappa11 \cdot (xd1 \cdot xd1 + yd1 \cdot yd1)) \\\
+         yu1 &= yd1 \cdot (1 + kappa11 \cdot (xd1 \cdot xd1 + yd1 \cdot yd1)) \\\
+         xu2 &= xd2 \cdot (1 + kappa12 \cdot (xd2 \cdot xd2 + yd2 \cdot yd2)) \\\
+         yu2 &= yd2 \cdot (1 + kappa12 \cdot (xd2 \cdot xd2 + yd2 \cdot yd2))
+     \end{array} \end{cases}</script></li>
+<li><p><strong>Convert from undistorted sensor plane coordinates to camera coordinates (\(2D=&gt;3D\), i.e., \((xu1,yu1)=&gt;(xc1,yc1,zc1), (xu1,yu1)=&gt;(xc1,yc1,zc1)\)):</strong></p>
+<script type="math/tex; mode=display">
+     \begin{cases} \begin{array}{l l}
+         xc1 &= xu1 \\\
+         yc1 &= yu1 \\\
+         zc1 &= f1 \\\
+         xc2 &= xu2 \\\
+         yc2 &= yu2 \\\
+         zc2 &= f2
+     \end{array} \end{cases}</script><p> NOTE: Here assumed that image plane are between camera position and the scene, if are not, \(zc\) should be set to be \(–f\).</p>
+</li>
+<li><p><strong>Convert from camera coordinates to world coordinates (\(3D=&gt;3D\), i.e., \((xc1,yc1,zc1)=&gt;(x1,y1,z1), (xc2,yc2,zc2)=&gt;(x2,y2,z2)\)):</strong> refer to the following function in PETS 2009’s calibration pragram:</p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">CameraModel::cameraToWorldCoord</span> <span class="params">(<span class="keyword">double</span> xc, <span class="keyword">double</span> yc, <span class="keyword">double</span> zc, <span class="keyword">double</span>&amp; xw, <span class="keyword">double</span>&amp; yw, <span class="keyword">double</span>&amp; zw)</span></span></span><br></pre></td></tr></table></figure></li>
+<li>Compute closest pair points of pair camera rays, say M1M2.</li>
+<li>Return M1M2’s midpoint as result.</li>
+</ol>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li>Multi-Camera Networks: Principles and Applications, H. Aghajan, A. Cavallaro, Elsevier, ISBN: 978-0-12-374633-7, May 2009.</li>
+<li>PETS 2009 Benchmark Data, <a href="http://www.cvg.rdg.ac.uk/PETS2009/a.html" target="_blank" rel="noopener">http://www.cvg.rdg.ac.uk/PETS2009/a.html</a>.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/conversion/" rel="tag"><i class="fa fa-tag"></i> conversion</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2012/01/01/IO-sumup/" rel="prev" title="IO sumup">
+      <i class="fa fa-chevron-left"></i> IO sumup
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2012/04/06/DOS-sumup/" rel="next" title="DOS sumup">
+      DOS sumup <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Preknowledge-Camera-calibration-information"><span class="nav-number">1.</span> <span class="nav-text">Preknowledge: Camera calibration information</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#World-coordinates-to-image-coordinates-3D-gt-2D-i-e-x-y-z-gt-u-v"><span class="nav-number">2.</span> <span class="nav-text">World coordinates to image coordinates (\(3D&#x3D;&gt;2D\), i.e., \((x,y,z)&#x3D;&gt;(u,v)\))</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Image-coordinates-to-world-coordinates-2D-gt-3D-i-e-u-v-gt-x-y-z"><span class="nav-number">3.</span> <span class="nav-text">Image coordinates to world coordinates (\(2D&#x3D;&gt;3D\), i.e., \((u,v)&#x3D;&gt;(x,y,z)\))</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#References"><span class="nav-number">4.</span> <span class="nav-text">References</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yongtao Hu"
+      src="/images/icon.png">
+  <p class="site-author-name" itemprop="name">Yongtao Hu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yongtao Hu</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-tommyhu.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog-tommyhu.github.io/2012/04/06/Conversion-between-image-and-world-coordinates/";
+    this.page.identifier = "2012/04/06/Conversion-between-image-and-world-coordinates/";
+    this.page.title = "Conversion between image and world coordinates";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-tommyhu.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

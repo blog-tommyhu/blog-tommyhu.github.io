@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/icon.png">
+  <link rel="mask-icon" href="/images/icon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="InstallError code: S1023 when trying to install DirectXSolve [1]:  Uninstall Microsoft Visual C++ 2010 x86 Redistributable and Microsoft Visual C++ 2010 x64 Redistributable. Install DirectX again. Sho">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Debugging: errors and fixes">
+<meta property="og:url" content="https://blog-tommyhu.github.io/2012/09/06/Debugging-errors-and-fixes/index.html">
+<meta property="og:site_name" content="Yongtao Hu&#39;s blog">
+<meta property="og:description" content="InstallError code: S1023 when trying to install DirectXSolve [1]:  Uninstall Microsoft Visual C++ 2010 x86 Redistributable and Microsoft Visual C++ 2010 x64 Redistributable. Install DirectX again. Sho">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2012-09-06T07:05:35.000Z">
+<meta property="article:modified_time" content="2021-08-12T11:31:59.651Z">
+<meta property="article:author" content="Yongtao Hu">
+<meta property="article:tag" content="coding">
+<meta property="article:tag" content="debugging">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog-tommyhu.github.io/2012/09/06/Debugging-errors-and-fixes/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Debugging: errors and fixes | Yongtao Hu's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yongtao Hu's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2012/09/06/Debugging-errors-and-fixes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon.png">
+      <meta itemprop="name" content="Yongtao Hu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yongtao Hu's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Debugging: errors and fixes
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2012-09-06 15:05:35" itemprop="dateCreated datePublished" datetime="2012-09-06T15:05:35+08:00">2012-09-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-12 19:31:59" itemprop="dateModified" datetime="2021-08-12T19:31:59+08:00">2021-08-12</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2012/09/06/Debugging-errors-and-fixes/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/09/06/Debugging-errors-and-fixes/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h1><h2 id="Error-code-S1023-when-trying-to-install-DirectX"><a href="#Error-code-S1023-when-trying-to-install-DirectX" class="headerlink" title="Error code: S1023 when trying to install DirectX"></a>Error code: S1023 when trying to install DirectX</h2><p>Solve <a href="http://answers.microsoft.com/en-us/windows/forum/windows_7-windows_programs/error-code-s1023-when-trying-to-install-directx/0aadf7ec-e004-42eb-8a1a-2865ff5b3a37" target="_blank" rel="noopener">[1]</a>:</p>
+<ol>
+<li>Uninstall <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
+<li>Install DirectX again. Should be OK.</li>
+<li>Install back <strong>Microsoft Visual C++ 2010 x86 Redistributable</strong> and <strong>Microsoft Visual C++ 2010 x64 Redistributable</strong>.</li>
+</ol>
+<a id="more"></a>
+<h2 id="Error-Code-S1023-when-trying-to-install-DirectX-SDK-June-2010"><a href="#Error-Code-S1023-when-trying-to-install-DirectX-SDK-June-2010" class="headerlink" title="Error Code: S1023 when trying to install DirectX SDK (June 2010)"></a>Error Code: S1023 when trying to install DirectX SDK (June 2010)</h2><p>cc: <a href="http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx" target="_blank" rel="noopener">http://blogs.msdn.com/b/chuckw/archive/2011/12/09/known-issue-directx-sdk-june-2010-setup-and-the-s1023-error.aspx</a></p>
+<ol>
+<li><p>Remove the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong> from the system (both x86 and x64 if applicable). This can be easily done via a command-line with administrator rights:</p>
+ <figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MsiExec.exe /passive /X&#123;F0C3E5D1-<span class="number">1</span>ADE-<span class="number">321</span>E-<span class="number">8167</span>-<span class="number">68</span>EF0DE699A5&#125;</span><br><span class="line">MsiExec.exe /passive /X&#123;<span class="number">1</span>D8E6291-B0D5-<span class="number">35</span>EC-<span class="number">8441</span>-<span class="number">6616</span>F567A0F7&#125;</span><br></pre></td></tr></table></figure></li>
+<li>Install the DirectX SDK (June 2010).</li>
+<li>Reinstall the <strong>Visual C++ 2010 Redistributable Package version 10.0.40219 (Service Pack 1)</strong>. On an x64 system, you should install both the x86 and x64 versions of the C++ REDIST. Be sure to install the most <a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;id=26999" target="_blank" rel="noopener">current version available</a>.</li>
+</ol>
+<h1 id="Compile"><a href="#Compile" class="headerlink" title="Compile"></a>Compile</h1><h2 id="Can-not-find-dxtrans-h-in-DirectX-programming"><a href="#Can-not-find-dxtrans-h-in-DirectX-programming" class="headerlink" title="Can not find dxtrans.h in DirectX programming"></a>Can not find dxtrans.h in DirectX programming</h2><p>cc: <a href="http://blog.csdn.net/clever101/article/details/5617982" target="_blank" rel="noopener">http://blog.csdn.net/clever101/article/details/5617982</a></p>
+<ol>
+<li>Remove <code>#include &quot;dxtrans.h&quot;</code> where causing errors (e.g. <code>qedit.h</code>).</li>
+<li><p>Add the following macro definition to the beginning of code <code>#include &lt;qedit.h&gt;</code></p>
+ <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtCompositor_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtAlphaSetter_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtJpeg_INTERFACE_DEFINED__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __IDxtKey_INTERFACE_DEFINED__</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="error-C2143-syntax-error-missing-‘-’-before-‘constant’"><a href="#error-C2143-syntax-error-missing-‘-’-before-‘constant’" class="headerlink" title="error C2143: syntax error : missing ‘)’ before ‘constant’"></a>error C2143: syntax error : missing ‘)’ before ‘constant’</h2><p>E.g. after defining a constant: <code>#define A 1</code>, but in program, we mistaken using <code>int A;</code> and so on.</p>
+<p>Solve: use <code>A</code> directly, not <code>int A</code>.</p>
+<h2 id="error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’"><a href="#error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’" class="headerlink" title="error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’"></a>error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’</h2><p>In <code>winnt.h</code>, add the following line</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> POINTER_64 __ptr64</span></span><br></pre></td></tr></table></figure>
+<p>before</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> *PVOID;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> * POINTER_64 PVOID64;</span><br></pre></td></tr></table></figure>
+<h2 id="error-C2471-cannot-update-program-database-—-vc90-pdb"><a href="#error-C2471-cannot-update-program-database-—-vc90-pdb" class="headerlink" title="error C2471: cannot update program database —-vc90.pdb"></a>error C2471: cannot update program database —-vc90.pdb</h2><p><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Disabled&#39;</code>.</p>
+<h2 id="error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’"><a href="#error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’" class="headerlink" title="error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’"></a>error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’</h2><p>Two ways to fix it:</p>
+<ol>
+<li><code>Project –&gt; Properties –&gt; General –&gt; Character Set –&gt; &quot;Use Multi-Byte Character Set&quot;</code>.</li>
+<li>Indicate that the string literal, in this case <code>&quot;Hello world!&quot;</code> is of a specific encoding. This can be done through either prefixing it with <code>L</code>, such as <code>L&quot;Hello world!&quot;</code>, or surrounding it with the generic <code>_T(&quot;Hello world!&quot;)</code> macro. The latter will expand to the L prefix if you are compiling for unicode, and nothing (indicating multi-byte) otherwise.</li>
+</ol>
+<h2 id="error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility"><a href="#error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility" class="headerlink" title="error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)"></a>error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)</h2><p>Based on: <a href="https://svn.boost.org/trac/boost/ticket/4874" target="_blank" rel="noopener">https://svn.boost.org/trac/boost/ticket/4874</a><br>This is a bug of boost library (before version 1_52_0) when using VC2010 in Debug mode (note: the problem also exists in boost-1_52_0 for VC2012 in Debug mode, but still cannot be solved with this method). It can be solved by modifying <code>BOOST_PATH/boost/multi_array/view.hpp</code> to something like</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">multi_array_view&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> multi_array_view&amp; other) &#123;</span><br><span class="line">    <span class="keyword">if</span> (&amp;other != <span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="comment">// make sure the dimensions agree</span></span><br><span class="line">        BOOST_ASSERT(other.num_dimensions() == <span class="keyword">this</span>-&gt;num_dimensions());</span><br><span class="line">        BOOST_ASSERT(<span class="built_in">std</span>::equal(other.shape(),</span><br><span class="line">            other.shape()+<span class="keyword">this</span>-&gt;num_dimensions(),</span><br><span class="line">            <span class="keyword">this</span>-&gt;shape()));</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> _MSC_VER &gt;= 1600</span></span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterThis = begin();</span><br><span class="line">        <span class="keyword">auto</span></span><br><span class="line">            iterOther = other.begin();</span><br><span class="line">        <span class="keyword">for</span> (; iterThis != end(); ++iterThis, ++iterOther)</span><br><span class="line">            *iterThis = *iterOther;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">        <span class="comment">// iterator-based copy</span></span><br><span class="line">        <span class="built_in">std</span>::copy(other.begin(),other.end(),begin());</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged"><a href="#This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged" class="headerlink" title="This source file has changed. It no longer matches the version of the file used to build the application being debugged"></a>This source file has changed. It no longer matches the version of the file used to build the application being debugged</h2><ol>
+<li>Check if code contains illegal characters, e.g. copied from QQ.</li>
+<li>Build your project before you debug.</li>
+</ol>
+<h1 id="Link"><a href="#Link" class="headerlink" title="Link"></a>Link</h1><h2 id="error-LNK1000-Internal-error-during-IncrBuildImage"><a href="#error-LNK1000-Internal-error-during-IncrBuildImage" class="headerlink" title="error LNK1000: Internal error during IncrBuildImage"></a>error LNK1000: Internal error during IncrBuildImage</h2><p>This is common in VS2008, VS2010 fix this. Two ways to fix it:</p>
+<ol>
+<li>Install patch <a href="https://gitlab.com/herohuyongtao/files-public/-/blob/master/files/exe/VS90-KB948127.exe" target="_blank" rel="noopener">VS90-KB948127.exe</a>.   </li>
+<li>Two steps:<ol>
+<li><code>Project –&gt; Properties –&gt; Linker –&gt; General –&gt; Enable Incremental Linking –&gt; &#39;No&#39;</code>.</li>
+<li><code>Project –&gt; Properties –&gt; C/C++ –&gt; General –&gt; Debug Information Format –&gt; &#39;Program Database (/Zi)&#39;</code>.</li>
+</ol>
+</li>
+</ol>
+<h2 id="error-LNK1104-cannot-open-file-‘cxcore-lib’"><a href="#error-LNK1104-cannot-open-file-‘cxcore-lib’" class="headerlink" title="error LNK1104: cannot open file ‘cxcore.lib’"></a>error LNK1104: cannot open file ‘cxcore.lib’</h2><p><code>Project –&gt; Properties –&gt; Configuration properties –&gt; Linker – &gt; Input –&gt; Additional Dependence –&gt;</code> Check whether all libs here are consistent with current PC (e.g. after installing OpenCV2.0, should be cxcore200.lib).</p>
+<h2 id="error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW"><a href="#error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW" class="headerlink" title="error LNK2001: unresolved external symbol __imp___CrtDbgReportW"></a>error LNK2001: unresolved external symbol <code>__imp___CrtDbgReportW</code></h2><p>This will happen when compiling code under <strong>vc10 + Debug</strong>.</p>
+<p>Solve: <code>Project –&gt; Properties –&gt; C/C++ –&gt; Code Generation –&gt; Runtime Library –&gt; Multi-threaded Debug DLL (/MDd)&#39;</code>.</p>
+<h2 id="error-LNK2001-unresolved-external-symbol"><a href="#error-LNK2001-unresolved-external-symbol" class="headerlink" title="error LNK2001: unresolved external symbol"></a>error LNK2001: unresolved external symbol</h2><p>Reason: not use <code>class::</code> before the types/names we defined ourselves.</p>
+<p>Solve: try to add these all <code>class::</code> needed.</p>
+<h1 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h1><h2 id="Entry-Point-Not-Found-in-DLLs"><a href="#Entry-Point-Not-Found-in-DLLs" class="headerlink" title="Entry Point Not Found in DLLs"></a>Entry Point Not Found in DLLs</h2><p>This means the related dlls CAN be found, but the versions (e.g., x64 vs. x86, built by different versions of MSVCs) of the found Dlls are not correct.</p>
+<ul>
+<li>To check which exact dlls are linking, use tools like <a href="https://github.com/lucasg/Dependencies" target="_blank" rel="noopener"><em>Dependencies</em></a> to check (click $    \rhd$ to see nested dependent dlls).</li>
+<li>To resolve this, make sure all the dependent DLLs are all correct.</li>
+</ul>
+<blockquote>
+<p>Note: In some cases, it’s caused by the settings of PATH environment variables, where dlls are found in <em>earlier included paths</em> rather the correct ones. Also keep in mind that System PATH will be included earlier than User PATH.</p>
+</blockquote>
+<h1 id="Misc"><a href="#Misc" class="headerlink" title="Misc."></a>Misc.</h1><h2 id="Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists"><a href="#Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists" class="headerlink" title="Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists"></a>Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists</h2><p>This will happen when you want to create a solution platform for a single project in a big solution, which one of other projects in the solution has already has this solution platform.<br>Solve <a href="http://www.dpvreony.co.uk/blog/post/v/62" target="_blank" rel="noopener">[1]</a>:</p>
+<ol>
+<li>Close Visual Studio</li>
+<li>Find the project’s (the one that you want to create platform) <code>.vcproject</code>  file and open it with e.g. notepad… other than VS.</li>
+<li>Inside the <code>&lt;ItemGroup Label=&quot;ProjectConfigurations&quot;&gt;</code> node you will find a series of Configuration nodes. Copy (and paste underneath) one which has a name attribute beginning with <code>Debug|</code> and replace the text at the end with your desired platform (i.e. Change <code>Debug|Win32</code> to <code>Debug|x64</code>).</li>
+<li>Repeat the above step for a <code>Release</code> configuration.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/coding/" rel="tag"><i class="fa fa-tag"></i> coding</a>
+              <a href="/tags/debugging/" rel="tag"><i class="fa fa-tag"></i> debugging</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2012/09/04/OpenCV-sumup/" rel="prev" title="OpenCV sumup">
+      <i class="fa fa-chevron-left"></i> OpenCV sumup
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2012/12/19/Weird-things-in-programming/" rel="next" title="Weird things in programming">
+      Weird things in programming <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Install"><span class="nav-number">1.</span> <span class="nav-text">Install</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Error-code-S1023-when-trying-to-install-DirectX"><span class="nav-number">1.1.</span> <span class="nav-text">Error code: S1023 when trying to install DirectX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Error-Code-S1023-when-trying-to-install-DirectX-SDK-June-2010"><span class="nav-number">1.2.</span> <span class="nav-text">Error Code: S1023 when trying to install DirectX SDK (June 2010)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Compile"><span class="nav-number">2.</span> <span class="nav-text">Compile</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Can-not-find-dxtrans-h-in-DirectX-programming"><span class="nav-number">2.1.</span> <span class="nav-text">Can not find dxtrans.h in DirectX programming</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-C2143-syntax-error-missing-‘-’-before-‘constant’"><span class="nav-number">2.2.</span> <span class="nav-text">error C2143: syntax error : missing ‘)’ before ‘constant’</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-C2146-syntax-error-missing-‘-’-before-identifier-‘PVOID64’"><span class="nav-number">2.3.</span> <span class="nav-text">error C2146: syntax error : missing ‘;’ before identifier ‘PVOID64’</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-C2471-cannot-update-program-database-—-vc90-pdb"><span class="nav-number">2.4.</span> <span class="nav-text">error C2471: cannot update program database —-vc90.pdb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-C2664-‘CWnd-MessageBoxW’-cannot-convert-parameter-1-from-‘const-char-12-’-to-‘LPCTSTR’"><span class="nav-number">2.5.</span> <span class="nav-text">error C2664: ‘CWnd::MessageBoxW’ : cannot convert parameter 1 from ‘const char [12]’ to ‘LPCTSTR’</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-C2665-‘std-Copy-impl’-none-of-the-2-overloads-could-convert-all-the-argument-types-xutility"><span class="nav-number">2.6.</span> <span class="nav-text">error C2665: ‘std::_Copy_impl’ : none of the 2 overloads could convert all the argument types (xutility)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#This-source-file-has-changed-It-no-longer-matches-the-version-of-the-file-used-to-build-the-application-being-debugged"><span class="nav-number">2.7.</span> <span class="nav-text">This source file has changed. It no longer matches the version of the file used to build the application being debugged</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Link"><span class="nav-number">3.</span> <span class="nav-text">Link</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#error-LNK1000-Internal-error-during-IncrBuildImage"><span class="nav-number">3.1.</span> <span class="nav-text">error LNK1000: Internal error during IncrBuildImage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-LNK1104-cannot-open-file-‘cxcore-lib’"><span class="nav-number">3.2.</span> <span class="nav-text">error LNK1104: cannot open file ‘cxcore.lib’</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-LNK2001-unresolved-external-symbol-imp-CrtDbgReportW"><span class="nav-number">3.3.</span> <span class="nav-text">error LNK2001: unresolved external symbol __imp___CrtDbgReportW</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#error-LNK2001-unresolved-external-symbol"><span class="nav-number">3.4.</span> <span class="nav-text">error LNK2001: unresolved external symbol</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Run"><span class="nav-number">4.</span> <span class="nav-text">Run</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Entry-Point-Not-Found-in-DLLs"><span class="nav-number">4.1.</span> <span class="nav-text">Entry Point Not Found in DLLs</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Misc"><span class="nav-number">5.</span> <span class="nav-text">Misc.</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Visual-Studio-Bug-This-platform-could-not-be-created-because-a-solution-platform-of-the-same-name-already-exists"><span class="nav-number">5.1.</span> <span class="nav-text">Visual Studio Bug: This platform could not be created because a solution platform of the same name already exists</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yongtao Hu"
+      src="/images/icon.png">
+  <p class="site-author-name" itemprop="name">Yongtao Hu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yongtao Hu</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-tommyhu.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog-tommyhu.github.io/2012/09/06/Debugging-errors-and-fixes/";
+    this.page.identifier = "2012/09/06/Debugging-errors-and-fixes/";
+    this.page.title = "Debugging: errors and fixes";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-tommyhu.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

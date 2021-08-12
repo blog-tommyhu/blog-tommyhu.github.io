@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/icon.png">
+  <link rel="mask-icon" href="/images/icon.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog-tommyhu.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="CMakeLists.txt for Lib project:1234567891011121314# add path of headers to include_directoriesinclude_directories(include)# STATIC for static lib, and SHARED for dynamicFILE(GLOB SOURCES	src&#x2F;*.h    sr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CMake sumup">
+<meta property="og:url" content="https://blog-tommyhu.github.io/2014/09/25/CMake-sumup/index.html">
+<meta property="og:site_name" content="Yongtao Hu&#39;s blog">
+<meta property="og:description" content="CMakeLists.txt for Lib project:1234567891011121314# add path of headers to include_directoriesinclude_directories(include)# STATIC for static lib, and SHARED for dynamicFILE(GLOB SOURCES	src&#x2F;*.h    sr">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2014-09-25T04:55:34.000Z">
+<meta property="article:modified_time" content="2021-08-12T10:23:13.128Z">
+<meta property="article:author" content="Yongtao Hu">
+<meta property="article:tag" content="cmake">
+<meta property="article:tag" content="coding">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog-tommyhu.github.io/2014/09/25/CMake-sumup/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>CMake sumup | Yongtao Hu's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yongtao Hu's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://blog-tommyhu.github.io/2014/09/25/CMake-sumup/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon.png">
+      <meta itemprop="name" content="Yongtao Hu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yongtao Hu's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CMake sumup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2014-09-25 12:55:34" itemprop="dateCreated datePublished" datetime="2014-09-25T12:55:34+08:00">2014-09-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-12 18:23:13" itemprop="dateModified" datetime="2021-08-12T18:23:13+08:00">2021-08-12</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2014/09/25/CMake-sumup/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2014/09/25/CMake-sumup/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="CMakeLists-txt-for-Lib-project"><a href="#CMakeLists-txt-for-Lib-project" class="headerlink" title="CMakeLists.txt for Lib project:"></a>CMakeLists.txt for Lib project:</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># add path of headers to include_directories</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># STATIC for static lib, and SHARED for dynamic</span></span><br><span class="line"><span class="keyword">FILE</span>(GLOB SOURCES</span><br><span class="line">	src/*.h</span><br><span class="line">    src/*.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_library</span>(mylib STATIC <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># link libs, list all of them</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(mylib</span><br><span class="line">    -lib-name-.lib</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="CMakeLists-txt-for-EXE-project"><a href="#CMakeLists-txt-for-EXE-project" class="headerlink" title="CMakeLists.txt for EXE project:"></a>CMakeLists.txt for EXE project:</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Set the minimum required version of cmake.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.6</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the entire solution name.</span></span><br><span class="line"><span class="keyword">project</span>(testProject)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add path of headers to include_directories.</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="keyword">include</span>)</span><br><span class="line"><span class="keyword">include_directories</span>(lib/mylib)</span><br><span class="line"><span class="keyword">include_directories</span>(external/-external-lib-/<span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add an executable to the project using the specified source files.</span></span><br><span class="line"><span class="keyword">file</span>(GLOB SOURCES</span><br><span class="line">    src/*.*</span><br><span class="line">	lib/-external-lib-/source/*.h</span><br><span class="line">    lib/-external-lib-/source/*.cpp</span><br><span class="line">    <span class="keyword">test</span>/main.cpp</span><br><span class="line">)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;SOURCES&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add mylib lib project</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(lib/mylib)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> mylib)</span><br><span class="line"></span><br><span class="line"><span class="comment"># add opencv lib</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV <span class="number">2</span> REQUIRED)</span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;OPENCV_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">link_directories</span>(<span class="variable">$&#123;OPENCV_LIBRARY_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;OPENCV_DEFINITIONS&#125;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span><span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="Remarks"><a href="#Remarks" class="headerlink" title="Remarks:"></a>Remarks:</h2><ol>
+<li>For <strong><code>add_executable()</code></strong>: actually there is no need to add headers here, but is essential to load them also in project view.</li>
+<li>To use name that contains spaces, use <code>\</code> before spaces to escape them.</li>
+<li>To group source files in VS (e.g. put given source files into new folder under VS), use<ul>
+<li><code>source_group(&lt;name&gt; FILES &lt;src&gt;...)</code> (use <code>${SOURCES}</code> for  files list defined earlier), or</li>
+<li><code>source_group(&lt;name&gt; REGULAR_EXPRESSION &lt;regex&gt;)</code> (e.g. use <code>.*..*</code> for normal <code>*.*</code>)</li>
+</ul>
+</li>
+<li>Link different libraries for Debug and Release mode: <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">target_link_libraries</span>(testProj</span><br><span class="line">      debug -path-to-debug-lib-/lib_debug.lib</span><br><span class="line">optimized -path-to-release-lib-/lib.lib</span><br><span class="line">  )</span><br></pre></td></tr></table></figure></li>
+<li>CMake for setting highest warning level can be: <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># set highest warnings level, and treat them as errors</span></span><br><span class="line"><span class="keyword">if</span>(MSVC)</span><br><span class="line">    <span class="comment"># c++</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_CXX_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># c</span></span><br><span class="line">    <span class="keyword">if</span>(CMAKE_C_FLAGS <span class="keyword">MATCHES</span> <span class="string">"/W[0-4]"</span>)</span><br><span class="line">        <span class="keyword">string</span>(REGEX REPLACE <span class="string">"/W[0-4]"</span> <span class="string">"/W4 /WX"</span> CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125;"</span>)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; /W4 /WX"</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUCC <span class="keyword">OR</span> CMAKE_COMPILER_IS_GNUCXX)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">elseif</span>(CMAKE_COMPILER_IS_GNUC)</span><br><span class="line">    <span class="keyword">set</span>(CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; -Wall -Werror -Wconversion -Wno-long-long -pedantic"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
+<li>Enable OpenMP: <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># enable openmp</span></span><br><span class="line"><span class="keyword">find_package</span>(OpenMP)</span><br><span class="line"><span class="keyword">if</span> (OPENMP_FOUND)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_C_FLAGS <span class="string">"$&#123;CMAKE_C_FLAGS&#125; $&#123;OpenMP_C_FLAGS&#125;"</span>)</span><br><span class="line">	<span class="keyword">set</span> (CMAKE_CXX_FLAGS <span class="string">"$&#123;CMAKE_CXX_FLAGS&#125; $&#123;OpenMP_CXX_FLAGS&#125;"</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure></li>
+<li>for copying all needed data files to binary dir (when <code>cmake</code>), there are two ways:<ul>
+<li>List all the files, e.g.,  <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data/*.*</span><br><span class="line">	lib/-external-lib-/models/*.dat</span><br><span class="line">	lib/-matlab-/*.m</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure></li>
+<li>List only the folders that contain the data, e.g.,  <figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">file</span>(GLOB files_needed</span><br><span class="line">	<span class="keyword">test</span>/<span class="keyword">test</span>-data</span><br><span class="line">	lib/-external-lib-/models</span><br><span class="line">	lib/-matlab-</span><br><span class="line">)</span><br><span class="line"><span class="keyword">file</span>(COPY <span class="variable">$&#123;files_needed&#125;</span> DESTINATION <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>)</span><br></pre></td></tr></table></figure>
+The difference is that: the first method <strong>only copy the listed files</strong> to the binary dir <strong>without directory structure</strong>, while the second will <strong>copy all the files in these folders</strong>, as well as <strong>with directory structure</strong> (only the least parent will retain), i.e. there will be three folders named <code>test-data</code>, <code>models</code> and <code>-matlab-</code> in the binary dir after copying.</li>
+</ul>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/cmake/" rel="tag"><i class="fa fa-tag"></i> cmake</a>
+              <a href="/tags/coding/" rel="tag"><i class="fa fa-tag"></i> coding</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2014/04/13/Good-refs-on-Stack-Overflow/" rel="prev" title="Good refs on Stack Overflow">
+      <i class="fa fa-chevron-left"></i> Good refs on Stack Overflow
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2014/12/08/Handle-Chinese-bookmarks-in-Latex/" rel="next" title="Handle Chinese bookmarks in Latex">
+      Handle Chinese bookmarks in Latex <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CMakeLists-txt-for-Lib-project"><span class="nav-number">1.</span> <span class="nav-text">CMakeLists.txt for Lib project:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CMakeLists-txt-for-EXE-project"><span class="nav-number">2.</span> <span class="nav-text">CMakeLists.txt for EXE project:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Remarks"><span class="nav-number">3.</span> <span class="nav-text">Remarks:</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yongtao Hu"
+      src="/images/icon.png">
+  <p class="site-author-name" itemprop="name">Yongtao Hu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yongtao Hu</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://blog-tommyhu.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://blog-tommyhu.github.io/2014/09/25/CMake-sumup/";
+    this.page.identifier = "2014/09/25/CMake-sumup/";
+    this.page.title = "CMake sumup";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://blog-tommyhu.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
